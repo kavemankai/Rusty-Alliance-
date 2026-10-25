@@ -74,3 +74,6 @@ Night visibility and constructed torches affect perception. Enemy reports have l
 ## Android 0.11.0 and audit
 
 Native tap/drag/pinch/pan, cancellation and pause cleanup, safe-area margins and scrollable button panels are verified on the documented Android emulator. See ANDROID_QA.md for repeatable OS-input tests. SOURCE_AUDIT.md and CONTRACT_ACCEPTANCE.md distinguish verified relationships, deliberate replacements and remaining mandatory/physical/commercial gates. Full production-foundation completion is not claimed.
+
+
+Future production art/audio/content planning is in [ASSET_LIST.md](ASSET_LIST.md). It is an estimated inventory for a finished release, separate from the current primitives-only milestone; no final asset production is implied.
