@@ -12,7 +12,11 @@ Run `godot --headless --script tests/run.gd`. A structured report is written to 
 | 6 Logistics | Food consumption, starvation penalty, midnight wage charge, debt morale, medical recovery, training and repairs consume time/resources | Separate squad stores, transport modes |
 | 7 Faction war | Existing groups move; bounded weaker attack loses to persistent levy defence | Broad rival war / reinforcement strategy |
 | 8 Persistent campaign | First battle result → return to market → recruit/resupply/recover → second target and real battle → second contract paid | Larger long-lived campaigns and content |
-| 9 Save/load | Tactical RNG/clock/injuries/loadout persisted; unit references rebound; exact strategic state roundtrip; malformed main recovers backup; missing/unsupported/incomplete saves rejected | Schema migration, arbitrary corrupted nested battle saves |
+| 9 Save/load | Tactical RNG/clock/injuries/loadout persisted; friendly and enemy references rebound; exact strategic state roundtrip; backup recovery; actual schema-1 strategic/tactical/corpse fixtures migrate to schema 2; duplicate ownership and canonical mismatches rejected | Broader malformed-data and OS interruption cases |
 | 10 Extended simulation | Thirty days, exactly 30 midnight ledger wage entries, exact elapsed time, only one recurring hourly event remains | Full faction/encounter campaign soak with player decisions |
 
 The extended clock fixture excludes active armies and employment to isolate event accounting. Combat defence tests sample fixed seeds and compare behaviour rather than claim probability calibration. The 160×160 assertion verifies lightweight logical capacity, not runtime performance at that size.
+
+## Inventory and continuity expansion
+
+tests/continuity_cases.gd adds 55 behavioural checks to the original 87, for 142 total. Coverage includes unique identity, independent durability, displaced backpack gear, carrying weight, equipped-transfer rejection, remote stockpile/squad rejection, adjacent 3-AP combat handover/equip, death and exact ground-item transfer, safe adjacent retreat, persistent enemy casualty/injury/ammunition/position, idempotent faction loss accounting, door and ground state, active enemy rebinding, blocked withdrawal, queued/multi-army contacts, obsolete travel callbacks and previous-release save migration. See tests/fixtures/README.md for fixture provenance. tests/ui_smoke.gd separately performs stockpile collection, character transfer and carried-item equip through visible controls before the campaign battle walkthrough.

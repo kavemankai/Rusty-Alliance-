@@ -22,6 +22,7 @@ var auto_minutes=0
 var timer=0.0
 var last_message=""
 var save_slot="user://campaign.json"
+var inspected_item=""
 var confirm: ConfirmationDialog
 
 func _ready() -> void:
@@ -138,7 +139,10 @@ func rebuild() -> void:
    else: status("Enemy turn resolved")
    refresh())
   button(bar,"Resolve",func():run_command("resolve"))
-  button(bar,"Retreat",func():ask("Withdraw to Ashford? Injuries and losses persist.",func():run_command("retreat")))
+  button(bar,"Retreat",func():
+   var exits=game.retreat_options()
+   var place="no safe exit" if exits.is_empty() else game.s.sectors[exits[0]].name
+   ask("Withdraw to "+place+"? Injuries and losses persist.",func():run_command("retreat")))
   button(bar,"−",func():battle_view.camera.size=clampf(battle_view.camera.size+2,8,32))
   button(bar,"+",func():battle_view.camera.size=clampf(battle_view.camera.size-2,8,32))
  message=label(root,last_message)
@@ -217,7 +221,7 @@ func sector_panel() -> void:
  var cell=game.s.sectors[sector]
  label(side,"%s · %d:%d\n%s · %s\nFacility: %s\nLoyalty %d · Order %d · Levy %d" % [cell.name,cell.x+1,cell.y+1,cell.terrain,cell.owner,cell.facility if cell.facility!="" else "none",cell.loyalty,cell.order,cell.garrison])
  for g in game.s.groups:
-  if g.sector==sector and g.strength>0 and cell.known: label(side,"Known force: %s · %d fighters" % [g.faction,g.strength])
+  if g.sector==sector and game.force_strength(g)>0 and cell.known: label(side,"Known force: %s · %d fighters" % [g.faction,game.force_strength(g)])
  label(side,"SELECT SQUAD")
  for q in game.s.squads.values():
   if q.members.is_empty(): continue
@@ -242,9 +246,12 @@ func company_panel() -> void:
   if m.dead:
    label(side,m.name+" · deceased")
    continue
+  if m.get("captured",false):
+   label(side,m.name+" · captured")
+   continue
   button(side,("● " if selected==m.id else "")+m.name+" · "+m.background,func():selected=m.id;show_panel())
   if selected!=m.id: continue
-  label(side,"HP %d/%d · AP %d · Morale %d\nFatigue %d · Wounds %d · Bleed %d\nSTR %d AGI %d DEX %d END %d\nPER %d WIS %d LEAD %d EXP %d\nMelee %d Ranged %d Medical %d Smith %d\n%s / %s · weight %d\n%d crowns/day" % [m.hp,m.max_hp,Data.ap(m),m.morale,m.fatigue,m.wounds,m.bleeding,m.strength,m.agility,m.dexterity,m.endurance,m.perception,m.wisdom,m.leadership,m.experience,m.melee,m.ranged,m.medical,m.smithing,m.weapon,m.armour,Data.weight(m),m.wage])
+  label(side,"HP %d/%d · AP %d · Morale %d\nFatigue %d · Wounds %d · Bleed %d\nSTR %d AGI %d DEX %d END %d\nPER %d WIS %d LEAD %d EXP %d\nMelee %d Ranged %d Medical %d Smith %d\n%s / %s · weight %d\n%d crowns/day" % [m.hp,m.max_hp,Data.ap(m),m.morale,m.fatigue,m.wounds,m.bleeding,m.strength,m.agility,m.dexterity,m.endurance,m.perception,m.wisdom,m.leadership,m.experience,m.melee,m.ranged,m.medical,m.smithing,Data.weapon(m),Data.armour(m),Data.weight(m),m.wage])
   if not m.hired: button(side,"Hire · %d crowns / 7 days" % m.fee,run_command.bind("hire",{"id":m.id,"squad":squad}))
   else:
    label(side,"Assignment: "+m.assignment)
@@ -259,14 +266,25 @@ func inventory_panel() -> void:
  for m in game.s.mercs.values():
   if m.hired: button(side,("● " if selected==m.id else "")+m.name,func():selected=m.id;show_panel())
  var m=game.s.mercs.get(selected,{})
- if not m.is_empty(): label(side,"%s · %s · ammo %d\nArmour %s · Shield %s\nCondition %d%% · Carried %s" % [m.name,m.weapon,m.ammo,m.armour,str(m.shield),m.condition,str(m.inventory)])
- if m.get("shield",false): button(side,"Remove shield to stash",run_command.bind("unequip_shield",{"id":selected}))
- label(side,"COMPANY STASH")
- var seen=[]
+ if not m.is_empty():
+  label(side,"%s · %s · ammo %d\nArmour %s · Shield %s\nWeapon condition %d%% · carried weight %d\nEquipment changes cost 3 AP in battle." % [m.name,Data.weapon(m),Data.ammo(m),Data.armour(m),str(Data.shield(m)),Data.condition(m),Data.weight(m)])
+  label(side,"CARRIED ITEMS · tap to manage")
+  for entry in m.inventory:
+   var slot=""
+   for key in m.equipment:
+    if m.equipment[key]==entry.id: slot=key
+   button(side,Data.item_label(entry)+(" · "+slot if slot!="" else ""),func():inspected_item=entry.id;show_panel())
+   if inspected_item!=entry.id: continue
+   if slot!="": button(side,"Unequip to backpack",run_command.bind("unequip",{"id":selected,"slot":slot}))
+   elif entry.kind!="ammo": button(side,"Equip carried item",run_command.bind("equip",{"id":selected,"item":entry.id}))
+   if slot=="":
+    button(side,"Deposit at Ashford",run_command.bind("transfer",{"from":selected,"to":"stash","item":entry.id}))
+    for other in game.s.mercs.values():
+     if other.hired and other.id!=selected: button(side,"Give to "+other.name,run_command.bind("transfer",{"from":selected,"to":other.id,"item":entry.id}))
+ label(side,"ASHFORD STOCKPILE · visit to collect")
  for item in game.s.stash:
-  if item in seen: continue
-  seen.append(item)
-  button(side,"Equip "+item+" → "+str(m.get("name","")),run_command.bind("equip",{"id":selected,"item":item}))
+  button(side,"Take "+Data.item_label(item),run_command.bind("transfer",{"from":"stash","to":selected,"item":item.id}))
+  button(side,"Equip "+Data.item_label(item),run_command.bind("equip",{"id":selected,"item":item.id}))
  label(side,"MARKET · visit Ashford")
  for item in ["food","medicine","tools","ammo","shield","helmet","sword","spear","axe","mace","bow","crossbow","mail","plate"]:
   var price=Data.WEAPONS[item].price if Data.WEAPONS.has(item) else (Data.ARMOUR[item].price if Data.ARMOUR.has(item) else {"food":20,"medicine":30,"tools":25,"ammo":15,"shield":65,"helmet":45}[item])
@@ -306,15 +324,18 @@ func tactical_panel() -> void:
   if u.team=="company" and u.person.hp>0: button(side,("● " if selected==u.id else "")+u.person.name+" · %d AP / %d HP" % [u.ap,u.person.hp],func():selected=u.id;target="";destination={};battle_view.selected=selected;refresh())
  var u=b.unit(selected)
  if u==null: return
- label(side,"%s · %s · %s\nAP %d · Fatigue %d · Morale %d\nBleeding %d · %s · Ammo %d" % [u.person.name,u.stance,u.mode,u.ap,u.person.fatigue,u.person.morale,u.person.bleeding,u.person.weapon,u.person.ammo])
+ label(side,"%s · %s · %s\nAP %d · Fatigue %d · Morale %d\nBleeding %d · %s · Ammo %d" % [u.person.name,u.stance,u.mode,u.ap,u.person.fatigue,u.person.morale,u.person.bleeding,Data.weapon(u.person),Data.ammo(u.person)])
  if target!="":
   var enemy=b.unit(target)
-  label(side,"Target %s · HP %d\nRange %d · Hit %d%% · aim %d\nAttack cost %d AP · defence may negate hit" % [enemy.person.name,enemy.person.hp,b.distance(u,enemy),b.hit_chance(u,enemy,aim),aim,Data.WEAPONS[u.person.weapon].ap+aim])
+  label(side,"Target %s · HP %d\nRange %d · Hit %d%% · aim %d\nAttack cost %d AP · defence may negate hit" % [enemy.person.name,enemy.person.hp,b.distance(u,enemy),b.hit_chance(u,enemy,aim),aim,Data.WEAPONS[Data.weapon(u.person)].ap+aim])
   button(side,"Aim + (max 3)",func():aim=(aim+1)%4;show_panel())
   button(side,"Confirm attack",battle_action.bind("attack",{"target":target,"aim":aim}))
  elif not destination.is_empty():
   var route=b.path(u,destination.x,destination.y)
-  label(side,"Tile %d:%d · move cost %d AP\nRemaining %d · %s" % [destination.x,destination.y,route.cost,u.ap-maxi(0,route.cost),str(b.tile(destination.x,destination.y))])
+  var cell=b.tile(destination.x,destination.y)
+  label(side,"Tile %d:%d · move cost %d AP\nRemaining %d · %s\nElevation %d · Cover %d · Concealment %d" % [destination.x,destination.y,route.cost,u.ap-maxi(0,route.cost),cell.kind.capitalize(),cell.elevation,cell.cover,cell.conceal])
+  for placement in b.t.ground:
+   if placement.x==destination.x and placement.y==destination.y: label(side,"Ground: "+Data.item_label(placement.item))
   button(side,"Confirm movement",battle_action.bind("move",destination.duplicate()))
   button(side,"Open / close door · 3 AP",battle_action.bind("door",destination.duplicate()))
  button(side,"Cancel selection",func():target="";destination={};battle_view.preview=[];refresh())

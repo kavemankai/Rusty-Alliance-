@@ -41,7 +41,7 @@ func _draw() -> void:
     draw_line(prev,next,Color("ffdd88"),2)
     prev=next
  for g in campaign.s.groups:
-  if g.strength>0 and campaign.s.sectors[g.sector].known:
+  if campaign.force_strength(g)>0 and campaign.s.sectors[g.sector].known:
    var center=offset+Vector2(int(g.sector)%16+0.78,int(g.sector/16)+0.25)*cell
    draw_circle(center,4*zoom,Color("ff8d7f"))
 

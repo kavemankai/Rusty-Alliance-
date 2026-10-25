@@ -31,14 +31,72 @@ static func person(id: String, title: String, background: String, weapon: String
  var p = {"id":id,"name":title,"background":background,"strength":65,"agility":65,"dexterity":65,
  "endurance":65,"perception":65,"wisdom":60,"leadership":45,"melee":58,"ranged":55,"medical":20,
  "smithing":20,"experience":1,"morale":70,"fatigue":0,"hp":75,"max_hp":75,"wounds":0,"bleeding":0,
- "weapon":weapon,"armour":"padded","shield":false,"helmet":false,"ammo":16,"loaded":true,
- "condition":100,"inventory":[weapon,"padded"],"assignment":"rest","hired":false,"dead":false,
+ "loaded":true,"inventory":[item(id+":weapon",weapon),item(id+":body","padded"),item(id+":ammo","ammo",16)],
+ "equipment":{"weapon":id+":weapon","body":id+":body"},"assignment":"rest","hired":false,"dead":false,
  "fee":100,"wage":20,"expires":0,"training":0,"kills":0}
  p.merge(BACKGROUNDS.get(background, {}), true)
  return p
 
 static func weight(p: Dictionary) -> int:
- return WEAPONS[p.weapon].weight + ARMOUR[p.armour].weight + (3 if p.shield else 0) + (2 if p.helmet else 0) + int(ceil(p.ammo / 8.0))
+ var total=0
+ for entry in p.inventory:
+  if WEAPONS.has(entry.kind): total+=WEAPONS[entry.kind].weight
+  elif ARMOUR.has(entry.kind): total+=ARMOUR[entry.kind].weight
+  elif entry.kind=="shield": total+=3
+  elif entry.kind=="helmet": total+=2
+  elif entry.kind=="ammo": total+=int(ceil(entry.quantity/8.0))
+ return total
+
+static func item(id: String, kind: String, quantity: int=1, condition: int=100) -> Dictionary:
+ return {"id":id,"kind":kind,"quantity":quantity,"condition":condition}
+
+static func item_label(entry: Dictionary) -> String:
+ if entry.kind=="ammo": return "Ammunition ×%d" % entry.quantity
+ return "%s · %d%% condition" % [entry.kind.capitalize(),entry.condition]
+
+static func equipped(p: Dictionary,slot: String) -> Dictionary:
+ var id=p.get("equipment",{}).get(slot,"")
+ for entry in p.inventory:
+  if entry.id==id: return entry
+ return {}
+
+static func weapon(p: Dictionary) -> String:
+ return equipped(p,"weapon").get("kind","unarmed")
+
+static func armour(p: Dictionary) -> String:
+ return equipped(p,"body").get("kind","clothing")
+
+static func shield(p: Dictionary) -> bool:
+ return not equipped(p,"shield").is_empty()
+
+static func helmet(p: Dictionary) -> bool:
+ return not equipped(p,"helmet").is_empty()
+
+static func condition(p: Dictionary) -> int:
+ return equipped(p,"weapon").get("condition",100)
+
+static func ammo(p: Dictionary) -> int:
+ var count=0
+ for entry in p.inventory:
+  if entry.kind=="ammo": count+=entry.quantity
+ return count
+
+static func consume_ammo(p: Dictionary) -> void:
+ for entry in p.inventory:
+  if entry.kind=="ammo" and entry.quantity>0:
+   entry.quantity-=1
+   if entry.quantity==0: p.inventory.erase(entry)
+   return
+
+static func hostile(id: String,index: int) -> Dictionary:
+ var p=person(id,"Raider %d" % (index+1),"farmer","spear" if index%2==0 else "bow")
+ p.melee=43
+ p.ranged=40
+ p.hp=48
+ p.max_hp=48
+ equipped(p,"body").kind="clothing"
+ p.morale=50
+ return p
 
 static func ap(p: Dictionary) -> int:
  if p.hp <= 10: return 0

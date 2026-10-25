@@ -17,3 +17,5 @@ Inspection date: 2026-10-25. The reference checkout lives outside this deliverab
 File discovery also located Tactical/PATHAI.C, Tactical/LOS.c, Tactical/opplist.c, Laptop/finances.c and Tactical/Merc Hiring.c. Those subsystems have **not** received a line-by-line parity audit. The original request's broader source study remains incomplete.
 
 All descriptions above are research notes. No original source code, tables, maps, mercenary profiles or assets are incorporated. See MECHANICS_PARITY.md for the deliberately limited fidelity claims.
+
+The schema-2 inventory/continuity update uses original rules: an item has one owner, equipment references owned IDs, hostile individuals remain in persistent groups, local doors/ground placements belong to their sector, and withdrawal chooses a safe adjacent sector. This update does not establish any new numerical JA2 parity claim or import additional reference material.

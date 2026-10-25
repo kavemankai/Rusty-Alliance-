@@ -91,6 +91,14 @@ func redraw() -> void:
    box(geometry,Vector3(c.x,0.3,c.y),Vector3(0.9,0.5,0.4),Color("8a7356"))
  instance.multimesh=multi
  geometry.add_child(instance)
+ var piles={}
+ for placement in battle.t.ground:
+  var key="%d:%d" % [placement.x,placement.y]
+  if not piles.has(key): piles[key]={"x":placement.x,"y":placement.y,"count":0}
+  piles[key].count+=1
+ for pile in piles.values():
+  var height=battle.tile(pile.x,pile.y).elevation*0.5
+  box(geometry,Vector3(pile.x,height+0.2,pile.y),Vector3(0.35,0.25,0.35),Color("e7c969"))
  for u in battle.t.units:
   if u.person.hp<=0: continue
   if u.team!="company" and not battle.known("company",u.id): continue

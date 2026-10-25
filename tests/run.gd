@@ -1,8 +1,28 @@
 extends SceneTree
 const Campaign=preload("res://sim/campaign.gd")
 const Data=preload("res://sim/catalog.gd")
+const Continuity=preload("res://tests/continuity_cases.gd")
 var checks=[]
 var failed=0
+
+func enemy(b):
+ for u in b.t.units:
+  if u.team=="enemy": return u
+ return null
+
+func loadout(p: Dictionary,slot: String,kind: String) -> void:
+ var entry=Data.equipped(p,slot)
+ if entry.is_empty():
+  entry=Data.item(p.id+":fixture_"+slot,kind)
+  p.inventory.append(entry)
+  p.equipment[slot]=entry.id
+ else: entry.kind=kind
+
+func count_kind(entries: Array,kind: String) -> int:
+ var count=0
+ for entry in entries:
+  if entry.kind==kind: count+=1
+ return count
 
 func check(condition: bool,name: String) -> void:
  checks.append({"name":name,"passed":condition})
@@ -28,10 +48,10 @@ func run() -> void:
  check(c.command("hire",{"id":"ada"}) and c.s.funds==1100 and "ada" in c.s.squads.first.members,"Hiring charges fee and adds persistent member")
  check(not c.command("hire",{"id":"ada"}) and c.s.funds==1100,"Duplicate hiring rejected without charge")
  c.s.funds=0
- check(not c.command("buy",{"item":"plate"}) and c.s.stash.count("plate")==0,"Unaffordable purchases rejected")
+ check(not c.command("buy",{"item":"plate"}) and count_kind(c.s.stash,"plate")==0,"Unaffordable purchases rejected")
  c.s.funds=1000
  check(c.command("buy",{"item":"mace"}) and c.s.funds==920,"Market purchases charge original prices")
- check(c.command("equip",{"id":"mara","item":"mace"}) and c.s.mercs.mara.weapon=="mace" and not c.s.stash.has("mace"),"Equipping transfers stash ownership")
+ check(c.command("equip",{"id":"mara","item":"mace"}) and Data.weapon(c.s.mercs.mara)=="mace" and count_kind(c.s.stash,"mace")==0,"Equipping transfers stash ownership")
  check(c.command("split",{"id":"ada"}) and c.s.squads.squad_ada.members==["ada"],"Squad split preserves identity")
  check(c.command("merge",{"from":"squad_ada"}) and c.s.squads.first.members.size()==3,"Co located squad merge")
  var route=c.strategic_path(17,34,c.s.squads.first)
@@ -43,7 +63,7 @@ func run() -> void:
  check(not c.s.encounter.is_empty() and c.s.squads.first.sector==34 and c.s.time<old+600,"Hostile arrival interrupts large time advance")
  check(c.s.food<60,"Travel consumes food through clock")
  c.command("enter")
- check(c.battle!=null and c.battle.unit("mara").person.weapon=="mace","Tactical deployment uses campaign equipment")
+ check(c.battle!=null and Data.weapon(c.battle.unit("mara").person)=="mace","Tactical deployment uses campaign equipment")
  var b=c.battle
  var a=b.unit("mara")
  var base=Data.ap(a.person)
@@ -70,7 +90,7 @@ func run() -> void:
  check(b.action(a.id,"door",{"x":7,"y":6}) and not b.tile(7,6).block,"Door interaction changes logical obstacle")
  check(b.move(a,7,6),"Opened door supports pathfinding")
  check(not b.action(a.id,"door",{"x":7,"y":6}),"Door cannot close on occupied tile")
- var e=b.unit("hostile_0")
+ var e=enemy(b)
  a.x=6
  a.y=3
  e.x=8
@@ -83,11 +103,11 @@ func run() -> void:
  a.y=6
  e.x=8
  e.y=6
- a.person.weapon="spear"
+ loadout(a.person,"weapon","spear")
  b.refresh_knowledge()
  check(b.distance(a,e)==2 and b.known("company",e.id),"Spear reach and knowledge fixture valid")
  check(b.attack(a,e),"Spear attacks at two tile reach")
- a.person.weapon="sword"
+ loadout(a.person,"weapon","sword")
  check(not b.attack(a,e),"Sword cannot attack at spear reach")
  a.x=9
  a.y=3
@@ -97,18 +117,19 @@ func run() -> void:
  var front=b.hit_chance(a,e)
  e.facing=4
  check(front>b.hit_chance(a,e),"Rear attack increases chance")
- a.person.weapon="bow"
+ loadout(a.person,"weapon","bow")
  a.person.loaded=true
- a.person.ammo=8
+ for entry in a.person.inventory:
+  if entry.kind=="ammo": entry.quantity=8
  a.ap=26
  e.x=12
  e.y=3
  b.refresh_knowledge()
  check(b.hit_chance(a,e,3)>b.hit_chance(a,e,0),"Aim changes displayed resolution probability")
- check(b.attack(a,e,1) and a.person.ammo==7 and not a.person.loaded,"Ranged attack consumes ammunition and loaded state")
+ check(b.attack(a,e,1) and Data.ammo(a.person)==7 and not a.person.loaded,"Ranged attack consumes ammunition and loaded state")
  check(not b.attack(a,e),"Unloaded ranged shot rejected")
  check(b.action(a.id,"reload") and a.person.loaded,"Bow reload consumes AP")
- a.person.weapon="crossbow"
+ loadout(a.person,"weapon","crossbow")
  a.person.loaded=false
  a.ap=6
  check(not b.action(a.id,"reload"),"Crossbow reload requires seven AP")
@@ -127,17 +148,17 @@ func run() -> void:
    var trial=fixture(seed_value)
    var tb=trial.battle
    var ta=tb.unit("mara")
-   var td=tb.unit("hostile_0")
+   var td=enemy(tb)
    ta.x=10;ta.y=2;td.x=11;td.y=2
-   ta.ap=26;ta.person.melee=100;ta.person.weapon="sword"
-   td.person.hp=100;td.person.max_hp=100;td.person.armour=armour
-   td.person.shield=false;td.ap=0
+   ta.ap=26;ta.person.melee=100;loadout(ta.person,"weapon","sword")
+   td.person.hp=100;td.person.max_hp=100;loadout(td.person,"body",armour)
+   td.person.equipment.erase("shield");td.ap=0
    tb.refresh_knowledge()
    tb.attack(ta,td)
    if armour=="clothing": naked_damage+=100-td.person.hp
    else: plate_damage+=100-td.person.hp
    if armour=="clothing":
-    td.person.hp=100;td.person.shield=true;td.ap=26;td.facing=4;ta.ap=26
+    td.person.hp=100;loadout(td.person,"shield","shield");td.ap=26;td.facing=4;ta.ap=26
     tb.attack(ta,td)
     if td.ap==24: blocked+=1
  check(blocked>0,"Shield/parry/dodge responses consume defender AP across deterministic seeds")
@@ -177,10 +198,10 @@ func run() -> void:
  check(c.s.funds==money-40,"Midnight wages charged exactly once")
  check(c.s.mercs.mara.hp>50 and c.s.mercs.mara.bleeding==0,"Strategic treatment heals persistent wounds")
  check(c.s.mercs.oswin.melee>58,"Time based training increases skill")
- c.s.mercs.mara.condition=30
+ Data.equipped(c.s.mercs.mara,"weapon").condition=30
  c.command("assignment",{"id":"mara","value":"repair"})
  c.command("advance",{"minutes":60})
- check(c.s.mercs.mara.condition>30 and c.s.tools<12,"Repair consumes tools and restores condition")
+ check(Data.condition(c.s.mercs.mara)>30 and c.s.tools<12,"Repair consumes tools and restores condition")
  # No armies are created during faction actions.
  var groups=c.s.groups.size()
  var location=c.s.groups[0].sector
@@ -264,7 +285,7 @@ func run() -> void:
  check(c.s.sectors[0].known,"Scouting reveals sectors through assignment time")
  var expires=c.s.mercs.mara.expires
  check(c.command("renew",{"id":"mara"}) and c.s.mercs.mara.expires==expires+10080,"Renewal extends actual employment contract")
- check(c.command("unequip_shield",{"id":"mara"}) and not c.s.mercs.mara.shield and c.s.stash.has("shield"),"Removing shield transfers ownership back to stash")
+ check(c.command("unequip_shield",{"id":"mara"}) and not Data.shield(c.s.mercs.mara) and count_kind(c.s.mercs.mara.inventory,"shield")==1,"Removing shield keeps item in backpack")
  c.s.sectors[17].order=60
  c.command("assignment",{"id":"mara","value":"guard"})
  c.command("advance",{"minutes":60})
@@ -282,7 +303,7 @@ func run() -> void:
  restored.load_from("user://roundtrip.json")
  check(JSON.stringify(restored.s)==JSON.stringify(c.s),"Full strategic save roundtrip preserves exact canonical state")
  var invalid=c.s.duplicate(true)
- invalid.mercs.mara.erase("weapon")
+ invalid.mercs.mara.erase("equipment")
  check(not c.valid_save(invalid),"Structurally incomplete character save rejected")
  invalid=c.s.duplicate(true)
  invalid.version=99
@@ -294,8 +315,8 @@ func run() -> void:
  check(b.path(a,8,3).cost>4,"Diagonal path cannot cut through a wall corner")
  a.x=9;a.y=9
  check(b.path(a,10,9).cost==5,"Climbing onto hill pays terrain plus elevation cost")
- e=b.unit("hostile_0")
- a.x=4;a.y=3;a.person.weapon="bow"
+ e=enemy(b)
+ a.x=4;a.y=3;loadout(a.person,"weapon","bow")
  e.x=5;e.y=3
  var with_cover=b.hit_chance(a,e)
  b.tile(5,3).cover=0
@@ -313,10 +334,10 @@ func run() -> void:
   var trial=fixture(seed_value)
   var tb=trial.battle
   var ta=tb.unit("mara")
-  var td=tb.unit("hostile_0")
+  var td=enemy(tb)
   ta.x=10;ta.y=2;td.x=11;td.y=2
   ta.ap=26;ta.person.fatigue=9;td.ap=0
-  td.person.hp=100;td.person.max_hp=100;td.person.armour="clothing"
+  td.person.hp=100;td.person.max_hp=100;loadout(td.person,"body","clothing")
   tb.refresh_knowledge()
   var chance=tb.hit_chance(ta,td)
   var expected_roll=(seed_value*48271)%2147483647%100
@@ -329,7 +350,7 @@ func run() -> void:
  c.s.sectors[33].owner="bandits"
  c.s.sectors[17].garrison=3
  c.faction_tick()
- check(c.s.sectors[17].owner=="company" and c.s.groups[0].strength==0,"Persistent levies defeat weaker strategic attack")
+ check(c.s.sectors[17].owner=="company" and c.force_strength(c.s.groups[0])==0,"Persistent levies defeat weaker strategic attack")
  c=Campaign.new()
  c.s.groups=[]
  c.s.funds=0
@@ -345,6 +366,7 @@ func run() -> void:
  c=fixture()
  c.battle.build_map(160,160)
  check(c.battle.t.tiles.size()==25600,"160 by 160 tactical grid supported as lightweight data")
+ Continuity.run(self)
  var results={"checks":checks,"passed":checks.size()-failed,"failed":failed,"contract_rounds":rounds,"engine":Engine.get_version_info().string}
  var f=FileAccess.open("res://test-results.json",FileAccess.WRITE)
  f.store_string(JSON.stringify(results,"  "))

@@ -11,3 +11,5 @@ https://github.com/godotengine/godot/blob/4.6.2-stable/platform/android/export/e
 It identified the Android texture-import setting behind a blank export-validation failure. This code was not copied into game rules.
 
 Source ownership/licensing for the newly authored game remains with the applicable project owner; no open-source licence has been invented or granted by this delivery.
+
+Schema-1 regression save fixtures were generated from this project's own previous commit cbffb36. They contain the fictional Marches world/characters, not JA2 source, campaign data or assets.

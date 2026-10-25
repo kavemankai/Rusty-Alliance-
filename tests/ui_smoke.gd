@@ -60,6 +60,22 @@ func run() -> void:
  await click("Ada · physician")
  await click("Hire · 100 crowns / 7 days")
  if not app.game.s.mercs.ada.hired: failures.append("Recruitment UI did not hire Ada")
+ await click("Inventory")
+ await click("Mara")
+ var spare_sword={}
+ for entry in app.game.s.stash:
+  if entry.kind=="sword": spare_sword=entry;break
+ await click("Take Sword · 100% condition")
+ await click("Sword · 100% condition")
+ await click("Give to Ada")
+ await click("Ada")
+ await click("Sword · 100% condition")
+ await click("Equip carried item")
+ if app.Data.equipped(app.game.s.mercs.ada,"weapon").get("id","")!=spare_sword.id: failures.append("Item UI did not transfer and equip the same sword")
+ await capture("inventory-preview.png")
+ await click("Spear · 100% condition")
+ await click("Equip carried item")
+ if app.Data.weapon(app.game.s.mercs.ada)!="spear": failures.append("Inventory UI did not restore carried spear")
  await click("Contracts")
  await click("Accept Clear Redbank")
  if app.game.s.jobs[0].status!="active": failures.append("Contract UI did not accept")
@@ -102,8 +118,8 @@ func run() -> void:
      for other in b.t.units:
       if other.team!="company" and other.person.hp>10 and b.known("company",other.id): candidates.append(other)
      candidates.sort_custom(func(a,z):return b.distance(fighter,a)<b.distance(fighter,z))
-     var weapon=app.Data.WEAPONS[fighter.person.weapon]
-     if weapon.reach==0 and not fighter.person.loaded and fighter.ap>=weapon.reload and fighter.person.ammo>0:
+     var weapon=app.Data.WEAPONS[app.Data.weapon(fighter.person)]
+     if weapon.reach==0 and not fighter.person.loaded and fighter.ap>=weapon.reload and app.Data.ammo(fighter.person)>0:
       await click("Reload")
       continue
      var enemy=candidates[0] if not candidates.is_empty() else null
@@ -137,7 +153,7 @@ func run() -> void:
    await click("Save")
    await click("Load")
    if app.game.s.sectors[34].owner!="company": failures.append("UI victory did not persist")
- var result={"failed":failures.size(),"failures":failures,"scope":"Desktop normal controls: recruit, contract, route, battle, payment, active-battle and post-victory save/load"}
+ var result={"failed":failures.size(),"failures":failures,"scope":"Desktop controls: recruit, take item, transfer to another fighter, equip carried gear, contract, route, battle, payment, active-battle and post-victory save/load"}
  var report=FileAccess.open("res://ui-test-results.json",FileAccess.WRITE)
  report.store_string(JSON.stringify(result,"  "))
  report.close()

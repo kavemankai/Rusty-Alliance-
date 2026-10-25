@@ -10,6 +10,8 @@
 | Armour and medical recovery | ADAPTED | Original damage-type reductions, wounds, bleeding, timed care |
 | Militia → levies | ADAPTED | Persistent recruitment, upkeep, training and abstract strategic defence |
 | Economy and facilities | ADAPTED | Original farms/mines/markets/workshops/training effects |
+| Persistent equipment ownership | PRESERVED concept, original implementation | Unique item IDs, per-item durability, inventory ownership and equipment references |
+| Retreat and local continuity | ADAPTED | Safe adjacent sectors, persistent hostile rosters and battlefield/loot state |
 | Shield/parry/dodge, reach, rear attack | ORIGINAL | AP-funded defence and original medieval positioning rules |
 | Melee disengagement and guard reactions | ORIGINAL | Reserved AP, legal perception, same attack validation |
 | Original Marches geography and people | ORIGINAL | Deterministic generated terrain and authored original fixtures |
