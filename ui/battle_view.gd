@@ -12,6 +12,9 @@ var pressed=false
 var dragged=false
 var down=Vector2.ZERO
 var fingers={}
+var terrain_stamp=0
+var floor_multi: MultiMesh
+var marked_cells=[]
 
 func _ready() -> void:
  stretch=true
@@ -60,58 +63,67 @@ func box(parent: Node3D,pos: Vector3,dimensions: Vector3,color: Color) -> MeshIn
 
 func redraw() -> void:
  if world==null or battle==null: return
- if geometry!=null:
-  world.remove_child(geometry)
-  geometry.queue_free()
- geometry=Node3D.new()
- world.add_child(geometry)
- # One MultiMesh draws the tile grid; logical cells never own nodes or bodies.
- var instance=MultiMeshInstance3D.new()
- var multi=MultiMesh.new()
- multi.transform_format=MultiMesh.TRANSFORM_3D
- multi.use_colors=true
- var cube=BoxMesh.new()
- cube.size=Vector3(0.94,0.12,0.94)
- var mat=material(Color.WHITE)
- mat.vertex_color_use_as_albedo=true
- cube.material=mat
- multi.mesh=cube
- multi.instance_count=battle.t.tiles.size()
  var chosen=battle.unit(selected)
  var cutaways={}
  for fighter in battle.t.units:
   if fighter.team=="company" or battle.known("company",fighter.id):
    var occupied=battle.Visibility.cell(battle,fighter.x,fighter.y)
    if occupied.has("room"): cutaways[occupied.room]=true
- var surfaces={"road":"77664b","floor":"777773","crop":"8b8143","quarry":"626971","mud":"55483b"}
- var obstacles={"palisade":"806044","rock":"656c75","tree":"344a36"}
- for i in range(battle.t.tiles.size()):
-  var actual=battle.t.tiles[i]
-  var level=battle.Visibility.level(battle,actual.x,actual.y)
-  var c=battle.Visibility.cell(battle,actual.x,actual.y)
-  var color=Color("485546") if int(c.x+c.y)%2==0 else Color("404d3f")
-  if surfaces.has(c.kind): color=Color(surfaces[c.kind])
-  if c.cost>2 and not surfaces.has(c.kind): color=Color("62604a")
-  if c.conceal>0: color=Color("2d523a")
-  if battle.t.phase=="deployment" and battle.deployment_tile(battle.t,c.x,c.y): color=Color("397a58")
-  if battle.t.get("night",false) and not (level==2 and battle.t.get("illumination",{}).get(str(i),0)>0): color=color.darkened(0.35)
-  if level==0: color=Color("11191f")
-  elif level==1: color=color.darkened(0.65)
-  if i in preview and level>0: color=Color("a69745")
-  if chosen!=null and c.x==chosen.x and c.y==chosen.y: color=Color("2898b4")
-  multi.set_instance_transform(i,Transform3D(Basis.IDENTITY,Vector3(c.x,c.elevation*0.5,c.y)))
-  multi.set_instance_color(i,color)
-  if show_roofs and level>0 and c.get("roof",false) and not cutaways.has(c.get("room","")):
-   box(geometry,Vector3(c.x,2.0+c.elevation*0.5,c.y),Vector3(0.96,0.15,0.96),Color("594c3d").darkened(0.4 if level==1 else 0.0))
-  if level>0 and c.get("light",0)>0: box(geometry,Vector3(c.x,0.6,c.y),Vector3(0.15,1.0,0.15),Color("ffd16d"))
-  if c.block and level>0:
-   var obstacle=Color(obstacles.get(c.kind,"8c8170")) if not c.door else Color("8e663f")
-   var structure=box(geometry,Vector3(c.x,0.65+c.elevation*0.5,c.y),Vector3(0.85,1.25 if c.kind!="window" else 0.5,0.85),obstacle.darkened(0.65) if level==1 else obstacle)
-   structure.set_meta("terrain_cell",i)
-  elif c.cover>0 and level>0:
-   box(geometry,Vector3(c.x,0.3+c.elevation*0.5,c.y),Vector3(0.9,0.5,1.1 if c.kind=="tent" else 0.4),Color("8a7356").darkened(0.65) if level==1 else Color("8a7356"))
- instance.multimesh=multi
- geometry.add_child(instance)
+ var stamp=[battle.get_instance_id(),battle.t.tiles.hash(),battle.t.get("fog",{}).get("company",{}).hash(),battle.t.get("sight",{}).get("company",{}).hash(),battle.t.phase,battle.t.get("night",false),battle.t.get("illumination",{}).hash(),show_roofs,cutaways].hash()
+ var multi: MultiMesh
+ var instance: MultiMeshInstance3D
+ var rebuild=geometry==null or stamp!=terrain_stamp
+ if rebuild:
+  if geometry!=null:
+   world.remove_child(geometry)
+   geometry.queue_free()
+  geometry=Node3D.new()
+  world.add_child(geometry)
+  # One MultiMesh draws the tile grid; logical cells never own nodes or bodies.
+  instance=MultiMeshInstance3D.new()
+  multi=MultiMesh.new()
+  multi.transform_format=MultiMesh.TRANSFORM_3D
+  multi.use_colors=true
+  var cube=BoxMesh.new()
+  cube.size=Vector3(0.94,0.12,0.94)
+  var mat=material(Color.WHITE)
+  mat.vertex_color_use_as_albedo=true
+  cube.material=mat
+  multi.mesh=cube
+  multi.instance_count=battle.t.tiles.size()
+  floor_multi=multi
+  terrain_stamp=stamp
+  var obstacles={"palisade":"806044","rock":"656c75","tree":"344a36"}
+  for i in range(battle.t.tiles.size()):
+   var actual=battle.t.tiles[i]
+   var level=battle.Visibility.level(battle,actual.x,actual.y)
+   var c=battle.Visibility.cell(battle,actual.x,actual.y)
+   var color=paint_cell(c,level,i,chosen)
+   multi.set_instance_transform(i,Transform3D(Basis.IDENTITY,Vector3(c.x,c.elevation*0.5,c.y)))
+   multi.set_instance_color(i,color)
+   if show_roofs and level>0 and c.get("roof",false) and not cutaways.has(c.get("room","")):
+    box(geometry,Vector3(c.x,2.0+c.elevation*0.5,c.y),Vector3(0.96,0.15,0.96),Color("594c3d").darkened(0.4 if level==1 else 0.0))
+   if level>0 and c.get("light",0)>0: box(geometry,Vector3(c.x,0.6,c.y),Vector3(0.15,1.0,0.15),Color("ffd16d"))
+   if c.block and level>0:
+    var obstacle=Color(obstacles.get(c.kind,"8c8170")) if not c.door else Color("8e663f")
+    var structure=box(geometry,Vector3(c.x,0.65+c.elevation*0.5,c.y),Vector3(0.85,1.25 if c.kind!="window" else 0.5,0.85),obstacle.darkened(0.65) if level==1 else obstacle)
+    structure.set_meta("terrain_cell",i)
+   elif c.cover>0 and level>0:
+    box(geometry,Vector3(c.x,0.3+c.elevation*0.5,c.y),Vector3(0.9,0.5,1.1 if c.kind=="tent" else 0.4),Color("8a7356").darkened(0.65) if level==1 else Color("8a7356"))
+  instance.multimesh=multi
+  geometry.add_child(instance)
+ else:
+  for child in geometry.get_children():
+   if child.has_meta("dynamic"):
+    geometry.remove_child(child);child.queue_free()
+ # Only changed selection/route colours need uploading when terrain/fog is unchanged.
+ var dirty=marked_cells.duplicate()
+ marked_cells=preview.duplicate()
+ if chosen!=null: marked_cells.append(int(chosen.y)*int(battle.t.width)+int(chosen.x))
+ dirty.append_array(marked_cells)
+ for i in dirty:
+  if i>=0 and i<battle.t.tiles.size(): floor_multi.set_instance_color(i,tile_color(i,chosen))
+ var static_count=geometry.get_child_count()
  var piles={}
  for placement in battle.t.ground:
   if battle.Visibility.level(battle,placement.x,placement.y)!=2: continue
@@ -143,6 +155,28 @@ func redraw() -> void:
   geometry.add_child(label)
   var angle=u.facing*PI/4
   box(geometry,Vector3(u.x+cos(angle)*0.32,elevation+0.8,u.y+sin(angle)*0.32),Vector3(0.13,0.15,0.13),Color("ffe2a0"))
+
+ for i in range(static_count,geometry.get_child_count()): geometry.get_child(i).set_meta("dynamic",true)
+
+func tile_color(i: int,chosen) -> Color:
+ var actual=battle.t.tiles[i]
+ var level=battle.Visibility.level(battle,actual.x,actual.y)
+ var c=battle.Visibility.cell(battle,actual.x,actual.y)
+ return paint_cell(c,level,i,chosen)
+
+func paint_cell(c: Dictionary,level: int,i: int,chosen) -> Color:
+ var surfaces={"road":"77664b","floor":"777773","crop":"8b8143","quarry":"626971","mud":"55483b"}
+ var color=Color("485546") if int(c.x+c.y)%2==0 else Color("404d3f")
+ if surfaces.has(c.kind): color=Color(surfaces[c.kind])
+ if c.cost>2 and not surfaces.has(c.kind): color=Color("62604a")
+ if c.conceal>0: color=Color("2d523a")
+ if battle.t.phase=="deployment" and battle.deployment_tile(battle.t,c.x,c.y): color=Color("397a58")
+ if battle.t.get("night",false) and not (level==2 and battle.t.get("illumination",{}).get(str(i),0)>0): color=color.darkened(0.35)
+ if level==0: color=Color("11191f")
+ elif level==1: color=color.darkened(0.65)
+ if i in preview and level>0: color=Color("a69745")
+ if chosen!=null and c.x==chosen.x and c.y==chosen.y: color=Color("2898b4")
+ return color
 
 func pick(point: Vector2) -> void:
  var screen=point*Vector2(viewport.size)/size

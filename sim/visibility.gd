@@ -10,8 +10,8 @@ static func reveal(b,team: String,cell: Dictionary) -> void:
  if b.t.fog[team].get(key,{})!=cell: b.t.fog[team][key]=cell.duplicate(true)
 
 static func refresh(b) -> void:
- b.lighting()
  var terrain_hash=b.t.tiles.hash()
+ b.lighting(terrain_hash)
  var signature=[b.t.get("night",false),b.t.get("active_entry","west"),b.t.phase,b.t.width,b.t.height,terrain_hash]
  for u in b.t.units: signature.append([u.id,u.x,u.y,u.facing,u.person.hp,u.person.perception])
  var stamp=signature.hash()

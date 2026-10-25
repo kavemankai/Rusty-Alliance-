@@ -1,4 +1,8 @@
 extends RefCounted
+const Records=preload("res://sim/records.gd")
+const SaveGuard=preload("res://sim/save_guard.gd")
+var save_fault="" # Per-instance fault injection for recovery verification.
+var recovery_source=""
 const Strategy=preload("res://sim/strategy.gd")
 const Operations=preload("res://sim/operations.gd")
 const Data = preload("res://sim/catalog.gd")
@@ -69,10 +73,10 @@ func note(message: String) -> void:
 
 func record(amount: int, reason: String) -> void:
  s.funds += amount
- s.ledger.append({"time":s.time,"amount":amount,"reason":reason,"balance":s.funds})
+ s.ledger.append(Records.Transaction.new(s.time,amount,reason,s.funds).pack())
 
 func schedule(at: int, kind: String, payload: Dictionary) -> void:
- s.events.append({"id":s.next_event,"at":at,"kind":kind,"payload":payload})
+ s.events.append(Records.Event.new(s.next_event,at,kind,payload).pack())
  s.next_event += 1
  s.events.sort_custom(func(a,b): return a.at < b.at or (a.at == b.at and a.id < b.id))
 
@@ -147,6 +151,10 @@ func command(kind: String, p: Dictionary = {}) -> bool:
    if not p.value in ["rest","medical","training","repair","guard","scout","garrison"]: return reject("Unknown assignment")
    if not s.mercs.has(p.id) or not s.mercs[p.id].hired: return reject("Not employed")
    s.mercs[p.id].assignment = p.value
+   var location=-1
+   for squad in s.squads.values():
+    if p.id in squad.members: location=squad.sector
+   s.mercs[p.id].assignment_record=Records.Assignment.new(p.id,p.value,location,s.time).pack()
   "renew":
    if battle != null: return reject("Resolve battle first")
    var m=s.mercs.get(p.get("id",""),{})
@@ -699,36 +707,55 @@ func resolve_battle(retreat: bool) -> bool:
  save_to(autosave_path)
  return true
 
+func decode_save(raw: String) -> Dictionary:
+ var parser=JSON.new()
+ if parser.parse(raw)!=OK: return {}
+ var parsed=normalize_numbers(parser.data)
+ if not SaveGuard.raw(parsed): return {}
+ var upgraded=Schema.upgrade(parsed)
+ return upgraded if valid_save(upgraded) else {}
+
+func write_verified(path: String,raw: String) -> bool:
+ var f=FileAccess.open(path,FileAccess.WRITE)
+ if f==null: return false
+ f.store_string(raw)
+ f.flush()
+ var code=f.get_error()
+ f.close()
+ return code==OK and not decode_save(FileAccess.get_file_as_string(path)).is_empty()
+
 func save_to(path: String) -> bool:
- if battle != null:
+ if battle!=null:
   s.battle=battle.t
   s.sectors[s.encounter.sector].battlefield=battle.field_state()
- var invalid=Items.ownership_error(s)
- if invalid!="": return reject(invalid)
  if not valid_save(s): return reject("Campaign state is inconsistent; previous save preserved")
- var f = FileAccess.open(path+".tmp",FileAccess.WRITE)
- if f == null: return reject("Cannot write save")
- f.store_string(JSON.stringify(s))
- f.flush()
- f.close()
- var absolute = ProjectSettings.globalize_path(path)
- if FileAccess.file_exists(path):
-  var parser=JSON.new()
-  if parser.parse(FileAccess.get_file_as_string(path))==OK and valid_save(Schema.upgrade(parser.data)):
-   var backup_error = DirAccess.copy_absolute(absolute,absolute+".bak")
-   if backup_error != OK: return reject("Cannot back up save")
- var code = DirAccess.rename_absolute(absolute+".tmp",absolute)
- return true if code == OK else reject("Cannot commit save")
+ var raw=JSON.stringify(s)
+ if save_fault=="partial_write":
+  var partial=FileAccess.open(path+".tmp",FileAccess.WRITE)
+  if partial!=null:
+   partial.store_string(raw.substr(0,int(raw.length()/2)));partial.close()
+  return reject("Interrupted temporary write")
+ if not write_verified(path+".tmp",raw): return reject("Cannot verify temporary save")
+ if save_fault=="after_temp": return reject("Interrupted after temporary write")
+ var absolute=ProjectSettings.globalize_path(path)
+ if FileAccess.file_exists(path) and not decode_save(FileAccess.get_file_as_string(path)).is_empty():
+  if not write_verified(path+".bak.tmp",FileAccess.get_file_as_string(path)): return reject("Cannot verify backup")
+  if save_fault=="backup_write": return reject("Interrupted backup write")
+  if DirAccess.rename_absolute(absolute+".bak.tmp",absolute+".bak")!=OK: return reject("Cannot commit backup")
+ if save_fault=="after_backup": return reject("Interrupted after backup commit")
+ if DirAccess.rename_absolute(absolute+".tmp",absolute)!=OK: return reject("Cannot commit save")
+ return true
 
 func load_from(path: String) -> bool:
- var data = null
- for candidate in [path,path+".bak"]:
+ var data={}
+ recovery_source=""
+ for candidate in [path,path+".bak",path+".tmp",path+".bak.tmp"]:
   if FileAccess.file_exists(candidate):
-   var parser=JSON.new()
-   var parsed=parser.parse(FileAccess.get_file_as_string(candidate))
-   data=Schema.upgrade(normalize_numbers(parser.data)) if parsed==OK else {}
-   if valid_save(data): break
- if not valid_save(data): return reject("Save invalid or unsupported version")
+   data=decode_save(FileAccess.get_file_as_string(candidate))
+   if not data.is_empty():
+    recovery_source=candidate
+    break
+ if data.is_empty(): return reject("Save invalid or unsupported version")
  s=normalize_numbers(data)
  Contracts.normalize(s)
  battle=null
@@ -755,6 +782,7 @@ func load_from(path: String) -> bool:
  return true
 
 func valid_save(data: Variant) -> bool:
+ if not SaveGuard.raw(data) or not SaveGuard.records(data): return false
  if not data is Dictionary: return false
  for key in ["version","sectors","mercs","squads","events","rng","time","battle","encounter","funds","jobs","ledger","stash","groups","factions","log","next_event","result"]:
   if not data.has(key): return false

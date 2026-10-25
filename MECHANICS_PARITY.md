@@ -13,3 +13,8 @@ Exploration-to-combat preserves the relationship between sight/contact and turn-
 Per-team terrain fog, cached remembered geometry and bounded cover/pursuit/support decisions are independently implemented. Personal/public opponent knowledge relationships informed the audit, but the game uses shared team sight, a three-round memory horizon and original cover values. No JA2 AI score, cover formula, numeric table or map data is reproduced.
 
 The production pass uses independent combat styles, wound severity, medicine/repair, ammo typing, transport, prisoner, convoy and strategic-budget rules. Rooms/roofs are single-level primitive geometry, and company-absent army clashes are aggregate rules over real profiles. No new numeric or source-level JA2 parity is claimed.
+
+
+## Save hardening and scale follow-up — 2026-10-26
+
+Phases 7 and 8 add typed event/financial/assignment records, structural preflight before migration, verified temporary/backup commits, process-termination recovery coverage, large-map heap routing, cached selection redraws and six 45-day campaign/replay scenarios. See HARDENING_SCALE.md and the raw profile/extended reports for exact evidence and limitations. The physical Android gate (phase 9) and wider source/parity/release audit (phase 10) remain open. No additional JA2 source was copied or newly audited in this follow-up.

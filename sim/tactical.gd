@@ -180,7 +180,76 @@ func step_cost(u: Dictionary, from: Dictionary, dest: Dictionary,charted: bool=f
  if u.mode=="cautious": cost+=1
  return cost
 
+# Binary min-heap avoids sorting the entire frontier at every expansion.
+func heap_push(heap: Array,entry: Array) -> void:
+ heap.append(entry)
+ var i=heap.size()-1
+ while i>0:
+  var parent=int((i-1)/2)
+  if heap[parent][0]<=entry[0]: break
+  heap[i]=heap[parent];i=parent
+ heap[i]=entry
+
+func heap_pop(heap: Array) -> Array:
+ var result=heap[0]
+ var tail=heap.pop_back()
+ if heap.is_empty(): return result
+ var i=0
+ while i*2+1<heap.size():
+  var child=i*2+1
+  if child+1<heap.size() and heap[child+1][0]<heap[child][0]: child+=1
+  if tail[0]<=heap[child][0]: break
+  heap[i]=heap[child];i=child
+ heap[i]=tail
+ return result
+
 func path(u: Dictionary,x: int,y: int,charted: bool=false) -> Dictionary:
+ # Preserve established equal-cost route choices in authored small encounters.
+ if t.tiles.size()<=512: return path_reference(u,x,y,charted)
+ return path_heap(u,x,y,charted)
+
+func path_heap(u: Dictionary,x: int,y: int,charted: bool=false) -> Dictionary:
+ var goal=Visibility.cell(self,x,y,u.team) if charted else tile(x,y)
+ if goal.is_empty() or goal.block or planned_occupant(u,x,y,charted)!=null: return {"path":[],"cost":-1}
+ var start=int(u.y*t.width+u.x);var end=y*t.width+x
+ if start==end: return {"path":[],"cost":0}
+ var minimum=1000000
+ for actual in t.tiles:
+  var cell=Visibility.cell(self,actual.x,actual.y,u.team) if charted else actual
+  minimum=mini(minimum,int(cell.cost))
+ var orth=minimum;var diagonal=int(ceil(minimum*1.4))
+ var extra=(1 if u.role=="cart" else 0)+(1 if u.stance=="crouch" else (3 if u.stance=="prone" else 0))
+ orth+=extra;diagonal+=extra
+ if u.mode=="run": orth=maxi(1,orth-1);diagonal=maxi(1,diagonal-1)
+ if u.mode=="cautious": orth+=1;diagonal+=1
+ diagonal=mini(diagonal,orth*2)
+ var heap=[];var costs={start:0};var previous={}
+ heap_push(heap,[route_estimate(start,end,orth,diagonal),start,0])
+ while not heap.is_empty():
+  var entry=heap_pop(heap);var pos=entry[1]
+  if entry[2]!=costs[pos]: continue
+  if pos==end:
+   var route=[]
+   while pos!=start:
+    route.push_front(pos);pos=previous[pos]
+   return {"path":route,"cost":costs[end]}
+  var from=Visibility.cell(self,int(pos)%int(t.width),int(pos)/int(t.width),u.team) if charted else t.tiles[pos]
+  for dy in range(-1,2):
+   for dx in range(-1,2):
+    var dest=Visibility.cell(self,from.x+dx,from.y+dy,u.team) if charted else tile(from.x+dx,from.y+dy)
+    var step=step_cost(u,from,dest,charted)
+    if step<0: continue
+    var next=dest.y*t.width+dest.x;var total=costs[pos]+step
+    if not costs.has(next) or total<costs[next]:
+     costs[next]=total;previous[next]=pos
+     heap_push(heap,[total+route_estimate(next,end,orth,diagonal),next,total])
+ return {"path":[],"cost":-1}
+
+func route_estimate(a: int,b: int,orth: int,diagonal: int) -> int:
+ var dx=absi(a%int(t.width)-b%int(t.width));var dy=absi(int(a/t.width)-int(b/t.width))
+ return mini(dx,dy)*diagonal+absi(dx-dy)*orth
+
+func path_reference(u: Dictionary,x: int,y: int,charted: bool=false) -> Dictionary:
  var goal=Visibility.cell(self,x,y,u.team) if charted else tile(x,y)
  if goal.is_empty() or goal.block or planned_occupant(u,x,y,charted)!=null: return {"path":[],"cost":-1}
  var start=int(u.y*t.width+u.x)
@@ -622,8 +691,8 @@ func choose_entry(direction: String) -> bool:
  refresh_knowledge()
  return true
 
-func lighting() -> void:
- var stamp=t.tiles.hash()
+func lighting(stamp: int=-1) -> void:
+ if stamp==-1: stamp=t.tiles.hash()
  if light_signature==stamp: return
  light_signature=stamp;t.illumination={}
  for cell in t.tiles:

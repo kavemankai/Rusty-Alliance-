@@ -79,7 +79,7 @@ static func run(test) -> void:
  # Combined squads and a full garrison use one validated formation.
  c=Campaign.new()
  c.autosave_path="user://deployment-test-autosave.json"
- c.s.funds=4000
+ c.record(4000-c.s.funds,"Fixture funding")
  for i in range(12): c.command("levy",{"sector":17})
  c.command("split",{"id":"oswin"})
  c.s.groups=[c.s.groups[0]]

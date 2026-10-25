@@ -10,6 +10,11 @@ Run mechanics and UI tests before continuing. Use scripts/build.ps1 for a gated 
 
 Saves: Godot user://campaign.json (manual) and user://autosave.json (battle boundaries and application pause), with .bak recovery. Test drivers use separate test-named save/autosave slots and preserve manual playthrough slots.
 
-There is a working central loop and 208 mechanical/integration checks, but **the full production contract is not completed**. Item ownership, battlefield continuity, per-squad logistics, persistent tactical levies and combined friendly squads are implemented. IMPLEMENTATION_PLAN.md is the authoritative next-work list. Remaining contract types are the next major code priority, followed by deployment/AI depth. Android device QA remains outstanding.
+There is a working central loop and 577 mechanical/integration checks plus the extended campaign suite, but **the full production contract is not completed**. Item ownership, battlefield continuity, per-squad logistics, persistent tactical levies and combined friendly squads are implemented. IMPLEMENTATION_PLAN.md is the authoritative next-work list. The next acceptance phases are physical Android QA and the wider source/parity/release audit.
 
 Repository is locally committed with the provided origin. Reference JA2 content is outside this deliverable. No game code/assets were copied from it, and no commercial publication or paid-service action occurred.
+
+
+## Save hardening and scale follow-up — 2026-10-26
+
+Phases 7 and 8 add typed event/financial/assignment records, structural preflight before migration, verified temporary/backup commits, process-termination recovery coverage, large-map heap routing, cached selection redraws and six 45-day campaign/replay scenarios. See HARDENING_SCALE.md and the raw profile/extended reports for exact evidence and limitations. The physical Android gate (phase 9) and wider source/parity/release audit (phase 10) remain open. No additional JA2 source was copied or newly audited in this follow-up.

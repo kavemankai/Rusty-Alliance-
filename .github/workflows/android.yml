@@ -49,6 +49,10 @@ jobs:
           ! grep -E 'SCRIPT ERROR:|^ERROR:' /tmp/import.log
           godot --headless --script tests/run.gd 2>&1 | tee /tmp/tests.log
           ! grep -E 'SCRIPT ERROR:|^ERROR:|FAIL:' /tmp/tests.log
+      - name: Extended campaign and path verification
+        run: |
+          godot --headless --script tests/extended.gd 2>&1 | tee /tmp/extended.log
+          ! grep -E 'SCRIPT ERROR:|^ERROR:|FAIL:' /tmp/extended.log
       - name: Verify normal UI campaign loop
         env:
           LIBGL_ALWAYS_SOFTWARE: '1'
@@ -70,5 +74,7 @@ jobs:
             builds/*.apk
             builds/*.txt
             test-results.json
+            extended-results.json
+            ui-test-results.json
             *-preview.png
           if-no-files-found: error

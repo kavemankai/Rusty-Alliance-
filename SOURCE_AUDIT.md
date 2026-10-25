@@ -35,3 +35,8 @@ Phase 3 reference inspection: Tactical/Overhead.c:5392 EnterCombatMode rejects d
 Visibility/AI inspection: TacticalAI/FindLocations.c:524 FindBestNearbyCover setup and :666-737 threat construction were read. The routine filters incapable/allied/unknown opponents and chooses personal/public last-known locations before evaluating threats. The independent implementation similarly limits target-position access to perception/memory, with original directional-cover values, a small protected-step search, three-round pursuit and ally-support rules. No reference scores, tables or source code were copied. Terrain fog caching and provisional unknown-ground routing are original implementation work, with no new numeric parity claim.
 
 2026-10-26 production pass: new melee/world/company/escort/AI/strategy systems are independently authored. Prior AP, movement, militia, event, perception and combat-mode relationships remain the reference scope. No additional JA2 code, tables, maps, item values or assets were copied. New values and bounded algorithms are specified in GAME_SPEC.md; broader source-parity and rights review remain outstanding.
+
+
+## Save hardening and scale follow-up — 2026-10-26
+
+Phases 7 and 8 add typed event/financial/assignment records, structural preflight before migration, verified temporary/backup commits, process-termination recovery coverage, large-map heap routing, cached selection redraws and six 45-day campaign/replay scenarios. See HARDENING_SCALE.md and the raw profile/extended reports for exact evidence and limitations. The physical Android gate (phase 9) and wider source/parity/release audit (phase 10) remain open. No additional JA2 source was copied or newly audited in this follow-up.

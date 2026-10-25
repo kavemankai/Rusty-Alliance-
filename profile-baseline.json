@@ -1,0 +1,49 @@
+{
+  "cpu": "13th Gen Intel(R) Core(TM) i5-13420H",
+  "engine": "4.6.2-stable (official)",
+  "headless": false,
+  "maps": [
+    {
+      "frame_median_ms": 16.653,
+      "frame_p95_ms": 16.746,
+      "path_cost": 124,
+      "path_ms": 166.35,
+      "redraw_ms": 7.652,
+      "render_build_ms": 10.713,
+      "scene_nodes": 42,
+      "size": 32,
+      "steps": 48,
+      "tiles": 1024,
+      "visibility_cached_ms": 0.459333333333333,
+      "visibility_cold_ms": 11.638
+    },
+    {
+      "frame_median_ms": 16.656,
+      "frame_p95_ms": 16.699,
+      "path_cost": 364,
+      "path_ms": 3422.338,
+      "redraw_ms": 35.262,
+      "render_build_ms": 38.202,
+      "scene_nodes": 90,
+      "size": 80,
+      "steps": 144,
+      "tiles": 6400,
+      "visibility_cached_ms": 1.74566666666667,
+      "visibility_cold_ms": 14.103
+    },
+    {
+      "frame_median_ms": 16.653,
+      "frame_p95_ms": 16.712,
+      "path_cost": 764,
+      "path_ms": 32101.517,
+      "redraw_ms": 132.073,
+      "render_build_ms": 135.62,
+      "scene_nodes": 170,
+      "size": 160,
+      "steps": 304,
+      "tiles": 25600,
+      "visibility_cached_ms": 10.3206666666667,
+      "visibility_cold_ms": 23.341
+    }
+  ]
+}

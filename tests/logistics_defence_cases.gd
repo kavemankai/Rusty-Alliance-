@@ -197,7 +197,7 @@ static func run(test) -> void:
  var funds=c.s.funds
  c.daily()
  test.check(c.s.funds==funds-43,"Living local levies incur upkeep alongside mercenary wages")
- c.s.funds=10000
+ c.record(10000-c.s.funds,"Fixture funding")
  while Garrison.living(cell)<12: c.command("levy",{"sector":17})
  funds=c.s.funds
  test.check(not c.command("levy",{"sector":17}) and c.s.funds==funds,"Garrison recruitment cap rejects before charging funds")

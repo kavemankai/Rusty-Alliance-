@@ -1,0 +1,3260 @@
+{
+  "campaigns": [
+    {
+      "battles": 3,
+      "days": 45,
+      "funds": 120820,
+      "groups": 4,
+      "iterations": 185,
+      "ledger_rows": 48,
+      "rounds": 9,
+      "seed": 731,
+      "time": 65280
+    },
+    {
+      "battles": 2,
+      "days": 45,
+      "funds": 120900,
+      "groups": 4,
+      "iterations": 183,
+      "ledger_rows": 48,
+      "rounds": 4,
+      "seed": 947,
+      "time": 65280
+    },
+    {
+      "battles": 2,
+      "days": 45,
+      "funds": 120860,
+      "groups": 4,
+      "iterations": 183,
+      "ledger_rows": 48,
+      "rounds": 4,
+      "seed": 1291,
+      "time": 65280
+    },
+    {
+      "battles": 2,
+      "days": 45,
+      "funds": 120860,
+      "groups": 4,
+      "iterations": 183,
+      "ledger_rows": 48,
+      "rounds": 9,
+      "seed": 1877,
+      "time": 65280
+    },
+    {
+      "battles": 3,
+      "days": 45,
+      "funds": 120880,
+      "groups": 4,
+      "iterations": 185,
+      "ledger_rows": 48,
+      "rounds": 10,
+      "seed": 2081,
+      "time": 65280
+    },
+    {
+      "battles": 3,
+      "days": 45,
+      "funds": 120840,
+      "groups": 4,
+      "iterations": 185,
+      "ledger_rows": 48,
+      "rounds": 8,
+      "seed": 3163,
+      "time": 65280
+    }
+  ],
+  "checks": [
+    {
+      "name": "Heap and reference agree on minimum AP: seed 0",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route preview equals execution cost",
+      "passed": true
+    },
+    {
+      "name": "Charted path solver preserves hidden-terrain rules: 0",
+      "passed": true
+    },
+    {
+      "name": "Heap and reference agree on minimum AP: seed 1",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route preview equals execution cost",
+      "passed": true
+    },
+    {
+      "name": "Charted path solver preserves hidden-terrain rules: 1",
+      "passed": true
+    },
+    {
+      "name": "Heap and reference agree on minimum AP: seed 2",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route preview equals execution cost",
+      "passed": true
+    },
+    {
+      "name": "Charted path solver preserves hidden-terrain rules: 2",
+      "passed": true
+    },
+    {
+      "name": "Heap and reference agree on minimum AP: seed 3",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route preview equals execution cost",
+      "passed": true
+    },
+    {
+      "name": "Charted path solver preserves hidden-terrain rules: 3",
+      "passed": true
+    },
+    {
+      "name": "Heap and reference agree on minimum AP: seed 4",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route preview equals execution cost",
+      "passed": true
+    },
+    {
+      "name": "Charted path solver preserves hidden-terrain rules: 4",
+      "passed": true
+    },
+    {
+      "name": "Heap and reference agree on minimum AP: seed 5",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route preview equals execution cost",
+      "passed": true
+    },
+    {
+      "name": "Charted path solver preserves hidden-terrain rules: 5",
+      "passed": true
+    },
+    {
+      "name": "Heap and reference agree on minimum AP: seed 6",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route preview equals execution cost",
+      "passed": true
+    },
+    {
+      "name": "Charted path solver preserves hidden-terrain rules: 6",
+      "passed": true
+    },
+    {
+      "name": "Heap and reference agree on minimum AP: seed 7",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route preview equals execution cost",
+      "passed": true
+    },
+    {
+      "name": "Charted path solver preserves hidden-terrain rules: 7",
+      "passed": true
+    },
+    {
+      "name": "Heap and reference agree on minimum AP: seed 8",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route preview equals execution cost",
+      "passed": true
+    },
+    {
+      "name": "Charted path solver preserves hidden-terrain rules: 8",
+      "passed": true
+    },
+    {
+      "name": "Heap and reference agree on minimum AP: seed 9",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route preview equals execution cost",
+      "passed": true
+    },
+    {
+      "name": "Charted path solver preserves hidden-terrain rules: 9",
+      "passed": true
+    },
+    {
+      "name": "Heap and reference agree on minimum AP: seed 10",
+      "passed": true
+    },
+    {
+      "name": "Heap route preview equals execution cost",
+      "passed": true
+    },
+    {
+      "name": "Charted path solver preserves hidden-terrain rules: 10",
+      "passed": true
+    },
+    {
+      "name": "Heap and reference agree on minimum AP: seed 11",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route contains legal paid step",
+      "passed": true
+    },
+    {
+      "name": "Heap route preview equals execution cost",
+      "passed": true
+    },
+    {
+      "name": "Charted path solver preserves hidden-terrain rules: 11",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 0",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 1",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 2",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 3",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 4",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 5",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 6",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 7",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 8",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 9",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 10",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 11",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 12",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 13",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 14",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 15",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 16",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 17",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 18",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 19",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 20",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 21",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 22",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 23",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 24",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 25",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 26",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 27",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 28",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 29",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 30",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 31",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 32",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 33",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 34",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 35",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 36",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 37",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 38",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 39",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 40",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 41",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 42",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 43",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 44",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 731 day 45",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "45-day campaign completes: 731",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 0",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 1",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 2",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 3",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 4",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 5",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 6",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 7",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 8",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 9",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 10",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 11",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 12",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 13",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 14",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 15",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 16",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 17",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 18",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 19",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 20",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 21",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 22",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 23",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 24",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 25",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 26",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 27",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 28",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 29",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 30",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 31",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 32",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 33",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 34",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 35",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 36",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 37",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 38",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 39",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 40",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 41",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 42",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 43",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 44",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 947 day 45",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "45-day campaign completes: 947",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 0",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 1",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 2",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 3",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 4",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 5",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 6",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 7",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 8",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 9",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 10",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 11",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 12",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 13",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 14",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 15",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 16",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 17",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 18",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 19",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 20",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 21",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 22",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 23",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 24",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 25",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 26",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 27",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 28",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 29",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 30",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 31",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 32",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 33",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 34",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 35",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 36",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 37",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 38",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 39",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 40",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 41",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 42",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 43",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 44",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1291 day 45",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "45-day campaign completes: 1291",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 0",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 1",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 2",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 3",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 4",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 5",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 6",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 7",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 8",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 9",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 10",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 11",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 12",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 13",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 14",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 15",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 16",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 17",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 18",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 19",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 20",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 21",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 22",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 23",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 24",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 25",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 26",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 27",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 28",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 29",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 30",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 31",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 32",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 33",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 34",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 35",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 36",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 37",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 38",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 39",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 40",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 41",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 42",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 43",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 44",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 1877 day 45",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "45-day campaign completes: 1877",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 0",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 1",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 2",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 3",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 4",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 5",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 6",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 7",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 8",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 9",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 10",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 11",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 12",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 13",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 14",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 15",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 16",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 17",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 18",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 19",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 20",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 21",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 22",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 23",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 24",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 25",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 26",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 27",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 28",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 29",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 30",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 31",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 32",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 33",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 34",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 35",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 36",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 37",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 38",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 39",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 40",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 41",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 42",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 43",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 44",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 2081 day 45",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "45-day campaign completes: 2081",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 0",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 1",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 2",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 3",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 4",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 5",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 6",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 7",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 8",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 9",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 10",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 11",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 12",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 13",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 14",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 15",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 16",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 17",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 18",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 19",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 20",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 21",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 22",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 23",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 24",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 25",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 26",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 27",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 28",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 29",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 30",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 31",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 32",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 33",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 34",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 35",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 36",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 37",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 38",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 39",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 40",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 41",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 42",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 43",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 44",
+      "passed": true
+    },
+    {
+      "name": "Long campaign invariants: seed 3163 day 45",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint writes",
+      "passed": true
+    },
+    {
+      "name": "Long campaign checkpoint preserves all state",
+      "passed": true
+    },
+    {
+      "name": "Replay checkpoint loads",
+      "passed": true
+    },
+    {
+      "name": "Checkpoint replay is deterministic",
+      "passed": true
+    },
+    {
+      "name": "45-day campaign completes: 3163",
+      "passed": true
+    }
+  ],
+  "elapsed_seconds": 24.991,
+  "engine": "4.6.2-stable (official)",
+  "failed": 0,
+  "passed": 796
+}

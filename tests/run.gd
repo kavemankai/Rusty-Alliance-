@@ -52,9 +52,9 @@ func run() -> void:
  check(c.s.sectors.size()==256,"Strategic grid contains 256 original sectors")
  check(c.command("hire",{"id":"ada"}) and c.s.funds==1100 and "ada" in c.s.squads.first.members,"Hiring charges fee and adds persistent member")
  check(not c.command("hire",{"id":"ada"}) and c.s.funds==1100,"Duplicate hiring rejected without charge")
- c.s.funds=0
+ c.record(0-c.s.funds,"Fixture funding")
  check(not c.command("buy",{"item":"plate"}) and count_kind(c.s.stash,"plate")==0,"Unaffordable purchases rejected")
- c.s.funds=1000
+ c.record(1000-c.s.funds,"Fixture funding")
  check(c.command("buy",{"item":"mace"}) and c.s.funds==920,"Market purchases charge original prices")
  check(c.command("equip",{"id":"mara","item":"mace"}) and Data.weapon(c.s.mercs.mara)=="mace" and count_kind(c.s.stash,"mace")==0,"Equipping transfers stash ownership")
  check(c.command("split",{"id":"ada"}) and c.s.squads.squad_ada.members==["ada"],"Squad split preserves identity")
@@ -365,7 +365,7 @@ func run() -> void:
  check(c.s.sectors[17].owner=="company" and c.force_strength(c.s.groups[0])==0,"Persistent levies defeat a weaker force through tactical combat")
  c=Campaign.new()
  c.s.groups=[]
- c.s.funds=0
+ c.record(0-c.s.funds,"Fixture funding")
  c.command("advance",{"minutes":960})
  check(c.s.funds==-40 and c.s.mercs.mara.morale<70,"Wage arrears remain accounted and penalize morale")
  c=fixture()
@@ -387,6 +387,7 @@ func run() -> void:
  preload("res://tests/visibility_ai_cases.gd").run(self)
  preload("res://tests/melee_cases.gd").run(self)
  preload("res://tests/production_cases.gd").run(self)
+ preload("res://tests/hardening_cases.gd").run(self)
  var results={"checks":checks,"passed":checks.size()-failed,"failed":failed,"contract_rounds":rounds,"engine":Engine.get_version_info().string}
  var f=FileAccess.open("res://test-results.json",FileAccess.WRITE)
  f.store_string(JSON.stringify(results,"  "))

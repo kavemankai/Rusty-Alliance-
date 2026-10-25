@@ -32,7 +32,7 @@ static func person(id: String, title: String, background: String, weapon: String
  "endurance":65,"perception":65,"wisdom":60,"leadership":45,"melee":58,"ranged":55,"medical":20,
  "smithing":20,"experience":1,"morale":70,"fatigue":0,"hp":75,"max_hp":75,"wounds":0,"bleeding":0,
  "injuries":[],"loaded":true,"inventory":[item(id+":weapon",weapon),item(id+":body","padded"),item(id+":ammo","ammo",16)],
- "equipment":{"weapon":id+":weapon","body":id+":body"},"assignment":"rest","hired":false,"dead":false,
+ "equipment":{"weapon":id+":weapon","body":id+":body"},"assignment":"rest","assignment_record":{"actor":id,"kind":"rest","sector":-1,"since":0},"hired":false,"dead":false,
  "fee":100,"wage":20,"expires":0,"training":0,"kills":0}
  p.inventory[2].ammo_type=ammo_kind_for(weapon)
  p.merge(BACKGROUNDS.get(background, {}), true)

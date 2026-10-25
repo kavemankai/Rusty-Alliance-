@@ -8,7 +8,7 @@ Engine: standard Godot 4.6.2 stable, official 71f334935. GDScript, Compatibility
 
 Verified on Windows with NVIDIA RTX 3050 Laptop GPU:
 
-- 522 mechanical/integration assertions pass with zero failures.
+- 577 mechanical/integration assertions pass with zero failures.
 - Phase 1 deployment is complete for the current encounter template: legal highlighted western placement, free facing changes, explicit combat confirmation, frozen actions/knowledge, company/combined/garrison formations and saved unconfirmed formations. Existing active saves resume combat. Phase 2 adds authored settlement, farm, mine and camp layouts plus terrain-based wilderness fallbacks. Geometry, deployment zones and hostile spawn pools persist with the sector.
 - Normal-control desktop UI scenarios pass company/item management, supply deposit/load, a capture contract battle and a separate stocked garrison defending while the company is elsewhere, with active/post-victory save/load.
 - Six objective types use authoritative travel/battle hooks, exclusive deadlines and exactly-once payments. Patrol/escort progress and freight survive save/load; road postings repeat after one day. Old boards are retained unchanged.
@@ -29,8 +29,13 @@ Verified on Windows with NVIDIA RTX 3050 Laptop GPU:
 
 No connected adb device or installed emulator was available. Android install, launch, physical touch, pause/resume under the OS and performance are **not verified**. No mobile FPS claim is made. The GitHub Actions workflow has not been run remotely.
 
-Remaining acceptance work includes broader malformed-save and disk/OS interruption coverage, typed service records, scale profiling, Android hardware/touch testing, and the wider source/release audit. The six requested gameplay areas and subsequent offensive/defensive pass are implemented as described in REQUEST_PROGRESS.md; multistorey buildings and mounted tactical combat are not claimed.
+Remaining acceptance work includes Android hardware/touch testing, physical filesystem/power-loss acceptance, and the wider source/release audit. Application-level save interruption and desktop scale profiling are covered in HARDENING_SCALE.md. The six requested gameplay areas and subsequent offensive/defensive pass are implemented as described in REQUEST_PROGRESS.md; multistorey buildings and mounted tactical combat are not claimed.
 
 Build notes: the preinstalled executable was the .NET editor and requested .mono templates. A separate official standard 4.6.2 executable was downloaded into the workspace work/ directory. The initial standard export's blank validation error was fixed by enabling Android ETC2/ASTC texture import. Project has an original primitive icon; final export should run without the earlier missing-icon error. Debug signing uses existing local development tooling; signing files/passwords are not placed in the repository.
 
 Resume: read AGENTS.md and GAME_SPEC.md, run both suites, then continue tactical/AI depth from IMPLEMENTATION_PLAN.md if no device is available. Full contract is preserved verbatim in PRODUCTION_CONTRACT.md.
+
+
+## Save hardening and scale follow-up — 2026-10-26
+
+Phases 7 and 8 add typed event/financial/assignment records, structural preflight before migration, verified temporary/backup commits, process-termination recovery coverage, large-map heap routing, cached selection redraws and six 45-day campaign/replay scenarios. See HARDENING_SCALE.md and the raw profile/extended reports for exact evidence and limitations. The physical Android gate (phase 9) and wider source/parity/release audit (phase 10) remain open. No additional JA2 source was copied or newly audited in this follow-up.

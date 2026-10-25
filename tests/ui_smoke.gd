@@ -504,6 +504,15 @@ func run() -> void:
  await click("Load")
  if app.game.battle.unit("mara").protecting!="oswin": failures.append("Defensive assignment did not persist through combat reload")
  await capture("offence-defence-preview.png")
+ # Cached static geometry must survive selection/preview redraws without accumulating actors.
+ var board_view=app.battle_view
+ var cached=board_view.floor_multi;var count=board_view.geometry.get_child_count()
+ for repeat in range(8): board_view.redraw()
+ if board_view.floor_multi!=cached or board_view.geometry.get_child_count()!=count: failures.append("Repeated redraw replaced static floor or accumulated dynamic actors")
+ var old_preview=board_view.preview.duplicate();var old_selected=board_view.selected
+ board_view.selected="oswin";board_view.preview=[0,1,2];board_view.redraw()
+ if board_view.floor_multi!=cached: failures.append("Selection or route preview rebuilt static terrain")
+ board_view.selected=old_selected;board_view.preview=old_preview;board_view.redraw()
  var result={"failed":failures.size(),"failures":failures,"scope":"Desktop controls: charge/bash/ally-protection, melee choices/disengagement, peaceful visits/building, timed exploration, transport, levy gear, prisoners, protected caravan and procedural jobs;  review/place/face/save/confirm company and garrison deployment, authored settlement/farm/mine/camp rendering and normal-control movement, scouting/waiting/save-load/detection-interrupted route, combat transition and quiet-round return, hidden terrain/loot render suppression and actual approach reveal, company and item management, supply deposit/load, capture contract battle, then recruit and stock levies, march company away, advance to an actual strategic attack, garrison-only defence, settlement defence payment, escorted freight, ordered patrol return and active/paid save/load"}
  var report=FileAccess.open("res://ui-test-results.json",FileAccess.WRITE)
  report.store_string(JSON.stringify(result,"  "))

@@ -139,6 +139,8 @@ static func normalize_combat(data: Dictionary) -> Dictionary:
  for person in people:
   if not person is Dictionary: return {}
   Data.normalize_person(person)
+  if not person.has("assignment_record"):
+   person.assignment_record={"actor":person.id,"kind":person.get("assignment","rest"),"sector":-1,"since":0}
  for item in loose:
   if not item is Dictionary: return {}
   if item.get("kind","")=="ammo" and not item.has("ammo_type"): item.ammo_type="arrows"
