@@ -13,3 +13,5 @@ It identified the Android texture-import setting behind a blank export-validatio
 Source ownership/licensing for the newly authored game remains with the applicable project owner; no open-source licence has been invented or granted by this delivery.
 
 Schema-1 regression save fixtures were generated from this project's own previous commit cbffb36. They contain the fictional Marches world/characters, not JA2 source, campaign data or assets.
+
+Schema-2 fixtures were generated from this project's own commit a5240f2. The schema-3 logistics and levy rules use original code, data and formulas. Additional reference inspection is limited to the persistent sector/training relationships identified in SOURCE_AUDIT.md; no JA2 militia tables or source code are included.

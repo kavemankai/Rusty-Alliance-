@@ -2,6 +2,7 @@ extends SceneTree
 const Campaign=preload("res://sim/campaign.gd")
 const Data=preload("res://sim/catalog.gd")
 const Continuity=preload("res://tests/continuity_cases.gd")
+const Logistics=preload("res://tests/logistics_defence_cases.gd")
 var checks=[]
 var failed=0
 
@@ -61,7 +62,7 @@ func run() -> void:
  check(c.s.squads.first.due>old,"Travel schedules actual future arrival")
  c.command("advance",{"minutes":600})
  check(not c.s.encounter.is_empty() and c.s.squads.first.sector==34 and c.s.time<old+600,"Hostile arrival interrupts large time advance")
- check(c.s.food<60,"Travel consumes food through clock")
+ check(c.s.squads.first.supplies.food<60,"Travel consumes food through clock")
  c.command("enter")
  check(c.battle!=null and Data.weapon(c.battle.unit("mara").person)=="mace","Tactical deployment uses campaign equipment")
  var b=c.battle
@@ -137,8 +138,8 @@ func run() -> void:
  check(b.action(a.id,"reload") and a.ap==3,"Crossbow reload differs from bow")
  a.ap=20
  a.person.bleeding=3
- var medicine=c.s.medicine
- check(b.action(a.id,"aid") and a.person.bleeding==0 and c.s.medicine==medicine-1,"First aid consumes real medical stock and stops bleeding")
+ var medicine=c.s.squads.first.supplies.medicine
+ check(b.action(a.id,"aid") and a.person.bleeding==0 and c.s.squads.first.supplies.medicine==medicine-1,"First aid consumes real medical stock and stops bleeding")
  # Defence and mitigation fixtures over a repeatable seed set.
  var blocked=0
  var naked_damage=0
@@ -201,7 +202,7 @@ func run() -> void:
  Data.equipped(c.s.mercs.mara,"weapon").condition=30
  c.command("assignment",{"id":"mara","value":"repair"})
  c.command("advance",{"minutes":60})
- check(Data.condition(c.s.mercs.mara)>30 and c.s.tools<12,"Repair consumes tools and restores condition")
+ check(Data.condition(c.s.mercs.mara)>30 and c.s.squads.first.supplies.tools<12,"Repair consumes tools and restores condition")
  # No armies are created during faction actions.
  var groups=c.s.groups.size()
  var location=c.s.groups[0].sector
@@ -210,10 +211,10 @@ func run() -> void:
  c.s.groups=[]
  c.s.sectors[34].owner="company"
  c.s.sectors[36].owner="company"
- c.s.food=0
+ c.s.sectors[34].supplies.food=0
  money=c.s.funds
  c.daily()
- check(c.s.food>0 and c.s.funds>money,"Owned farms and mines produce meaningful resources")
+ check(c.s.sectors[34].supplies.food>0 and c.s.funds>money,"Owned farms and mines produce meaningful local resources")
  c=Campaign.new()
  c.s.groups=[]
  c.s.mercs.mara.expires=c.s.time+60
@@ -272,12 +273,12 @@ func run() -> void:
  check(long_run.s.events.size()==1 and long_run.s.events[0].kind=="hour","Expired events drain without duplicate recurring events")
  c=Campaign.new()
  c.s.groups=[]
- c.s.food=0
+ c.s.squads.first.supplies.food=0
  var morale=c.s.mercs.mara.morale
  c.command("advance",{"minutes":60})
  check(c.s.mercs.mara.morale==morale-5 and c.s.mercs.mara.fatigue>0,"Supply shortage penalizes morale and fatigue")
  c=Campaign.new()
- check(c.command("levy",{"sector":17}) and c.s.sectors[17].garrison==1 and c.s.funds==1120,"Levy recruitment charges funds and persists in sector")
+ check(c.command("levy",{"sector":17}) and c.Garrison.strength(c.s.sectors[17])==1 and c.s.funds==1120,"Levy recruitment charges funds and persists in sector")
  c.command("assignment",{"id":"mara","value":"garrison"})
  c.command("assignment",{"id":"oswin","value":"scout"})
  c.command("advance",{"minutes":60})
@@ -348,9 +349,12 @@ func run() -> void:
  c.s.groups=[{"id":"fixture_raiders","faction":"bandits","sector":33,"strength":1,"objective":17}]
  c.s.squads.first.sector=18
  c.s.sectors[33].owner="bandits"
- c.s.sectors[17].garrison=3
+ for i in range(3): c.command("levy",{"sector":17})
  c.faction_tick()
- check(c.s.sectors[17].owner=="company" and c.force_strength(c.s.groups[0])==0,"Persistent levies defeat weaker strategic attack")
+ c.command("enter")
+ play_battle(c)
+ c.command("resolve")
+ check(c.s.sectors[17].owner=="company" and c.force_strength(c.s.groups[0])==0,"Persistent levies defeat a weaker force through tactical combat")
  c=Campaign.new()
  c.s.groups=[]
  c.s.funds=0
@@ -367,6 +371,7 @@ func run() -> void:
  c.battle.build_map(160,160)
  check(c.battle.t.tiles.size()==25600,"160 by 160 tactical grid supported as lightweight data")
  Continuity.run(self)
+ Logistics.run(self)
  var results={"checks":checks,"passed":checks.size()-failed,"failed":failed,"contract_rounds":rounds,"engine":Engine.get_version_info().string}
  var f=FileAccess.open("res://test-results.json",FileAccess.WRITE)
  f.store_string(JSON.stringify(results,"  "))

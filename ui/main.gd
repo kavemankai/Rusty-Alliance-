@@ -23,6 +23,7 @@ var timer=0.0
 var last_message=""
 var save_slot="user://campaign.json"
 var inspected_item=""
+var supply_amount=5
 var confirm: ConfirmationDialog
 
 func _ready() -> void:
@@ -78,6 +79,9 @@ func menu() -> void:
  label(box,"Tap to inspect. Drag to pan. Pinch or use +/− to zoom.\nRecruit → contract → travel → battle → recover.\nEvery action changes persistent campaign state.")
 
 func rebuild() -> void:
+ target=""
+ destination={}
+ aim=0
  clear()
  if not game.s.squads.has(squad): squad="first"
  var root=VBoxContainer.new()
@@ -87,7 +91,7 @@ func rebuild() -> void:
  header=label(root,"")
  var nav=HBoxContainer.new()
  root.add_child(nav)
- for item in [["Map","sector"],["Company","company"],["Contracts","contracts"],["Inventory","inventory"],["Ledger","ledger"],["Inspector","debug"],["Settings","settings"]]:
+ for item in [["Map","sector"],["Company","company"],["Contracts","contracts"],["Inventory","inventory"],["Supplies","supplies"],["Ledger","ledger"],["Inspector","debug"],["Settings","settings"]]:
   button(nav,item[0],change_tab.bind(item[1]))
  content=HBoxContainer.new()
  content.size_flags_vertical=Control.SIZE_EXPAND_FILL
@@ -159,20 +163,35 @@ func status(text: String) -> void:
 
 func refresh() -> void:
  var s=game.s
- header.text="  THE BROKEN MARCHES  |  Day %d · %02d:%02d  |  %d crowns  |  Food %d  ·  Medicine %d  ·  Tools %d" % [int(s.time/1440)+1,int(s.time/60)%24,int(s.time)%60,s.funds,s.food,s.medicine,s.tools]
+ var pack=game.s.squads[squad].supplies
+ var caption=game.s.squads[squad].name
+ if game.battle!=null:
+  if game.battle.unit(selected)==null:
+   for u in game.battle.t.units:
+    if u.team=="company": selected=u.id;break
+  if game.battle.unit(selected)!=null:
+   pack=game.Supplies.for_person(s,selected)
+   caption=game.battle.unit(selected).person.name
+ header.text="  Day %d · %02d:%02d  |  %d crowns  |  %s: Food %d · Medicine %d · Tools %d" % [int(s.time/1440)+1,int(s.time/60)%24,int(s.time)%60,s.funds,caption,pack.get("food",0),pack.get("medicine",0),pack.get("tools",0)]
  if map_view!=null:
   map_view.campaign=game
   map_view.selected=sector
   map_view.squad=squad
   map_view.queue_redraw()
- if battle_view!=null: battle_view.redraw()
+ if battle_view!=null:
+  battle_view.selected=selected
+  battle_view.redraw()
  show_panel()
 
 func run_command(kind: String,p: Dictionary={}) -> void:
  if kind=="save" and not p.has("path"): p={"path":save_slot}
  var had_battle=game.battle!=null
+ var previous_log="" if game.s.log.is_empty() else str(game.s.log.back())
  if game.command(kind,p):
-  status("Done: "+kind+". "+str(game.s.log.back()))
+  var titles={"supply_transfer":"Supplies transferred","enter":"Defenders deployed","equip":"Equipment updated","unequip":"Item unequipped","unequip_shield":"Shield unequipped","transfer":"Item transferred","resolve":"Battle resolved","retreat":"Company withdrew","levy":"Levy recruited","hire":"Fighter hired","advance":"Time advanced","assignment":"Assignment updated","route":"Route plotted","split":"Squad split","merge":"Squads merged","buy":"Purchase completed","save":"Campaign saved","load":"Campaign loaded"}
+  var update=titles.get(kind,kind.capitalize()+" completed")
+  if not game.s.log.is_empty() and str(game.s.log.back())!=previous_log: update+=". "+str(game.s.log.back())
+  status(update)
   if kind in ["resolve","retreat","enter","load"] or had_battle!=(game.battle!=null): rebuild()
   else: refresh()
  else: status(game.error)
@@ -194,6 +213,7 @@ func show_panel() -> void:
     if j.status=="available": button(side,"Accept "+j.name,run_command.bind("accept",{"id":j.id}))
    label(side,"Capture contracts pay only after a real victory at the target sector. Missing the deadline fails the job.")
   "inventory": inventory_panel()
+  "supplies": supplies_panel()
   "ledger":
    label(side,"FINANCIAL LEDGER")
    for i in range(game.s.ledger.size()-1,-1,-1):
@@ -219,7 +239,11 @@ func show_panel() -> void:
 
 func sector_panel() -> void:
  var cell=game.s.sectors[sector]
- label(side,"%s · %d:%d\n%s · %s\nFacility: %s\nLoyalty %d · Order %d · Levy %d" % [cell.name,cell.x+1,cell.y+1,cell.terrain,cell.owner,cell.facility if cell.facility!="" else "none",cell.loyalty,cell.order,cell.garrison])
+ label(side,"%s · %d:%d\n%s · %s\nFacility: %s\nLoyalty %d · Order %d · Levy %d" % [cell.name,cell.x+1,cell.y+1,cell.terrain,cell.owner,cell.facility if cell.facility!="" else "none",cell.loyalty,cell.order,game.Garrison.strength(cell)])
+ if cell.owner=="company":
+  label(side,"LOCAL DEPOT\nFood %d · Medicine %d · Tools %d" % [cell.supplies.food,cell.supplies.medicine,cell.supplies.tools])
+  for levy in cell.levies:
+   if levy.hp>0 and not levy.get("captured",false): label(side,"%s: %d/%d HP · melee %d · %s" % [levy.name,levy.hp,levy.max_hp,levy.melee,Data.weapon(levy)])
  for g in game.s.groups:
   if g.sector==sector and game.force_strength(g)>0 and cell.known: label(side,"Known force: %s · %d fighters" % [g.faction,game.force_strength(g)])
  label(side,"SELECT SQUAD")
@@ -228,7 +252,7 @@ func sector_panel() -> void:
   button(side,("● " if q.id==squad else "")+q.name+" · %d fighters" % q.members.size(),func():squad=q.id;refresh())
  if not game.s.encounter.is_empty():
   label(side,"HOSTILE CONTACT · strategic time paused")
-  button(side,"Deploy company",run_command.bind("enter",{}))
+  button(side,"Deploy garrison" if game.s.encounter.squad=="" else "Deploy company",run_command.bind("enter",{}))
  else:
   var q=game.s.squads[squad]
   var route=game.strategic_path(q.sector,sector,q)
@@ -239,6 +263,24 @@ func sector_panel() -> void:
  if cell.owner=="company": button(side,"Recruit levy · 80 crowns",run_command.bind("levy",{"sector":sector}))
  if not game.s.result.is_empty(): label(side,"LAST BATTLE\n"+str(game.s.result))
  label(side,"Blue: company · Red: bandits\nPurple: noble house · Dark: undiscovered\nLetters: facilities · Dots: forces\nSelect sector 3:3 for the first job.")
+
+func supplies_panel() -> void:
+ label(side,"SUPPLIES · local stores")
+ for q in game.s.squads.values():
+  button(side,("● " if q.id==squad else "")+q.name,func():squad=q.id;refresh())
+ var q=game.s.squads[squad]
+ var location=game.s.sectors[q.sector]
+ label(side,"%s · %s\nPACK: Food %d · Medicine %d · Tools %d\nDEPOT: Food %d · Medicine %d · Tools %d" % [q.name,location.name,q.supplies.food,q.supplies.medicine,q.supplies.tools,location.supplies.food,location.supplies.medicine,location.supplies.tools])
+ label(side,"Transfer amount: %d" % supply_amount)
+ var choices=HBoxContainer.new()
+ side.add_child(choices)
+ for amount in [1,5,10,20]: button(choices,str(amount),func():supply_amount=amount;show_panel())
+ for resource in game.Supplies.KINDS:
+  button(side,"Load %d %s from depot" % [supply_amount,resource],run_command.bind("supply_transfer",{"from":"sector:%d" % q.sector,"to":q.id,"resource":resource,"amount":supply_amount}))
+  button(side,"Store %d %s in depot" % [supply_amount,resource],run_command.bind("supply_transfer",{"from":q.id,"to":"sector:%d" % q.sector,"resource":resource,"amount":supply_amount}))
+  for other in game.s.squads.values():
+   if other.id!=q.id: button(side,"Give %d %s to %s" % [supply_amount,resource,other.name],run_command.bind("supply_transfer",{"from":q.id,"to":other.id,"resource":resource,"amount":supply_amount}))
+ label(side,"Supply exchanges require stationary stores in the same sector and a controlled depot. Levies use their home depot. Farms produce local food. Market purchases go into the selected squad's pack.")
 
 func company_panel() -> void:
  label(side,"COMPANY & RECRUITMENT")

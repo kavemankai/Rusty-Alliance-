@@ -158,7 +158,7 @@ static func run(test) -> void:
  var path="res://tests/fixtures/legacy-strategic.json"
  var hash_before=FileAccess.get_sha256(path)
  c=Campaign.new()
- test.check(c.load_from(path) and c.s.version==2 and Data.weapon(c.s.mercs.mara)=="sword" and c.s.stash.size()==5,"Previous-release strategic save migrates to item instances")
+ test.check(c.load_from(path) and c.s.version==3 and Data.weapon(c.s.mercs.mara)=="sword" and c.s.stash.size()==5,"Previous-release strategic save migrates to item instances and local supplies")
  test.check(FileAccess.get_sha256(path)==hash_before,"Loading a legacy save leaves the original file unchanged")
  test.check(Items.ownership_error(c.s)=="","Migrated strategic save has valid unique item ownership")
  test.check(c.load_from("res://tests/fixtures/legacy-tactical.json") and c.battle!=null,"Previous-release active battle migrates and resumes")
@@ -167,7 +167,7 @@ static func run(test) -> void:
  test.check(c.s.groups[0].fighters[0].hp==31,"Migrated hostile profile is shared with its strategic group")
  test.check(c.save_to("user://migrated-v2.json"),"Migrated legacy battle can be saved in schema 2")
  loaded=Campaign.new()
- test.check(loaded.load_from("user://migrated-v2.json") and JSON.stringify(loaded.s)==JSON.stringify(c.s),"Migrated schema-2 state roundtrips without creating new item identities")
+ test.check(loaded.load_from("user://migrated-v2.json") and JSON.stringify(loaded.s)==JSON.stringify(c.s),"Migrated state roundtrips without creating new item identities")
  test.check(c.load_from("res://tests/fixtures/legacy-corpse.json") and Items.ownership_error(c.s)=="","Legacy corpse inventory and old ground loot migrate without duplicate ownership")
  var corpse=c.battle.unit("hostile_0")
  var corpse_weapon=c.battle.t.ground[0].item

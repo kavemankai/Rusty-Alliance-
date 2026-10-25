@@ -7,3 +7,5 @@ These are actual saves emitted by this project's previous release, commit `cbffb
 - legacy-corpse.json: same active encounter with hostile_0 at zero HP and the original name-only weapon loot record at its location. This reproduces the old corpse/ground ownership ambiguity.
 
 The previous implementation was extracted to the workspace work/schema1-fixture directory and used to generate these files. Tests load these read-only and write migrated output to separate user:// test slots. Do not regenerate fixtures using the new save code: that would cease to test backwards compatibility.
+
+schema2-strategic.json and schema2-tactical.json were generated from this project's next previous release, commit a5240f2. The strategic fixture splits Oswin into another squad, recruits one levy using the old counter and sets local training to 40. Its original global food/medicine/tools totals are 60/12/12. The tactical fixture travels to Redbank and moves Mara to (4,3) before saving. These verify supply conservation, trained-profile creation and active-battle context during schema-2→3 migration.

@@ -158,6 +158,7 @@ static func ownership_error(state: Dictionary) -> String:
  for g in state.groups:
   for m in g.get("fighters",[]): owners.append(m)
  for cell in state.sectors:
+  for p in cell.levies: owners.append(p)
   for ground in cell.get("battlefield",{}).get("ground",[]):
    if not ground is Dictionary or not ground.has_all(["item","x","y"]): return "Invalid ground placement"
    owners.append({"name":"ground","inventory":[ground.item]})

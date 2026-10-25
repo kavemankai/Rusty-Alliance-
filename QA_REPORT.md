@@ -5,14 +5,16 @@
 | Check | Result |
 |---|---|
 | Godot 4.6.2 standard import / script execution | Passed |
-| Deterministic mechanical/integration suite | 142 passed, 0 failed |
+| Deterministic mechanical/integration suite | 208 passed, 0 failed |
 | Desktop rendered UI scenario | 0 failures; real buttons and selection callbacks, no battle-result injection |
 | First legal-action contract battle | Victory in 3 simulation-driver rounds for seed 731; casualties are retained |
 | Repeated campaign contract scenario | Returned to market, recruited replacements, resupplied, recovered, won second battle |
 | Save/load | Strategic exact-state and tactical reference/RNG checks pass; backup fallback checked |
 | Item ownership and transfers | Unique IDs, independent condition, backpack weight, equip/unequip, co-location and combat adjacency/AP checks |
 | Retreat continuity | Dead enemies remain dead; survivor injury/ammo/reload/equipment/position, open door and ground loot persist through save/re-entry |
-| Save migration | Actual schema-1 strategic/tactical/corpse fixtures upgrade and roundtrip as schema 2 |
+| Save migration | Actual schema-1 and schema-2 strategic/tactical fixtures upgrade and roundtrip as schema 3; old counters become trained profiles, supply totals are conserved |
+| Squad logistics | Separate stores, co-location/stationary transfers, split/merge and odd-remainder conservation, local farm output, travel burden and local medical/repair resources |
+| Tactical levies and combined squads | Same-sector squads deploy together; levy-only defence wins through legal actions; wounds/death/capture, ownership loss, upkeep/training and continued defence are verified |
 | Concurrent contacts | Queueing, invalid-contact cleanup, multi-army tick processing and stale-route rejection |
 | Extended clock | Thirty days, 30 wage entries, no duplicate hourly event |
 | Android debug export | Successful, signed; package org.brokenmarches.foundation |
@@ -20,7 +22,7 @@
 | Physical Android / emulator | Not run: no adb device or installed emulator available |
 | Remote CI | Configuration supplied; not dispatched or observed |
 
-Rendered strategic and tactical screenshots were inspected. They show actual runtime geometry and controls. Both interfaces use fixed 48-unit minimum button heights and scrolling side panels. These observations do not establish hardware touch comfort or safe-area support.
+Rendered strategic, inventory, supplies and garrison screenshots were inspected. They show actual runtime geometry and controls. Controls use 48-unit minimum button heights and scrolling panels. These observations do not establish hardware touch comfort or safe-area support.
 
 ## Repairs verified during development
 
@@ -36,10 +38,10 @@ Rendered strategic and tactical screenshots were inspected. They show actual run
 
 ## Limits and open risks
 
-This is not comprehensive coverage of the master contract. Buildings, full fog, advanced formations, precise interrupt parity, all job types, tactical garrisons and several inventory/persistence requirements remain incomplete. AI uses shared team knowledge and last-known positions, but is deliberately simple. LOS uses sampled cells; all geometric corner/elevation cases have not been proven. Scenario tests use fixed maps/seeds. Logical 160×160 allocation is checked; scale frame time is not.
+This is not comprehensive coverage of the master contract. Buildings, full fog, formations, precise interrupt parity, all job types, levy equipment management, transport modes and several persistence/UX requirements remain incomplete. AI uses shared team knowledge and last-known positions, but is deliberately simple. LOS uses sampled cells; all geometric corner/elevation cases have not been proven. Logical 160×160 allocation is checked; scale frame time is not.
 
-UI automation runs on desktop and uses desktop pointer events plus control selection methods. It now exercises stockpile collection, transfer to a different fighter, equipping and restoring a carried weapon before the campaign walkthrough. It is not physical Android touch evidence. Application-pause save code exists, but Android interruption and disk-failure injection remain untested. Schema 1 migrates to schema 2; unsupported versions are rejected. Ownership/canonical profile and basic tactical geometry validation are checked, but arbitrary malformed-data coverage is not exhaustive.
+UI automation runs on desktop and uses pointer events plus selection methods. The first walkthrough covers item management, local supply deposit/load and capture. The second starts with one existing enemy group placed a sector from Ashford as a documented test fixture; all recruitment, stocking, company travel, clock advances, garrison deployment, combat, aid and save/load then use normal controls. The existing group advances through real strategic AI; no victory or payment is injected. This is not physical Android touch evidence. Android interruption and disk-failure injection remain untested. Schema 1→2→3 migrations, ownership/canonical profiles and basic geometry validation are checked; arbitrary malformed-data coverage is not exhaustive.
 
-The continuity tests include actual legal combat death/looting followed by a deterministic wounded-survivor fixture, withdrawal, save/reload and re-entry. They verify the surviving hostile roster by identity and exact health, bleeding, ammunition, reload state, condition and position. Actual previous-release fixture files test backward compatibility, including old corpse/loot duplication risk. Faction loss accounting is checked for duplicate casualty counts. Existing 87 checks remain covered by the expanded 142-check suite.
+The continuity suite verifies legal death/looting, retreat, save/re-entry and exact hostile identity/condition. The logistics/defence suite adds 66 checks for separate stores, local skills, conserved migration, garrison profiles and control/casualty consequences. It includes legal enemy attacks causing actual levy deaths, continued home defence after retreat, garrison-only legal-action victories, legacy undeployed reserves and deterministic incapacitation fixtures for capture/defeat edges. Existing rule coverage remains in the expanded 208-check suite.
 
 Final acceptance: gates C/D pass for the delivered slice. Gate E is pending hardware validation and Gate F remains incomplete. Follow IMPLEMENTATION_PLAN.md before extending acceptance claims.

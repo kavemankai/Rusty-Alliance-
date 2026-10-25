@@ -8,7 +8,8 @@
 | Team turns, perception and knowledge | ADAPTED | Bounded team turn machine with facing and last-known coordinates |
 | Firearms → medieval missiles | ADAPTED | Bow/crossbow/javelin catalogue; common missile ammunition abstraction |
 | Armour and medical recovery | ADAPTED | Original damage-type reductions, wounds, bleeding, timed care |
-| Militia → levies | ADAPTED | Persistent recruitment, upkeep, training and abstract strategic defence |
+| Militia → levies | ADAPTED | Individual persistent profiles, paid recruitment/upkeep, local training/supplies and actual tactical defence |
+| Company logistics | ADAPTED | Squad packs and local depots; conservative splits/merges/transfers; local care and farm output |
 | Economy and facilities | ADAPTED | Original farms/mines/markets/workshops/training effects |
 | Persistent equipment ownership | PRESERVED concept, original implementation | Unique item IDs, per-item durability, inventory ownership and equipment references |
 | Retreat and local continuity | ADAPTED | Safe adjacent sectors, persistent hostile rosters and battlefield/loot state |

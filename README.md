@@ -2,7 +2,7 @@
 
 Original Godot 4.6.2 / GDScript medieval mercenary strategy game. This is a **playable integrated foundation slice**, not the complete production contract. Primitive 3D tactical board, touch-oriented controls, 16×16 campaign, persistent company, two capture jobs and independent strategic forces.
 
-The current update adds unique persistent items, backpack/equipment transfers, individual durability, enemy survivors, persistent doors/ground loot, adjacent-sector withdrawal and schema-1 save migration. Previous saves load automatically without modifying the original file until you save.
+The current update adds per-squad provisions, local depots, local medical care, persistent tactical levies and combined friendly-squad battles, on top of the item/continuity systems. Schema-1 and schema-2 saves migrate automatically to schema 3 without modifying the original file until you save. Old company supplies are divided between staffed squads; stock local depots before leaving levies to defend.
 
 ## Play
 
@@ -16,6 +16,14 @@ Import project.godot in **standard Godot 4.6.2** and press Run. The .NET engine 
 6. Resolve after actual victory or defeat. Retreat requires confirmation and a safe adjacent sector; the arrival sector is preferred. Capture pays an accepted job and changes ownership. Wounds, ammunition, losses, enemy survivors, doors and uncollected ground items persist. Victory loot is carried by survivors; return to Ashford to deposit it.
 7. Assign medical care, rest, training, repairs, scouting or guard duty. Return to Ashford for recruits and supplies. Iron Hollow at 5:3 is a harder second contract.
 8. Save/Load preserves campaign or active battle. Continue autosave loads the last battle boundary/application pause.
+
+## Supplies and defence
+
+Supplies → select a squad → choose 1/5/10/20 → Load or Store a resource. A stationary squad can exchange with a controlled depot in the same sector or another co-located squad. Food, medicine and tools cannot be consumed remotely. Purchases fill the selected squad's pack; farms stock their own local depot. Split and merge conserve every resource. A heavier pack slows travel.
+
+Select an owned sector → Recruit levy (80 crowns). Each levy is a persistent spear-and-shield defender with health, skills and actual equipment. Their hourly food and medical care come from the home depot; upkeep is 3 crowns per living levy per day. Leadership-based garrison training improves their combat skills. New recruitment is capped at 12 living levies per sector in this slice.
+
+Enemy attacks trigger a tactical defence even if the company is elsewhere: Deploy garrison and control the levy units normally. Co-located company squads join the same battle. Withdrawing mercenaries leave the levies defending at home; losing defenders changes ownership. Loot from a garrison-only victory remains on the battlefield for later company recovery.
 
 ## Verify / build
 

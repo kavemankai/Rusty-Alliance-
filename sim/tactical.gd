@@ -1,5 +1,6 @@
 extends RefCounted
 const Data = preload("res://sim/catalog.gd")
+const Supplies=preload("res://sim/supplies.gd")
 var campaign_ref: WeakRef
 var campaign:
  get: return campaign_ref.get_ref()
@@ -11,10 +12,9 @@ func _init(owner, restored: Dictionary = {}) -> void:
  if not restored.is_empty():
   t=restored
   return
- t={"width":18,"height":14,"tiles":[],"units":[],"turn":"company","round":1,"knowledge":{"company":{},"enemy":{}},"log":[],"ai":[],"noise":[],"ground":[]}
+ t={"width":18,"height":14,"tiles":[],"units":[],"squads":[],"turn":"company","round":1,"knowledge":{"company":{},"enemy":{}},"log":[],"ai":[],"noise":[],"ground":[]}
  build_map(18,14)
- var q=campaign.s.squads[campaign.s.encounter.squad]
- var sector=campaign.s.sectors[q.sector]
+ var sector=campaign.s.sectors[campaign.s.encounter.sector]
  if sector.has("battlefield"):
   var saved=sector.battlefield
   t.width=saved.width
@@ -23,31 +23,48 @@ func _init(owner, restored: Dictionary = {}) -> void:
   t.ground=saved.ground
  else: sector.battlefield={"width":t.width,"height":t.height,"tiles":t.tiles,"ground":t.ground}
  var index=0
- for id in q.members:
-  var m=campaign.s.mercs[id]
-  t.units.append(make_unit(id,"company",m,2+int(index/5),3+(index%5)*2))
-  index+=1
+ for q in campaign.combat_squads(sector.id):
+  t.squads.append(q.id)
+  for id in q.members:
+   var m=campaign.s.mercs[id]
+   if m.hp<=0 or m.get("captured",false): continue
+   var u=make_unit(id,"company",m,2+int(index/5),3+(index%5)*2)
+   u.squad=q.id
+   place_unit(u)
+   index+=1
+ if sector.owner=="company":
+  for p in sector.levies:
+   if p.hp<=0 or p.get("captured",false): continue
+   var u=make_unit(p.id,"company",p,4+int(index/5),3+(index%5)*2)
+   u.role="levy"
+   u.sector=sector.id
+   place_unit(u)
+   index+=1
  campaign.ensure_group_rosters()
  var count=0
  for g in campaign.s.groups:
-  if g.sector == q.sector and g.faction!="company":
+  if g.sector == sector.id and g.faction!="company":
    for p in g.fighters:
     if p.hp<=10 or p.get("captured",false): continue
     var position=g.positions.get(p.id,{"x":11+count%3,"y":3+(count*3)%9})
     var u=make_unit(p.id,"enemy",p,position.x,position.y)
     u.group=g.id
     # A later entrant may otherwise collide with a survivor's remembered position.
-    if at(u.x,u.y)!=null or tile(u.x,u.y).block:
-     for cell in t.tiles:
-      if not cell.block and at(cell.x,cell.y)==null:
-       u.x=cell.x;u.y=cell.y
-       break
-    t.units.append(u)
+    place_unit(u)
     count+=1
  refresh_knowledge()
 
 func make_unit(id: String, team: String, p: Dictionary, x: int, y: int) -> Dictionary:
- return {"id":id,"team":team,"person":p,"x":x,"y":y,"ap":Data.ap(p),"stance":"stand","mode":"walk","facing":0 if team=="company" else 4,"guard":false,"reason":"guarding"}
+ return {"id":id,"team":team,"role":"merc" if team=="company" else "enemy","person":p,"x":x,"y":y,"ap":Data.ap(p),"stance":"stand","mode":"walk","facing":0 if team=="company" else 4,"guard":false,"reason":"guarding"}
+
+func place_unit(u: Dictionary) -> void:
+ var cell=tile(u.x,u.y)
+ if cell.is_empty() or cell.block or at(u.x,u.y)!=null:
+  for candidate in t.tiles:
+   if not candidate.block and at(candidate.x,candidate.y)==null:
+    u.x=candidate.x;u.y=candidate.y
+    break
+ t.units.append(u)
 
 func build_map(w: int,h: int) -> void:
  t.width=w
@@ -369,9 +386,10 @@ func action(id: String,kind: String,p: Dictionary={}) -> bool:
    cell.block=not cell.open
   "aid":
    var target=unit(p.get("target",id))
-   if target==null or target.team!=u.team or target.person.hp<=0 or distance(u,target)>1 or u.ap<5 or campaign.s.medicine<=0: return fail("Need nearby survivor, medicine and 5 AP")
+   var provisions=Supplies.for_person(campaign.s,id)
+   if target==null or target.team!=u.team or target.person.hp<=0 or distance(u,target)>1 or u.ap<5 or provisions.get("medicine",0)<=0: return fail("Need nearby survivor, medicine in the actor's local pack and 5 AP")
    u.ap-=5
-   campaign.s.medicine-=1
+   provisions.medicine-=1
    target.person.bleeding=0
    target.person.hp=mini(target.person.max_hp,target.person.hp+2+int(u.person.medical/12))
   "guard": u.guard=true

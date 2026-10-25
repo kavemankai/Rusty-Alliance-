@@ -1,11 +1,14 @@
 extends RefCounted
 const Data=preload("res://sim/catalog.gd")
 const Items=preload("res://sim/inventory.gd")
+const Supplies=preload("res://sim/supplies.gd")
+const Garrison=preload("res://sim/garrison.gd")
 
 # Upgrade detached parsed data. Never mutate the currently running campaign.
 static func upgrade(data: Variant) -> Dictionary:
  if not data is Dictionary: return {}
- if data.get("version",0)==2: return data
+ if data.get("version",0)==3: return data
+ if data.get("version",0)==2: return upgrade_v2(data)
  if data.get("version",0)!=1 or not legacy_shape(data): return {}
  data.version=2
  data.next_item=1
@@ -56,6 +59,32 @@ static func upgrade(data: Variant) -> Dictionary:
    if entry.is_empty(): entry=Items.create(data,placement.item)
    placement.item=entry
   data.sectors[data.encounter.sector].battlefield={"width":data.battle.width,"height":data.battle.height,"tiles":data.battle.tiles,"ground":data.battle.ground}
+ return upgrade_v2(data)
+
+static func upgrade_v2(data: Dictionary) -> Dictionary:
+ if not data.has_all(["sectors","squads","stash_sector","battle"]): return {}
+ if not data.sectors is Array or data.sectors.size()!=256 or not data.squads is Dictionary or not data.battle is Dictionary: return {}
+ if not (data.stash_sector is int or data.stash_sector is float) or data.stash_sector<0 or data.stash_sector>=256: return {}
+ for sector in data.sectors:
+  if not sector is Dictionary or not sector.has_all(["garrison","training"]): return {}
+  if not (sector.garrison is int or sector.garrison is float) or sector.garrison<0 or sector.garrison>256: return {}
+ if not Supplies.migrate_pool(data): return {}
+ data.next_levy=1
+ for sector in data.sectors:
+  sector.levies=[]
+  for index in range(sector.garrison): Garrison.create(data,sector)
+  sector.erase("garrison")
+ if not data.battle.is_empty():
+  if not data.battle.has("units") or not data.battle.units is Array: return {}
+  data.battle.squads=[]
+  for u in data.battle.units:
+   u.role="merc" if u.team=="company" else "enemy"
+   if u.team=="company":
+    var q=Supplies.squad_for(data,u.id)
+    if q.is_empty(): return {}
+    u.squad=q.id
+    if q.id not in data.battle.squads: data.battle.squads.append(q.id)
+ data.version=3
  return data
 
 static func legacy_shape(data: Dictionary) -> bool:

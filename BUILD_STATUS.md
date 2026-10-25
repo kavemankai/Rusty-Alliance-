@@ -8,20 +8,22 @@ Engine: standard Godot 4.6.2 stable, official 71f334935. GDScript, Compatibility
 
 Verified on Windows with NVIDIA RTX 3050 Laptop GPU:
 
-- 142 mechanical/integration assertions pass with zero failures.
-- Normal-control desktop UI scenario passes recruitment, contract, travel, deployment, combat, payment, active-battle save/load and post-victory save/load.
+- 208 mechanical/integration assertions pass with zero failures.
+- Normal-control desktop UI scenarios pass company/item management, supply deposit/load, a capture contract battle and a separate stocked garrison defending while the company is elsewhere, with active/post-victory save/load.
 - Two distinct contract battles complete through legal simulation actions in the integration suite.
 - Thirty-day isolated clock scenario produces exactly one wage entry each midnight.
 - Unique equipment IDs, per-item condition/quantity, backpack switching and location/AP-validated transfers are implemented. The rendered UI scenario takes, transfers and equips an actual item.
 - Persistent enemy rosters, casualties, injuries, ammunition/reload state, doors and uncollected ground items survive retreat, save/load and re-entry. Retreat uses safe neighbouring sectors.
-- Schema-1 strategic/tactical/corpse fixtures from the previous release migrate to schema 2 without rewriting the original files. Both friendly and hostile active-battle references rebind after load.
+- Actual schema-1 and schema-2 fixtures migrate to schema 3 without rewriting the original files. Mercenary, enemy and levy active-battle references rebind after load.
+- Squads carry separate food/medicine/tools. Local depots, transfers, split/merge conservation, farm output, supply burden and local medical care are verified. Remote resources confer no benefit.
+- Levies are persistent tactical defenders with gear, training, wounds, casualties and upkeep. Co-located squads deploy together; garrisons defend alone and continue after company withdrawal. Lost packs stay at the defeated sector.
 - Strategic contacts queue and stale travel callbacks are rejected.
 - Godot imports and runs. Signed Android debug export succeeds; APK inspected with SDK package tools and signature verification.
 
 No connected adb device or installed emulator was available. Android install, launch, physical touch, pause/resume under the OS and performance are **not verified**. No mobile FPS claim is made. The GitHub Actions workflow has not been run remotely.
 
-Production gaps include additional contract types, per-squad consumable logistics, sector-specific map authoring, tactical levies and combined squads, full prisoner handling, exploration/combat transitions, deeper AI/knowledge/cover/lighting, additional future save migrations and scale profiling. See IMPLEMENTATION_PLAN.md for ordered acceptance work.
+Production gaps include additional contract types, sector-specific maps/deployment, levy loadout management, full prisoner handling, exploration/combat transitions, deeper AI/knowledge/cover/lighting, transport modes, broader malformed-save/OS interruption coverage and scale profiling. See IMPLEMENTATION_PLAN.md for ordered acceptance work.
 
 Build notes: the preinstalled executable was the .NET editor and requested .mono templates. A separate official standard 4.6.2 executable was downloaded into the workspace work/ directory. The initial standard export's blank validation error was fixed by enabling Android ETC2/ASTC texture import. Project has an original primitive icon; final export should run without the earlier missing-icon error. Debug signing uses existing local development tooling; signing files/passwords are not placed in the repository.
 
-Resume: read AGENTS.md and GAME_SPEC.md, run both suites, then continue with per-squad consumable supplies, tactical levies or remaining contract types if no device is available. Full contract is preserved verbatim in PRODUCTION_CONTRACT.md.
+Resume: read AGENTS.md and GAME_SPEC.md, run both suites, then implement remaining contract types if no device is available. Full contract is preserved verbatim in PRODUCTION_CONTRACT.md.

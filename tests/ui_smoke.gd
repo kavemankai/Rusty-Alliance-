@@ -43,6 +43,68 @@ func capture(filename: String) -> void:
  await RenderingServer.frame_post_draw
  root.get_texture().get_image().save_png("res://"+filename)
 
+func select_sector(index: int) -> void:
+ var view=app.map_view
+ var point=view.offset+Vector2(index%16+0.5,int(index/16)+0.5)*32*view.zoom
+ var down=InputEventMouseButton.new()
+ down.button_index=MOUSE_BUTTON_LEFT;down.pressed=true;down.position=point
+ view.input_event(down)
+ var up=InputEventMouseButton.new()
+ up.button_index=MOUSE_BUTTON_LEFT;up.pressed=false;up.position=point
+ view.input_event(up)
+ await settle()
+
+func fight_with_buttons() -> void:
+ var rounds=0
+ while app.game.battle.outcome()=="ongoing" and rounds<30:
+  var b=app.game.battle
+  for fighter in b.t.units:
+   if fighter.team!="company" or not b.can_act(fighter): continue
+   app.battle_view.pick(app.battle_view.camera.unproject_position(Vector3(fighter.x,b.tile(fighter.x,fighter.y).elevation*0.5,fighter.y))*app.battle_view.size/Vector2(app.battle_view.viewport.size))
+   await settle()
+   if app.selected!=fighter.id:
+    failures.append("Could not select "+fighter.id)
+    continue
+   var actions=0
+   while b.can_act(fighter) and fighter.ap>0 and actions<16:
+    actions+=1
+    var provisions=app.game.Supplies.for_person(app.game.s,fighter.id)
+    if fighter.person.bleeding>0 and fighter.ap>=5 and provisions.get("medicine",0)>0:
+     await click("First aid self · 5 AP")
+     continue
+    var candidates=[]
+    for other in b.t.units:
+     if other.team!="company" and other.person.hp>10 and b.known("company",other.id): candidates.append(other)
+    candidates.sort_custom(func(a,z):return b.distance(fighter,a)<b.distance(fighter,z))
+    var weapon=app.Data.WEAPONS[app.Data.weapon(fighter.person)]
+    if weapon.reach==0 and not fighter.person.loaded and fighter.ap>=weapon.reload and app.Data.ammo(fighter.person)>0:
+     await click("Reload")
+     continue
+    var enemy=candidates[0] if not candidates.is_empty() else null
+    if enemy!=null and b.distance(fighter,enemy)<=weapon.range and b.los(fighter,enemy) and fighter.ap>=weapon.ap:
+     app.tactical_cell(enemy.x,enemy.y)
+     await settle()
+     await click("Confirm attack")
+     continue
+    var goal=enemy if enemy!=null else {"x":11,"y":6}
+    var best={}
+    var score=-9999
+    for dy in range(-1,2):
+     for dx in range(-1,2):
+      var cell=b.tile(fighter.x+dx,fighter.y+dy)
+      var cost=b.step_cost(fighter,b.tile(fighter.x,fighter.y),cell)
+      if cost<0 or cost>fighter.ap: continue
+      var value=-b.distance(cell,goal)*10-cost
+      if value>score:
+       score=value
+       best=cell
+    if best.is_empty(): break
+    app.tactical_cell(best.x,best.y)
+    await settle()
+    await click("Confirm movement")
+  if b.outcome()=="ongoing": await click("End turn")
+  rounds+=1
+
 func run() -> void:
  app=load("res://main.tscn").instantiate()
  app.save_slot="user://ui-test-campaign.json"
@@ -76,6 +138,11 @@ func run() -> void:
  await click("Spear · 100% condition")
  await click("Equip carried item")
  if app.Data.weapon(app.game.s.mercs.ada)!="spear": failures.append("Inventory UI did not restore carried spear")
+ await click("Supplies")
+ await click("Store 5 food in depot")
+ if app.game.s.sectors[17].supplies.food!=5 or app.game.s.squads.first.supplies.food!=55: failures.append("Supply UI did not deposit real rations")
+ await click("Load 5 food from depot")
+ if app.game.s.sectors[17].supplies.food!=0 or app.game.s.squads.first.supplies.food!=60: failures.append("Supply UI did not restore rations from the depot")
  await click("Contracts")
  await click("Accept Clear Redbank")
  if app.game.s.jobs[0].status!="active": failures.append("Contract UI did not accept")
@@ -104,48 +171,7 @@ func run() -> void:
   await click("Save")
   await click("Load")
   if app.game.battle==null: failures.append("UI save/load lost active battle")
-  var rounds=0
-  while app.game.battle.outcome()=="ongoing" and rounds<30:
-   var b=app.game.battle
-   for fighter in b.t.units:
-    if fighter.team!="company" or not b.can_act(fighter): continue
-    app.battle_view.pick(app.battle_view.camera.unproject_position(Vector3(fighter.x,b.tile(fighter.x,fighter.y).elevation*0.5,fighter.y))*app.battle_view.size/Vector2(app.battle_view.viewport.size))
-    await settle()
-    var actions=0
-    while b.can_act(fighter) and fighter.ap>0 and actions<16:
-     actions+=1
-     var candidates=[]
-     for other in b.t.units:
-      if other.team!="company" and other.person.hp>10 and b.known("company",other.id): candidates.append(other)
-     candidates.sort_custom(func(a,z):return b.distance(fighter,a)<b.distance(fighter,z))
-     var weapon=app.Data.WEAPONS[app.Data.weapon(fighter.person)]
-     if weapon.reach==0 and not fighter.person.loaded and fighter.ap>=weapon.reload and app.Data.ammo(fighter.person)>0:
-      await click("Reload")
-      continue
-     var enemy=candidates[0] if not candidates.is_empty() else null
-     if enemy!=null and b.distance(fighter,enemy)<=weapon.range and b.los(fighter,enemy) and fighter.ap>=weapon.ap:
-      app.tactical_cell(enemy.x,enemy.y)
-      await settle()
-      await click("Confirm attack")
-      continue
-     var goal=enemy if enemy!=null else {"x":11,"y":6}
-     var best={}
-     var score=-9999
-     for dy in range(-1,2):
-      for dx in range(-1,2):
-       var cell=b.tile(fighter.x+dx,fighter.y+dy)
-       var cost=b.step_cost(fighter,b.tile(fighter.x,fighter.y),cell)
-       if cost<0 or cost>fighter.ap: continue
-       var value=-b.distance(cell,goal)*10-cost
-       if value>score:
-        score=value
-        best=cell
-     if best.is_empty(): break
-     app.tactical_cell(best.x,best.y)
-     await settle()
-     await click("Confirm movement")
-   if b.outcome()=="ongoing": await click("End turn")
-   rounds+=1
+  await fight_with_buttons()
   if app.game.battle.outcome()!="victory": failures.append("UI battle did not win")
   else:
    await click("Resolve")
@@ -153,7 +179,51 @@ func run() -> void:
    await click("Save")
    await click("Load")
    if app.game.s.sectors[34].owner!="company": failures.append("UI victory did not persist")
- var result={"failed":failures.size(),"failures":failures,"scope":"Desktop controls: recruit, take item, transfer to another fighter, equip carried gear, contract, route, battle, payment, active-battle and post-victory save/load"}
+ # A deterministic second campaign places an existing enemy patrol one sector
+ # from Ashford. Recruitment, stocking, travel, time and defence all use controls.
+ app.game=app.Campaign.new()
+ app.game.autosave_path="user://ui-test-autosave.json"
+ app.game.s.groups[0].sector=18
+ app.game.s.groups[0].objective=17
+ app.game.s.sectors[18].owner="bandits"
+ app.sector=17;app.squad="first";app.selected="mara";app.tab="sector"
+ app.rebuild()
+ await settle()
+ await click("Inventory")
+ await click("Buy food · 20 crowns")
+ await click("Buy food · 20 crowns")
+ await click("Map")
+ for i in range(3): await click("Recruit levy · 80 crowns")
+ await click("Supplies")
+ await click("20")
+ for i in range(3): await click("Store 20 food in depot")
+ await click("5")
+ await click("Store 5 medicine in depot")
+ if app.game.s.sectors[17].supplies.food!=60 or app.game.Garrison.strength(app.game.s.sectors[17])!=3: failures.append("UI did not recruit and stock a real garrison")
+ await capture("supplies-preview.png")
+ await click("Map")
+ await select_sector(1)
+ await click("Plot route to selected sector")
+ await click("+1 hour")
+ for i in range(3): await click("+6 hours")
+ if app.game.s.encounter.is_empty() or app.game.s.encounter.squad!="": failures.append("Strategic attack did not create a garrison-only contact")
+ await click("Deploy garrison")
+ if app.game.battle==null: failures.append("Garrison deployment UI failed")
+ else:
+  if app.target!="": failures.append("New garrison battle retained a stale enemy selection")
+  await capture("garrison-preview.png")
+  await click("Save")
+  await click("Load")
+  if app.game.battle.unit("mara")!=null: failures.append("Remote mercenary teleported into garrison defence")
+  await fight_with_buttons()
+  if app.game.battle.outcome()!="victory": failures.append("Garrison UI defence did not win")
+  else:
+   await click("Resolve")
+   var survivors=app.game.Garrison.strength(app.game.s.sectors[17])
+   await click("Save")
+   await click("Load")
+   if app.game.s.sectors[17].owner!="company" or app.game.s.squads.first.sector!=1 or app.game.Garrison.strength(app.game.s.sectors[17])!=survivors: failures.append("Garrison victory did not persist correctly")
+ var result={"failed":failures.size(),"failures":failures,"scope":"Desktop controls: company and item management, supply deposit/load, capture contract battle, then recruit and stock levies, march company away, advance to an actual strategic attack, garrison-only defence, and active/post-victory save/load"}
  var report=FileAccess.open("res://ui-test-results.json",FileAccess.WRITE)
  report.store_string(JSON.stringify(result,"  "))
  report.close()
