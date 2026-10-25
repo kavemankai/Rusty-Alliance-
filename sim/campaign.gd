@@ -5,6 +5,7 @@ const Items = preload("res://sim/inventory.gd")
 const Schema = preload("res://sim/save_schema.gd")
 const Supplies = preload("res://sim/supplies.gd")
 const Garrison = preload("res://sim/garrison.gd")
+const Layouts=preload("res://sim/battlefields.gd")
 const Contracts = preload("res://sim/contracts.gd")
 var s: Dictionary
 var battle = null
@@ -578,7 +579,7 @@ func resolve_battle(retreat: bool) -> bool:
  for u in battle.t.units:
   if u.team=="enemy" and not u.group in engaged: engaged.append(u.group)
  # The sector owns structures and uncollected items; groups own enemy profiles.
- sector.battlefield={"width":battle.t.width,"height":battle.t.height,"tiles":battle.t.tiles,"ground":battle.t.ground}
+ sector.battlefield=battle.field_state()
  for u in battle.t.units:
   if u.person.hp<=0 and not u.person.inventory.is_empty(): drop_inventory(u.person,u.x,u.y,battle.t.ground)
   if u.team=="enemy":
@@ -657,7 +658,7 @@ func resolve_battle(retreat: bool) -> bool:
 func save_to(path: String) -> bool:
  if battle != null:
   s.battle=battle.t
-  s.sectors[s.encounter.sector].battlefield={"width":battle.t.width,"height":battle.t.height,"tiles":battle.t.tiles,"ground":battle.t.ground}
+  s.sectors[s.encounter.sector].battlefield=battle.field_state()
  var invalid=Items.ownership_error(s)
  if invalid!="": return reject(invalid)
  if not valid_save(s): return reject("Campaign state is inconsistent; previous save preserved")
@@ -701,7 +702,7 @@ func load_from(path: String) -> bool:
      if g.id==u.group:
       for m in g.fighters:
        if m.id==u.id: u.person=m
-  s.sectors[s.encounter.sector].battlefield={"width":battle.t.width,"height":battle.t.height,"tiles":battle.t.tiles,"ground":battle.t.ground}
+  s.sectors[s.encounter.sector].battlefield=battle.field_state()
  return true
 
 func valid_save(data: Variant) -> bool:
@@ -771,6 +772,8 @@ func valid_save(data: Variant) -> bool:
   if data.encounter.sector<0 or data.encounter.sector>=256: return false
   var field=data.sectors[data.encounter.sector].get("battlefield",{})
   if not valid_battlefield(field) or field.tiles!=data.battle.tiles or field.ground!=data.battle.ground: return false
+  for key in Layouts.META:
+   if field.get(key)!=data.battle.get(key): return false
   var phase=data.battle.get("phase","combat")
   if phase not in ["deployment","combat"]: return false
   if phase=="deployment" and (data.battle.turn!="company" or data.battle.round!=1 or data.battle.knowledge!={"company":{},"enemy":{}} or not data.battle.ai.is_empty() or not data.battle.noise.is_empty()): return false
@@ -810,6 +813,7 @@ func valid_battlefield(field: Variant) -> bool:
  if not field is Dictionary or not field.has_all(["width","height","tiles","ground"]): return false
  if not (field.width is int or field.width is float) or not (field.height is int or field.height is float): return false
  if field.width<1 or field.height<1 or field.width>160 or field.height>160: return false
+ if not Layouts.valid_metadata(field): return false
  if not field.tiles is Array or field.tiles.size()!=int(field.width)*int(field.height) or not field.ground is Array: return false
  for cell in field.tiles:
   if not cell is Dictionary or not cell.has_all(["x","y","cost","elevation","block","cover","conceal","door","open","kind"]): return false

@@ -371,6 +371,7 @@ func tactical_panel() -> void:
  if b.t.phase=="deployment":
   deployment_panel()
   return
+ label(side,"FIELD · "+game.s.sectors[game.s.encounter.sector].name+" · "+b.t.get("layout","legacy"))
  label(side,"BATTLE · round %d · %s\n%s" % [b.t.round,b.t.turn,b.outcome()])
  for u in b.t.units:
   if u.team=="company" and u.person.hp>0: button(side,("● " if selected==u.id else "")+u.person.name+" · %d AP / %d HP" % [u.ap,u.person.hp],func():selected=u.id;target="";destination={};battle_view.selected=selected;refresh())
@@ -436,8 +437,8 @@ func contracts_panel() -> void:
 
 func deployment_panel() -> void:
  var b=game.battle
- label(side,"DEPLOYMENT · combat paused")
- label(side,"Select a fighter, then tap a green western entry tile. Confirm placement and choose facing. Begin combat when the formation is ready. Placement costs no AP.")
+ label(side,"DEPLOYMENT · "+game.s.sectors[game.s.encounter.sector].name+" · "+b.t.get("layout","legacy"))
+ label(side,"Select a fighter, then tap a green deployment tile. Confirm placement and choose facing. Begin combat when the formation is ready. Placement costs no AP.")
  for fighter in b.t.units:
   if fighter.team!="company" or fighter.person.hp<=0: continue
   var title=("● " if selected==fighter.id else "")+fighter.person.name+" · "+("placed" if fighter.get("deployed",false) else "needs placement")

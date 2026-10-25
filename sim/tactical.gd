@@ -1,5 +1,6 @@
 extends RefCounted
 const Data = preload("res://sim/catalog.gd")
+const Layouts=preload("res://sim/battlefields.gd")
 const Supplies=preload("res://sim/supplies.gd")
 var campaign_ref: WeakRef
 var campaign:
@@ -16,20 +17,19 @@ func _init(owner, restored: Dictionary = {}) -> void:
  t={"phase":"deployment","width":18,"height":14,"tiles":[],"units":[],"squads":[],"turn":"company","round":1,"knowledge":{"company":{},"enemy":{}},"log":[],"ai":[],"noise":[],"ground":[]}
  build_map(18,14)
  var sector=campaign.s.sectors[campaign.s.encounter.sector]
- if sector.has("battlefield"):
-  var saved=sector.battlefield
-  t.width=saved.width
-  t.height=saved.height
-  t.tiles=saved.tiles
-  t.ground=saved.ground
- else: sector.battlefield={"width":t.width,"height":t.height,"tiles":t.tiles,"ground":t.ground}
+ if not sector.has("battlefield"): sector.battlefield=Layouts.create(sector)
+ var saved=sector.battlefield
+ for key in ["width","height","tiles","ground"]+Layouts.META:
+  if saved.has(key): t[key]=saved[key]
  campaign.ensure_group_rosters()
  var count=0
  for g in campaign.s.groups:
   if g.sector == sector.id and g.faction!="company":
    for p in g.fighters:
     if p.hp<=10 or p.get("captured",false): continue
-    var position=g.positions.get(p.id,{"x":11+count%3,"y":3+(count*3)%9})
+    var spawn={"x":11+count%3,"y":3+(count*3)%9}
+    if t.has("enemy_spawns") and count<t.enemy_spawns.size(): spawn=t.enemy_spawns[count]
+    var position=g.positions.get(p.id,spawn)
     var u=make_unit(p.id,"enemy",p,position.x,position.y)
     u.group=g.id
     # A later entrant may otherwise collide with a survivor's remembered position.
@@ -61,6 +61,12 @@ func make_unit(id: String, team: String, p: Dictionary, x: int, y: int) -> Dicti
 func place_unit(u: Dictionary) -> void:
  var cell=tile(u.x,u.y)
  if cell.is_empty() or cell.block or at(u.x,u.y)!=null:
+  if u.team=="enemy":
+   for point in t.get("enemy_spawns",[]):
+    if not tile(point.x,point.y).block and at(point.x,point.y)==null:
+     u.x=point.x;u.y=point.y
+     t.units.append(u)
+     return
   for candidate in t.tiles:
    if not candidate.block and at(candidate.x,candidate.y)==null:
     u.x=candidate.x;u.y=candidate.y
@@ -515,10 +521,13 @@ func ai_unit(u: Dictionary) -> void:
  u.guard=true
  t.ai.append({"id":u.id,"reason":u.reason,"remaining_ap":u.ap})
 
-# Phase 1 uses one fixed western entry zone on the existing encounter template.
-# Phase 2 will author sector layouts; placement validation is already data driven.
+# Authored zones persist with each battlefield; legacy maps keep the western strip.
 static func deployment_tile(state: Dictionary,x: int,y: int) -> bool:
- if x<0 or y<0 or x>=mini(6,int(state.width)) or y>=state.height: return false
+ if x<0 or y<0 or x>=state.width or y>=state.height: return false
+ var inside=false
+ for zone in state.get("deployment_zones",[{"x":0,"y":0,"w":mini(6,int(state.width)),"h":state.height}]):
+  if x>=zone.x and y>=zone.y and x<zone.x+zone.w and y<zone.y+zone.h: inside=true
+ if not inside: return false
  var cell=state.tiles[y*int(state.width)+x]
  if cell.block: return false
  for other in state.units:
@@ -543,7 +552,7 @@ func deployment_error(id: String,x: int,y: int) -> String:
  var u=unit(id)
  if t.phase!="deployment": return "Deployment is already confirmed"
  if u==null or u.team!="company" or u.person.hp<=0: return "Select a living friendly fighter"
- if not deployment_tile(t,x,y): return "Choose an available tile in the western deployment zone"
+ if not deployment_tile(t,x,y): return "Choose an available tile in the highlighted deployment zone"
  if at(x,y,id)!=null: return "Deployment tile is occupied"
  return ""
 
@@ -571,3 +580,9 @@ func confirm_deployment() -> bool:
  refresh_knowledge()
  log_event("Deployment confirmed; combat begins")
  return true
+
+func field_state() -> Dictionary:
+ var field={"width":t.width,"height":t.height,"tiles":t.tiles,"ground":t.ground}
+ for key in Layouts.META:
+  if t.has(key): field[key]=t[key]
+ return field

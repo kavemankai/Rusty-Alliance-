@@ -27,3 +27,5 @@ The schema-3 update adds original squad/depot supply accounting and individual t
 The contract-board update is independent original design, using existing strategic arrival and battle-result hooks. No additional JA2 source was inspected or copied for these objectives. Named-force/camp/defence payments, ordered patrols and escorted strategic freight make no numeric or mission-data parity claim.
 
 Phase 1 deployment uses original placement and freeze rules on the existing template. No additional reference source was inspected or copied. The western entry strip, hostile separation, free setup facing and confirmation policy are independent design choices; no JA2 deployment parity is claimed. Sector-specific maps are reserved for Phase 2.
+
+Phase 2 battlefields are original authored tile geometry and spawn/deployment metadata. No additional reference material was inspected or copied. Layouts retain the existing independent movement/LOS/cover mechanics and persistent sector ownership; no JA2 map or deployment-data parity is claimed.

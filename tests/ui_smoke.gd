@@ -281,7 +281,40 @@ func run() -> void:
  await click("Save")
  await click("Load")
  if app.game.s.jobs[5].status!="paid": failures.append("UI lost paid patrol after reload")
- var result={"failed":failures.size(),"failures":failures,"scope":"Desktop controls: review/place/face/save/confirm company and garrison deployment, company and item management, supply deposit/load, capture contract battle, then recruit and stock levies, march company away, advance to an actual strategic attack, garrison-only defence, settlement defence payment, escorted freight, ordered patrol return and active/paid save/load"}
+ # Layout fixtures isolate presentation and deployment controls; combat wins
+ # for every layout are separately exercised by the legal-action rule driver.
+ for spec in [[17,"settlement"],[34,"farm"],[36,"mine"],[52,"camp"]]:
+  app.game=preload("res://tests/battlefield_cases.gd").contact(spec[0])
+  app.game.autosave_path="user://ui-test-autosave.json"
+  app.selected="mara";app.tab="sector";app.sector=spec[0]
+  app.rebuild()
+  await settle()
+  var b=app.game.battle
+  if b.t.get("layout","")!=spec[1]: failures.append("Wrong visible map for "+spec[1])
+  var destination={}
+  for cell in b.t.tiles:
+   if b.deployment_error("mara",cell.x,cell.y)=="" and b.at(cell.x,cell.y)==null: destination=cell;break
+  app.battle_view.pick(app.battle_view.camera.unproject_position(Vector3(destination.x,destination.elevation*0.5,destination.y))*app.battle_view.size/Vector2(app.battle_view.viewport.size))
+  await settle()
+  await click("Confirm placement")
+  await click("Save")
+  await click("Load")
+  b=app.game.battle
+  if b.unit("mara").x!=destination.x or b.unit("mara").y!=destination.y or b.t.phase!="deployment": failures.append("Layout deployment controls failed on "+spec[1])
+  await capture(spec[1]+"-map-preview.png")
+  await click("Begin combat")
+  b=app.game.battle
+  var actor=b.unit("mara")
+  var prior_ap=actor.ap
+  var step={}
+  for direction in [Vector2i.RIGHT,Vector2i.DOWN,Vector2i.UP]:
+   var cell=b.tile(actor.x+direction.x,actor.y+direction.y)
+   if b.step_cost(actor,b.tile(actor.x,actor.y),cell)>0: step=cell;break
+  app.battle_view.pick(app.battle_view.camera.unproject_position(Vector3(step.x,step.elevation*0.5,step.y))*app.battle_view.size/Vector2(app.battle_view.viewport.size))
+  await settle()
+  await click("Confirm movement")
+  if actor.ap>=prior_ap or actor.x!=step.x or actor.y!=step.y: failures.append("Normal combat movement failed on "+spec[1])
+ var result={"failed":failures.size(),"failures":failures,"scope":"Desktop controls: review/place/face/save/confirm company and garrison deployment, authored settlement/farm/mine/camp rendering and normal-control movement, company and item management, supply deposit/load, capture contract battle, then recruit and stock levies, march company away, advance to an actual strategic attack, garrison-only defence, settlement defence payment, escorted freight, ordered patrol return and active/paid save/load"}
  var report=FileAccess.open("res://ui-test-results.json",FileAccess.WRITE)
  report.store_string(JSON.stringify(result,"  "))
  report.close()

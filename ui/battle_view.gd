@@ -76,10 +76,13 @@ func redraw() -> void:
  multi.mesh=cube
  multi.instance_count=battle.t.tiles.size()
  var chosen=battle.unit(selected)
+ var surfaces={"road":"77664b","floor":"777773","crop":"8b8143","quarry":"626971","mud":"55483b"}
+ var obstacles={"palisade":"806044","rock":"656c75","tree":"344a36"}
  for i in range(battle.t.tiles.size()):
   var c=battle.t.tiles[i]
   var color=Color("485546") if int(c.x+c.y)%2==0 else Color("404d3f")
-  if c.cost>2: color=Color("62604a")
+  if surfaces.has(c.kind): color=Color(surfaces[c.kind])
+  if c.cost>2 and not surfaces.has(c.kind): color=Color("62604a")
   if c.conceal>0: color=Color("2d523a")
   if battle.t.phase=="deployment" and battle.deployment_tile(battle.t,c.x,c.y): color=Color("397a58")
   if i in preview: color=Color("a69745")
@@ -87,9 +90,10 @@ func redraw() -> void:
   multi.set_instance_transform(i,Transform3D(Basis.IDENTITY,Vector3(c.x,c.elevation*0.5,c.y)))
   multi.set_instance_color(i,color)
   if c.block:
-   box(geometry,Vector3(c.x,0.65+c.elevation*0.5,c.y),Vector3(0.85,1.25 if c.kind!="window" else 0.5,0.85),Color("8c8170") if not c.door else Color("8e663f"))
+   var obstacle=Color(obstacles.get(c.kind,"8c8170")) if not c.door else Color("8e663f")
+   box(geometry,Vector3(c.x,0.65+c.elevation*0.5,c.y),Vector3(0.85,1.25 if c.kind!="window" else 0.5,0.85),obstacle)
   elif c.cover>0:
-   box(geometry,Vector3(c.x,0.3,c.y),Vector3(0.9,0.5,0.4),Color("8a7356"))
+   box(geometry,Vector3(c.x,0.3+c.elevation*0.5,c.y),Vector3(0.9,0.5,1.1 if c.kind=="tent" else 0.4),Color("8a7356"))
  instance.multimesh=multi
  geometry.add_child(instance)
  var piles={}

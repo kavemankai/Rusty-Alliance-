@@ -8,8 +8,8 @@ Engine: standard Godot 4.6.2 stable, official 71f334935. GDScript, Compatibility
 
 Verified on Windows with NVIDIA RTX 3050 Laptop GPU:
 
-- 291 mechanical/integration assertions pass with zero failures.
-- Phase 1 deployment is complete for the current encounter template: legal highlighted western placement, free facing changes, explicit combat confirmation, frozen actions/knowledge, company/combined/garrison formations and saved unconfirmed formations. Existing active saves resume combat. Phase 2 sector-specific maps has not started.
+- 365 mechanical/integration assertions pass with zero failures.
+- Phase 1 deployment is complete for the current encounter template: legal highlighted western placement, free facing changes, explicit combat confirmation, frozen actions/knowledge, company/combined/garrison formations and saved unconfirmed formations. Existing active saves resume combat. Phase 2 adds authored settlement, farm, mine and camp layouts plus terrain-based wilderness fallbacks. Geometry, deployment zones and hostile spawn pools persist with the sector.
 - Normal-control desktop UI scenarios pass company/item management, supply deposit/load, a capture contract battle and a separate stocked garrison defending while the company is elsewhere, with active/post-victory save/load.
 - Six objective types use authoritative travel/battle hooks, exclusive deadlines and exactly-once payments. Patrol/escort progress and freight survive save/load; road postings repeat after one day. Old boards are retained unchanged.
 - New rendered controls also fulfil a garrison defence posting and a saved escort/patrol route.
@@ -21,12 +21,13 @@ Verified on Windows with NVIDIA RTX 3050 Laptop GPU:
 - Squads carry separate food/medicine/tools. Local depots, transfers, split/merge conservation, farm output, supply burden and local medical care are verified. Remote resources confer no benefit.
 - Levies are persistent tactical defenders with gear, training, wounds, casualties and upkeep. Co-located squads deploy together; garrisons defend alone and continue after company withdrawal. Lost packs stay at the defeated sector.
 - Strategic contacts queue and stale travel callbacks are rejected.
+- Company and garrison legal-action victories pass on all four layout types. Rendered controls verify each layout, placement, reload and paid movement; doors and ground loot survive retreat/re-entry. Older battlefields retain their exact geometry.
 - Godot imports and runs. Signed Android debug export succeeds; APK inspected with SDK package tools and signature verification.
 
 No connected adb device or installed emulator was available. Android install, launch, physical touch, pause/resume under the OS and performance are **not verified**. No mobile FPS claim is made. The GitHub Actions workflow has not been run remotely.
 
-Production gaps include independently targetable escort carts, sector-specific maps, levy loadout management, full prisoner handling, exploration/combat transitions, deeper AI/knowledge/cover/lighting, transport modes, broader malformed-save/OS interruption coverage and scale profiling. See IMPLEMENTATION_PLAN.md for ordered acceptance work.
+Production gaps include independently targetable escort carts, levy loadout management, full prisoner handling, exploration/combat transitions, deeper AI/knowledge/cover/lighting, transport modes, broader malformed-save/OS interruption coverage and scale profiling. See IMPLEMENTATION_PLAN.md for ordered acceptance work.
 
 Build notes: the preinstalled executable was the .NET editor and requested .mono templates. A separate official standard 4.6.2 executable was downloaded into the workspace work/ directory. The initial standard export's blank validation error was fixed by enabling Android ETC2/ASTC texture import. Project has an original primitive icon; final export should run without the earlier missing-icon error. Debug signing uses existing local development tooling; signing files/passwords are not placed in the repository.
 
-Resume: read AGENTS.md and GAME_SPEC.md, run both suites, then begin Phase 2 sector-specific geography if no device is available. Full contract is preserved verbatim in PRODUCTION_CONTRACT.md.
+Resume: read AGENTS.md and GAME_SPEC.md, run both suites, then continue tactical/AI depth from IMPLEMENTATION_PLAN.md if no device is available. Full contract is preserved verbatim in PRODUCTION_CONTRACT.md.

@@ -8,6 +8,7 @@ Godot 4.6.2 standard, GDScript, Compatibility renderer, Android landscape. Read 
 - Food/medicine/tools belong to squad.supplies or sector.supplies. Never reintroduce a remote global pool. Split/merge must conserve quantities; transfers require stationary co-location and controlled depots. Tactical first aid uses the actor's own pack or home depot.
 - Garrison strength is derived from capable uncaptured profiles, not a counter. Co-located squads and local levies share a tactical engagement. Levies remain home when mercenaries withdraw, and defeated packs stay at the battle sector.
 - Base stockpile access requires Ashford; character transfers require co-location, and combat transfers require adjacency plus 3 AP. Preserve IDs when equipping, transferring, looting or repairing.
+- Battlefields own layout/version/deployment_zones/enemy_spawns alongside tiles/ground. Preserve all metadata through field_state(); never regenerate a visited sector or attach new geometry to a legacy active save.
 - Rules belong in sim/, presentation in ui/. Commands reject invalid actions before spending resources.
 - New mechanics need deterministic behavioural checks. Run tests/run.gd and tests/ui_smoke.gd. An exit code alone is insufficient: reject SCRIPT ERROR and ERROR output.
 - Movement preview and execution must use the same step_cost. Displayed accuracy uses hit_chance before condition/fatigue mutations.
