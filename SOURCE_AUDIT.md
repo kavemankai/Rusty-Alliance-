@@ -23,3 +23,5 @@ All descriptions above are research notes. No original source code, tables, maps
 The schema-2 inventory/continuity update uses original rules: an item has one owner, equipment references owned IDs, hostile individuals remain in persistent groups, local doors/ground placements belong to their sector, and withdrawal chooses a safe adjacent sector. This update does not establish any new numerical JA2 parity claim or import additional reference material.
 
 The schema-3 update adds original squad/depot supply accounting and individual tactical levies. Town Militia.c and the specified training routine were inspected for persistent sector/training relationships; no numeric parity or translation is claimed. Current saves are schema 3 with migration/rebinding for all three tactical profile owners.
+
+The contract-board update is independent original design, using existing strategic arrival and battle-result hooks. No additional JA2 source was inspected or copied for these objectives. Named-force/camp/defence payments, ordered patrols and escorted strategic freight make no numeric or mission-data parity claim.

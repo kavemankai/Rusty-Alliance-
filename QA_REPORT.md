@@ -5,7 +5,7 @@
 | Check | Result |
 |---|---|
 | Godot 4.6.2 standard import / script execution | Passed |
-| Deterministic mechanical/integration suite | 208 passed, 0 failed |
+| Deterministic mechanical/integration suite | 252 passed, 0 failed |
 | Desktop rendered UI scenario | 0 failures; real buttons and selection callbacks, no battle-result injection |
 | First legal-action contract battle | Victory in 3 simulation-driver rounds for seed 731; casualties are retained |
 | Repeated campaign contract scenario | Returned to market, recruited replacements, resupplied, recovered, won second battle |
@@ -22,7 +22,7 @@
 | Physical Android / emulator | Not run: no adb device or installed emulator available |
 | Remote CI | Configuration supplied; not dispatched or observed |
 
-Rendered strategic, inventory, supplies and garrison screenshots were inspected. They show actual runtime geometry and controls. Controls use 48-unit minimum button heights and scrolling panels. These observations do not establish hardware touch comfort or safe-area support.
+Rendered strategic, inventory, supplies, garrison and contract-board screenshots were inspected. They show actual runtime geometry and controls. Controls use 48-unit minimum button heights and scrolling panels. These observations do not establish hardware touch comfort or safe-area support.
 
 ## Repairs verified during development
 
@@ -38,10 +38,10 @@ Rendered strategic, inventory, supplies and garrison screenshots were inspected.
 
 ## Limits and open risks
 
-This is not comprehensive coverage of the master contract. Buildings, full fog, formations, precise interrupt parity, all job types, levy equipment management, transport modes and several persistence/UX requirements remain incomplete. AI uses shared team knowledge and last-known positions, but is deliberately simple. LOS uses sampled cells; all geometric corner/elevation cases have not been proven. Logical 160×160 allocation is checked; scale frame time is not.
+This is not comprehensive coverage of the master contract. Buildings, full fog, formations, precise interrupt parity, independently targetable escort carts, levy equipment management, transport modes and several persistence/UX requirements remain incomplete. AI uses shared team knowledge and last-known positions, but is deliberately simple. LOS uses sampled cells; all geometric corner/elevation cases have not been proven. Logical 160×160 allocation is checked; scale frame time is not.
 
-UI automation runs on desktop and uses pointer events plus selection methods. The first walkthrough covers item management, local supply deposit/load and capture. The second starts with one existing enemy group placed a sector from Ashford as a documented test fixture; all recruitment, stocking, company travel, clock advances, garrison deployment, combat, aid and save/load then use normal controls. The existing group advances through real strategic AI; no victory or payment is injected. This is not physical Android touch evidence. Android interruption and disk-failure injection remain untested. Schema 1→2→3 migrations, ownership/canonical profiles and basic geometry validation are checked; arbitrary malformed-data coverage is not exhaustive.
+UI automation runs on desktop and uses pointer events plus selection methods. The first walkthrough covers item management, local supply deposit/load and capture. The second starts with one existing enemy group placed a sector from Ashford as a documented test fixture; all recruitment, stocking, company travel, clock advances, garrison deployment, combat, aid and save/load then use normal controls. The existing group advances through real strategic AI; no victory or payment is injected. A third quiet-road fixture removes hostile forces and then uses normal controls to accept an escort/patrol, travel through ordered stops, save/load mid-route, deliver freight and return for patrol payment. The second also accepts and earns a settlement defence posting. This is not physical Android touch evidence. Android interruption and disk-failure injection remain untested. Schema 1→2→3 migrations, ownership/canonical profiles and basic geometry validation are checked; arbitrary malformed-data coverage is not exhaustive.
 
-The continuity suite verifies legal death/looting, retreat, save/re-entry and exact hostile identity/condition. The logistics/defence suite adds 66 checks for separate stores, local skills, conserved migration, garrison profiles and control/casualty consequences. It includes legal enemy attacks causing actual levy deaths, continued home defence after retreat, garrison-only legal-action victories, legacy undeployed reserves and deterministic incapacitation fixtures for capture/defeat edges. Existing rule coverage remains in the expanded 208-check suite.
+The continuity suite verifies legal death/looting, retreat, save/re-entry and exact hostile identity/condition. The logistics/defence suite adds 66 checks for separate stores, local skills, conserved migration, garrison profiles and control/casualty consequences. It includes legal enemy attacks causing actual levy deaths, continued home defence after retreat, garrison-only legal-action victories, legacy undeployed reserves and deterministic incapacitation fixtures for capture/defeat edges. Existing rule coverage remains in the expanded 252-check suite. The contracts suite adds 44 checks for all six objective types, exact delivery and idempotency, ordered patrol return, saved road/combat progress, off-site target tracking, actual camp combat, garrison defence payments, ownership loss, deadline failure, withdrawal/defeat/disbanding freight loss, repeat posting cooldown and malformed objective data. A neutralized target remains pending while its actual battle awaits resolution.
 
 Final acceptance: gates C/D pass for the delivered slice. Gate E is pending hardware validation and Gate F remains incomplete. Follow IMPLEMENTATION_PLAN.md before extending acceptance claims.

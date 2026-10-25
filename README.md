@@ -1,8 +1,8 @@
 # The Broken Marches
 
-Original Godot 4.6.2 / GDScript medieval mercenary strategy game. This is a **playable integrated foundation slice**, not the complete production contract. Primitive 3D tactical board, touch-oriented controls, 16×16 campaign, persistent company, two capture jobs and independent strategic forces.
+Original Godot 4.6.2 / GDScript medieval mercenary strategy game. This is a **playable integrated foundation slice**, not the complete production contract. Primitive 3D tactical board, touch-oriented controls, 16×16 campaign, persistent company, six contract types and independent strategic forces.
 
-The current update adds per-squad provisions, local depots, local medical care, persistent tactical levies and combined friendly-squad battles, on top of the item/continuity systems. Schema-1 and schema-2 saves migrate automatically to schema 3 without modifying the original file until you save. Old company supplies are divided between staffed squads; stock local depots before leaving levies to defend.
+The current update adds state-driven elimination, camp assault, escort, patrol and settlement-defence jobs alongside capture. The prior update added per-squad provisions, local depots, local medical care, persistent tactical levies and combined friendly-squad battles, on top of the item/continuity systems. Schema-1 and schema-2 saves migrate automatically to schema 3 without modifying the original file until you save. Old company supplies are divided between staffed squads; stock local depots before leaving levies to defend.
 
 ## Play
 
@@ -16,6 +16,14 @@ Import project.godot in **standard Godot 4.6.2** and press Run. The .NET engine 
 6. Resolve after actual victory or defeat. Retreat requires confirmation and a safe adjacent sector; the arrival sector is preferred. Capture pays an accepted job and changes ownership. Wounds, ammunition, losses, enemy survivors, doors and uncollected ground items persist. Victory loot is carried by survivors; return to Ashford to deposit it.
 7. Assign medical care, rest, training, repairs, scouting or guard duty. Return to Ashford for recruits and supplies. Iron Hollow at 5:3 is a harder second contract.
 8. Save/Load preserves campaign or active battle. Continue autosave loads the last battle boundary/application pause.
+
+## Contract board
+
+New campaigns have seven postings across six objective types. Elimination follows a named existing enemy force, camp assault requires its actual garrison, and defence pays only for repelling the named attackers at the settlement. Clear Redbank and eliminate its raiders can be fulfilled together; killing those raiders elsewhere fails their Ashford defence posting.
+
+Pick up the Willow escort and western-road patrol with a capable stationary squad at Ashford. Freight is a separate 20-food consignment with travel weight; it is unavailable for consumption or transfer. Delivery stores it in Willow's depot. An arrival ambush must be won first; withdrawal, defeat or loss of the assigned squad loses the caravan. The patrol must visit 2:3, 2:4, 2:6 and Ashford in that order. Progress survives save/load. Road work can be reposted one day after closing with a fresh identifier and deadline. Finish before the listed minute.
+
+Existing schema-3 campaigns retain their existing board and world. Start a new campaign to see the new postings and Briar camp at 5:4. There is no automatic insertion of armies into old saves. Escort is a strategic freight abstraction; an independently targetable cart and caravan driver are future tactical work.
 
 ## Supplies and defence
 

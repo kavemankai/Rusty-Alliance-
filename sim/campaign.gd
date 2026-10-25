@@ -5,6 +5,7 @@ const Items = preload("res://sim/inventory.gd")
 const Schema = preload("res://sim/save_schema.gd")
 const Supplies = preload("res://sim/supplies.gd")
 const Garrison = preload("res://sim/garrison.gd")
+const Contracts = preload("res://sim/contracts.gd")
 var s: Dictionary
 var battle = null
 var error = ""
@@ -25,12 +26,14 @@ func _init(seed_value: int = 731) -> void:
  s.sectors[36].merge({"name":"Iron Hollow","owner":"bandits","facility":"mine","known":true},true)
  s.sectors[49].merge({"name":"Willow workshop","owner":"free","facility":"workshop","known":true},true)
  s.sectors[65].merge({"name":"Greywatch","owner":"nobles","facility":"garrison","known":true},true)
+ s.sectors[52].merge({"name":"Briar camp","owner":"bandits","facility":"camp","known":true},true)
  s.sectors[81].merge({"name":"Old drill yard","owner":"free","facility":"training","known":true},true)
  for f in ["company","bandits","nobles","free"]:
   s.factions[f] = {"id":f,"resources":100,"losses":0}
  s.groups = [{"id":"raiders","faction":"bandits","sector":34,"strength":2,"objective":17},
  {"id":"mine_guard","faction":"bandits","sector":36,"strength":3,"objective":36},
- {"id":"grey_patrol","faction":"nobles","sector":65,"strength":3,"objective":34}]
+ {"id":"grey_patrol","faction":"nobles","sector":65,"strength":3,"objective":34},
+ {"id":"briar_guard","faction":"bandits","sector":52,"strength":2,"objective":52,"stationary":true}]
  var profiles = [["mara","Mara","soldier","sword"],["oswin","Oswin","hunter","bow"],
  ["ada","Ada","physician","spear"],["bram","Bram","smith","mace"],["elin","Elin","knight","sword"],["tom","Tom","farmer","crossbow"]]
  for entry in profiles:
@@ -49,6 +52,8 @@ func _init(seed_value: int = 731) -> void:
  s.squads["first"] = {"id":"first","name":"First company","members":["mara","oswin"],"leader":"mara","sector":17,"route":[],"due":0,"assignment":"rest","supplies":{"food":60,"medicine":12,"tools":12}}
  for entry in [["redbank","Clear Redbank",34,450],["iron","Take Iron Hollow",36,650]]:
   s.jobs.append({"id":entry[0],"name":entry[1],"sector":entry[2],"reward":entry[3],"deadline":s.time+5*1440,"status":"available","type":"capture"})
+ Contracts.seed_board(self)
+ Contracts.normalize(s)
  schedule(540,"hour",{})
  for id in ["mara","oswin"]: schedule(s.mercs[id].expires,"employment",{"id":id})
  for j in s.jobs: schedule(j.deadline,"deadline",{"id":j.id})
@@ -95,13 +100,8 @@ func command(kind: String, p: Dictionary = {}) -> bool:
    if battle != null: return reject("Cannot dismiss during combat")
    if not s.mercs.has(p.id) or not s.mercs[p.id].hired: return reject("Not employed")
    remove_member(p.id)
-  "accept":
-   for j in s.jobs:
-    if j.id == p.id and j.status == "available" and j.deadline > s.time:
-     j.status = "active"
-     note("Accepted: " + j.name)
-     return true
-   return reject("Job unavailable")
+  "accept": return Contracts.accept(self,p.get("id",""),p.get("squad","first"))
+  "repost": return Contracts.repost(self,p.get("id",""))
   "buy":
    if battle != null: return reject("Market inaccessible in battle")
    var q = s.squads.get(p.get("squad","first"),{})
@@ -186,6 +186,7 @@ func command(kind: String, p: Dictionary = {}) -> bool:
   "save": return save_to(p.get("path","user://campaign.json"))
   "load": return load_from(p.get("path","user://campaign.json"))
   _: return reject("Unknown command: " + kind)
+ Contracts.tick(self)
  return true
 
 func remove_member(id: String) -> void:
@@ -209,7 +210,10 @@ func travel_cost(q: Dictionary, sector: int) -> int:
  for id in q.members:
   var m = s.mercs[id]
   burden = maxf(burden,1.0+m.fatigue/150.0+(1.0-m.hp/float(m.max_hp))*0.7+maxf(0,Data.weight(m)-m.strength/4.0)/30.0)
- var pack_weight=Supplies.carried_weight(q.supplies)/maxi(1,q.members.size())
+ var freight=0
+ for j in s.jobs:
+  if j.type=="escort" and j.status=="active" and j.squad==q.id: freight+=j.cargo
+ var pack_weight=(Supplies.carried_weight(q.supplies)+freight*0.1)/maxi(1,q.members.size())
  burden+=pack_weight/60.0
  if q.supplies.food <= 0: burden *= 1.3
  return int(ceil(cost*burden))
@@ -251,13 +255,11 @@ func advance(minutes: int) -> bool:
    if not m.is_empty() and m.hired and m.expires<=s.time:
     remove_member(m.id)
     note(m.name+" contract expired")
-  elif event.kind == "deadline":
-   for j in s.jobs:
-    if j.id==event.payload.id and j.status in ["active","available"] and j.deadline<=s.time:
-     j.status="failed"
-     note(j.name+" deadline missed")
+  elif event.kind == "deadline": Contracts.tick(self)
+  Contracts.tick(self)
   if not s.encounter.is_empty(): return true
  s.time = target
+ Contracts.tick(self)
  return true
 
 func medical_skill_at(index: int) -> int:
@@ -340,10 +342,6 @@ func hourly() -> void:
   if m.hired and m.expires <= s.time:
    remove_member(m.id)
    note(m.name+" contract expired")
- for j in s.jobs:
-  if j.status in ["active","available"] and s.time >= j.deadline:
-   j.status = "failed"
-   note(j.name+" deadline missed")
  for sector in s.sectors:
   if sector.owner!="company": continue
   var need=Garrison.living(sector)
@@ -366,6 +364,7 @@ func hourly() -> void:
     if levy.hp==0: levy.dead=true
    else: levy.hp=mini(levy.max_hp,levy.hp+1)
  if int(s.time)%1440 == 0: daily()
+ Contracts.tick(self)
 
 func daily() -> void:
  var wages = 0
@@ -458,7 +457,7 @@ func faction_tick() -> void:
    if d < distance:
     best=n
     distance=d
-  if target != g.sector:
+  if target != g.sector and not g.get("stationary",false):
    g.sector=best
    g.positions={}
   var sector = s.sectors[g.sector]
@@ -486,6 +485,8 @@ func faction_tick() -> void:
       p.hp=0;p.dead=true;casualties-=1
     group_losses(g,force_strength(g))
 
+ Contracts.tick(self)
+
 func arrive(id: String,token: int=-1) -> void:
  if not s.squads.has(id): return
  var q = s.squads[id]
@@ -502,6 +503,7 @@ func arrive(id: String,token: int=-1) -> void:
    q.route=[]
    encounter(q,q.sector)
    return
+ Contracts.visit(self,q)
  if not q.route.is_empty():
   schedule_arrival(q)
 
@@ -565,6 +567,9 @@ func resolve_battle(retreat: bool) -> bool:
   if u.team=="company" and u.role=="merc" and u.person.hp>10: mobile_fighter=true
  if retreat and (exits.is_empty() or not mobile_fighter): return reject("Need a capable mercenary and safe adjacent withdrawal; levies defend their home")
  var participating=battle.t.squads.duplicate()
+ var engaged=[]
+ for u in battle.t.units:
+  if u.team=="enemy" and not u.group in engaged: engaged.append(u.group)
  # The sector owns structures and uncollected items; groups own enemy profiles.
  sector.battlefield={"width":battle.t.width,"height":battle.t.height,"tiles":battle.t.tiles,"ground":battle.t.ground}
  for u in battle.t.units:
@@ -597,10 +602,7 @@ func resolve_battle(retreat: bool) -> bool:
     survivors[index%survivors.size()].inventory.append(placement.item)
     index+=1
    battle.t.ground.clear()
-  for j in s.jobs:
-   if j.status == "active" and j.sector == sector.id and s.time <= j.deadline:
-    j.status="paid"
-    record(j.reward,"Contract: "+j.name)
+
  else:
   if not retreat:
    for u in battle.t.units:
@@ -628,6 +630,7 @@ func resolve_battle(retreat: bool) -> bool:
      break
  for g in s.groups:
   if g.sector==sector.id and g.faction!="company": record_group_losses(g)
+ Contracts.resolved(self,sector.id,victory,participating,engaged)
  var surviving=0
  for u in battle.t.units:
   if u.team=="company" and u.person.hp>0 and not u.person.get("captured",false): surviving+=1
@@ -635,6 +638,7 @@ func resolve_battle(retreat: bool) -> bool:
  note("Battle "+s.result.outcome+" at "+sector.name)
  battle=null
  s.battle={}
+ Contracts.tick(self)
  next_encounter()
  if not victory and hostile_at(sector.id):
   var reserves=combat_squads(sector.id)
@@ -674,6 +678,7 @@ func load_from(path: String) -> bool:
    if valid_save(data): break
  if not valid_save(data): return reject("Save invalid or unsupported version")
  s=normalize_numbers(data)
+ Contracts.normalize(s)
  battle=null
  if not s.battle.is_empty():
   battle=Battle.new(self,s.battle)
@@ -699,6 +704,7 @@ func valid_save(data: Variant) -> bool:
  if data.version!=3 or not data.has_all(["next_item","next_levy","stash_sector","pending_encounters"]) or not data.sectors is Array or data.sectors.size()!=256 or not data.mercs is Dictionary or not data.squads is Dictionary: return false
  if not (data.next_item is int or data.next_item is float) or data.next_item<1 or data.next_item!=floor(data.next_item): return false
  if not (data.stash_sector is int or data.stash_sector is float) or data.stash_sector<0 or data.stash_sector>=256: return false
+ if not Contracts.valid(data): return false
  if not data.pending_encounters is Array or not data.groups is Array or not data.stash is Array: return false
  if not (data.next_levy is int or data.next_levy is float) or data.next_levy<1 or data.next_levy!=floor(data.next_levy): return false
  if data.has("food") or data.has("medicine") or data.has("tools"): return false

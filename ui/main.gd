@@ -206,12 +206,7 @@ func show_panel() -> void:
   return
  match tab:
   "company": company_panel()
-  "contracts":
-   label(side,"CONTRACT BOARD")
-   for j in game.s.jobs:
-    label(side,"%s · %s\n%d crowns · sector %d:%d\nDeadline day %d" % [j.name,j.status,j.reward,int(j.sector)%16+1,int(j.sector/16)+1,int(j.deadline/1440)+1])
-    if j.status=="available": button(side,"Accept "+j.name,run_command.bind("accept",{"id":j.id}))
-   label(side,"Capture contracts pay only after a real victory at the target sector. Missing the deadline fails the job.")
+  "contracts": contracts_panel()
   "inventory": inventory_panel()
   "supplies": supplies_panel()
   "ledger":
@@ -411,3 +406,15 @@ func _notification(what: int) -> void:
  if what==NOTIFICATION_APPLICATION_PAUSED and game!=null:
   auto_minutes=0
   game.save_to(game.autosave_path)
+
+func contracts_panel() -> void:
+ label(side,"CONTRACT BOARD · selected squad: "+squad)
+ label(side,"Finish before the listed deadline. Road work reposts one day after closing.")
+ for j in game.s.jobs:
+  label(side,"%s · %s · %s\n%d crowns · sector %d:%d\nDeadline day %d, %02d:%02d" % [j.name,j.type,j.status,j.reward,int(j.sector)%16+1,int(j.sector/16)+1,int(j.deadline/1440)+1,int(j.deadline%1440/60),int(j.deadline%60)])
+  label(side,game.Contracts.describe(j))
+  if j.squad!="": label(side,"Assigned: "+j.squad)
+  if j.reason!="": label(side,j.reason)
+  if j.status=="available": button(side,"Accept "+j.name,run_command.bind("accept",{"id":j.id,"squad":squad}))
+  elif j.type in ["escort","patrol"] and j.status in ["paid","failed"] and game.s.time>=j.finished+1440:
+   button(side,"Repost "+j.name,run_command.bind("repost",{"id":j.id}))

@@ -372,6 +372,7 @@ func run() -> void:
  check(c.battle.t.tiles.size()==25600,"160 by 160 tactical grid supported as lightweight data")
  Continuity.run(self)
  Logistics.run(self)
+ preload("res://tests/contracts_cases.gd").run(self)
  var results={"checks":checks,"passed":checks.size()-failed,"failed":failed,"contract_rounds":rounds,"engine":Engine.get_version_info().string}
  var f=FileAccess.open("res://test-results.json",FileAccess.WRITE)
  f.store_string(JSON.stringify(results,"  "))

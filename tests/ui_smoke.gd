@@ -189,6 +189,8 @@ func run() -> void:
  app.sector=17;app.squad="first";app.selected="mara";app.tab="sector"
  app.rebuild()
  await settle()
+ await click("Contracts")
+ await click("Accept Defend Ashford from the raiders")
  await click("Inventory")
  await click("Buy food · 20 crowns")
  await click("Buy food · 20 crowns")
@@ -223,7 +225,37 @@ func run() -> void:
    await click("Save")
    await click("Load")
    if app.game.s.sectors[17].owner!="company" or app.game.s.squads.first.sector!=1 or app.game.Garrison.strength(app.game.s.sectors[17])!=survivors: failures.append("Garrison victory did not persist correctly")
- var result={"failed":failures.size(),"failures":failures,"scope":"Desktop controls: company and item management, supply deposit/load, capture contract battle, then recruit and stock levies, march company away, advance to an actual strategic attack, garrison-only defence, and active/post-victory save/load"}
+   if app.game.s.jobs[6].status!="paid": failures.append("Garrison victory did not fulfil settlement defence")
+ # A third campaign exercises pickup, freight, ordered patrol and return using
+ # controls. The quiet-road fixture removes hostile forces, never sets results.
+ app.game=app.Campaign.new()
+ app.game.autosave_path="user://ui-test-autosave.json"
+ app.game.s.groups=[]
+ app.sector=17;app.squad="first";app.selected="mara";app.tab="sector"
+ app.rebuild()
+ await settle()
+ await click("Contracts")
+ await click("Accept Escort the Willow provisions")
+ await click("Accept Patrol the western road")
+ if app.game.s.jobs[4].cargo!=20 or app.game.s.jobs[5].status!="active": failures.append("Road work UI did not assign freight and patrol")
+ await capture("contracts-preview.png")
+ await click("Map")
+ await select_sector(33)
+ await click("Plot route to selected sector")
+ await click("+6 hours")
+ await click("Save")
+ await click("Load")
+ if app.game.s.jobs[5].step!=1 or app.game.s.jobs[4].cargo!=20: failures.append("UI save/load lost road objective progress")
+ for index in [49,81,17]:
+  await select_sector(index)
+  await click("Plot route to selected sector")
+  await click("+6 hours")
+  if not app.game.s.squads.first.route.is_empty(): await click("+6 hours")
+ if app.game.s.jobs[4].status!="paid" or app.game.s.jobs[5].status!="paid" or app.game.s.sectors[49].supplies.food!=20: failures.append("UI road route did not fulfil delivery and ordered patrol")
+ await click("Save")
+ await click("Load")
+ if app.game.s.jobs[5].status!="paid": failures.append("UI lost paid patrol after reload")
+ var result={"failed":failures.size(),"failures":failures,"scope":"Desktop controls: company and item management, supply deposit/load, capture contract battle, then recruit and stock levies, march company away, advance to an actual strategic attack, garrison-only defence, settlement defence payment, escorted freight, ordered patrol return and active/paid save/load"}
  var report=FileAccess.open("res://ui-test-results.json",FileAccess.WRITE)
  report.store_string(JSON.stringify(result,"  "))
  report.close()

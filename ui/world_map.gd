@@ -40,6 +40,11 @@ func _draw() -> void:
     var next=offset+Vector2(int(index)%16+0.5,int(index/16)+0.5)*cell
     draw_line(prev,next,Color("ffdd88"),2)
     prev=next
+ for j in campaign.s.jobs:
+  if j.type=="escort" and j.status=="active" and campaign.s.squads.has(j.squad):
+   var q=campaign.s.squads[j.squad]
+   var center=offset+Vector2(int(q.sector)%16+0.25,int(q.sector/16)+0.75)*cell
+   draw_rect(Rect2(center-Vector2.ONE*4,Vector2.ONE*8),Color("ffd27d"))
  for g in campaign.s.groups:
   if campaign.force_strength(g)>0 and campaign.s.sectors[g.sector].known:
    var center=offset+Vector2(int(g.sector)%16+0.78,int(g.sector/16)+0.25)*cell
