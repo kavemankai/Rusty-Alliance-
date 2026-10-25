@@ -1,0 +1,19 @@
+# Reference source audit
+
+Repository: https://github.com/kavemankai/jaggedalliance2.git
+Inspected revision: 9bec381bcaec845361e13f95098faaf294435acd
+Inspection date: 2026-10-25. The reference checkout lives outside this deliverable under work/ja2-reference.
+
+| Source location | Observed relationship | Independent implementation |
+|---|---|---|
+| ja2/Build/Tactical/Soldier Control.c:473, CalcActionPoints | Ability/experience establish base AP; health, breath and carried burden reduce it; minimum and maximum bounds apply. New turns permit limited carryover. | catalog.gd uses an original bounded formula and fatigue/burden modifiers. No numeric parity claimed; no carryover yet. |
+| ja2/Build/Tactical/Points.c:247, ActionPointCost and preceding TerrainBreathPoints | Terrain and movement mode control AP/breath costs; weight affects exertion; costs are distinct from graphics. | tactical.gd step_cost drives A* preview and execution; original cost values. |
+| ja2/Build/Strategic/Strategic Movement.c:1557, GroupArrivedAtSector; :2738, CalculateTravelTimeOfGroup; :3123, GetTravelTimeForGroup | Groups carry waypoints and arrival timestamps; remaining travel and subsequent waypoint travel compose ETA. Arrivals can trigger battle checks. | Weighted four-neighbour routing, timestamped arrivals, hostile-contact time interruption. |
+| ja2/Build/Strategic/Game Events.c:213, ProcessPendingGameEvents; :428, AddStrategicEvent | Pending timestamped events are executed through callbacks within a world-time adjustment. | Explicit sorted (minute, stable event id) event queue; hours and arrivals share the same clock. |
+| ja2/Build/Strategic/Game Event Hook.c:74, ExecuteStrategicEvent | Dispatch links events to strategic services. | Campaign event dispatch calls arrival, hourly assignment and daily economy/faction processing. |
+| ja2/Build/TacticalAI/AIUtils.c:1164, ClosestSeenOpponent | Filters neutral/allied/inactive opponents and checks personal opponent knowledge before using current positions. | Enemy decisions access visible knowledge, last-known coordinates and acoustic coordinates. Omniscient target selection is excluded. |
+| ja2/Build/SaveLoadGame.c:460, SaveGame; declarations near :421 | Save pipeline includes versioned header and random-number persistence among campaign systems. | JSON schema v1 saves entire campaign and tactical state, including custom integer PRNG state; backup recovery and reference rebinding. |
+
+File discovery also located Tactical/PATHAI.C, Tactical/LOS.c, Tactical/opplist.c, Laptop/finances.c and Tactical/Merc Hiring.c. Those subsystems have **not** received a line-by-line parity audit. The original request's broader source study remains incomplete.
+
+All descriptions above are research notes. No original source code, tables, maps, mercenary profiles or assets are incorporated. See MECHANICS_PARITY.md for the deliberately limited fidelity claims.

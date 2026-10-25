@@ -1,0 +1,74 @@
+name: Mechanical tests and Android debug
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  foundation:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      GODOT_VERSION: 4.6.2
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - name: Install SDK and desktop test dependencies
+        run: |
+          sdkmanager 'platform-tools' 'platforms;android-35' 'build-tools;35.0.1'
+          sudo apt-get update
+          sudo apt-get install -y xvfb libgl1-mesa-dri libxinerama1 libxcursor1 libxi6 libasound2t64
+      - name: Install matching standard Godot and Android debug template
+        run: |
+          curl --fail -L -o /tmp/godot.zip "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          unzip -q /tmp/godot.zip -d /tmp/godot
+          sudo install /tmp/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64 /usr/local/bin/godot
+          curl --fail -L -o /tmp/templates.tpz "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
+          mkdir -p "$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable"
+          unzip -j /tmp/templates.tpz templates/android_debug.apk templates/version.txt -d "$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable"
+      - name: Configure debug tools
+        shell: python
+        run: |
+          import os, pathlib, subprocess
+          config = pathlib.Path.home() / '.config/godot'
+          config.mkdir(parents=True, exist_ok=True)
+          key = pathlib.Path(os.environ['RUNNER_TEMP']) / 'debug.keystore'
+          subprocess.run(['keytool', '-genkeypair', '-keystore', str(key), '-storepass', 'android', '-alias', 'androiddebugkey', '-keypass', 'android', '-dname', 'CN=Android Debug,O=Android,C=US', '-keyalg', 'RSA', '-validity', '10000'], check=True)
+          settings = '[gd_resource type="EditorSettings" format=3]\n\n[resource]\n'
+          for k,v in {'java_sdk_path': os.environ['JAVA_HOME'], 'android_sdk_path': os.environ['ANDROID_HOME'], 'debug_keystore': str(key), 'debug_keystore_user': 'androiddebugkey', 'debug_keystore_pass': 'android'}.items():
+              settings += f'export/android/{k} = "{v}"\n'
+          (config/'editor_settings-4.6.tres').write_text(settings)
+      - name: Import and verify mechanics
+        run: |
+          godot --headless --editor --import --quit 2>&1 | tee /tmp/import.log
+          ! grep -E 'SCRIPT ERROR:|^ERROR:' /tmp/import.log
+          godot --headless --script tests/run.gd 2>&1 | tee /tmp/tests.log
+          ! grep -E 'SCRIPT ERROR:|^ERROR:|FAIL:' /tmp/tests.log
+      - name: Verify normal UI campaign loop
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: |
+          xvfb-run -a godot --audio-driver Dummy --script tests/ui_smoke.gd 2>&1 | tee /tmp/ui.log
+          ! grep -E 'SCRIPT ERROR:|^ERROR:|"failed":[1-9]' /tmp/ui.log
+      - name: Export and inspect APK
+        run: |
+          mkdir -p builds
+          godot --headless --export-debug Android builds/broken-marches-debug.apk 2>&1 | tee /tmp/export.log
+          ! grep -E 'SCRIPT ERROR:|^ERROR:' /tmp/export.log
+          "$ANDROID_HOME/build-tools/35.0.1/apksigner" verify --verbose builds/broken-marches-debug.apk
+          "$ANDROID_HOME/build-tools/35.0.1/aapt" dump badging builds/broken-marches-debug.apk | tee builds/apk-package.txt
+          sha256sum builds/broken-marches-debug.apk > builds/SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: broken-marches-debug
+          path: |
+            builds/*.apk
+            builds/*.txt
+            test-results.json
+            *-preview.png
+          if-no-files-found: error

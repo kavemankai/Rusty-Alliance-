@@ -1,0 +1,8 @@
+.godot/
+builds/
+*.tmp
+*.log
+test-results.json
+ui-test-results.json
+*-preview.png.import
+*.keystore
