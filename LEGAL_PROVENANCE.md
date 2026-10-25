@@ -15,3 +15,8 @@ Source ownership/licensing for the newly authored game remains with the applicab
 Schema-1 regression save fixtures were generated from this project's own previous commit cbffb36. They contain the fictional Marches world/characters, not JA2 source, campaign data or assets.
 
 Schema-2 fixtures were generated from this project's own commit a5240f2. The schema-3 logistics and levy rules use original code, data and formulas. Additional reference inspection is limited to the persistent sector/training relationships identified in SOURCE_AUDIT.md; no JA2 militia tables or source code are included.
+
+
+Phase 10: additional reference function bodies were read as documented in SOURCE_AUDIT.md. No reference C/header code, tables, campaign data or assets were incorporated. The release audit compares tracked-source hashes with research files of at least 512 bytes and checks archive/APK paths and signing-material exclusion; absence of byte-identical files is not proof of independent creation or legal clearance.
+
+THIRD_PARTY_NOTICES.txt is generated from standard Godot 4.6.2 engine APIs, with an Android-template attribution supplement. Matching official template declarations and Maven licence metadata identify Kotlin standard library 2.1.20, AndroidX fragment 1.8.6, core-splashscreen 1.0.1 and documentfile 1.1.0 under Apache-2.0, whose text is included. Related AndroidX/Kotlin runtime families are acknowledged. This is not an exact transitive binary SBOM or a substitute for complete dependency-notice/ownership review before commercial distribution. No commercial publication or project licence grant is performed.

@@ -24,5 +24,8 @@ Phases 7 and 8 add typed event/financial/assignment records, structural prefligh
 |---|---|
 | 7 Save/state hardening | Implemented; malformed records, backups and process interruption verified |
 | 8 Scale/performance and extended checks | Implemented; 32/80/160 desktop profiles, faster routing/redraw and six 45-day campaigns |
-| 9 Android hardware acceptance | Open; needs a physical device or emulator |
-| 10 Wider source/parity/release audit | Open |
+| 9 Android acceptance | Emulator functional checks completed as requested; physical-phone gate remains open |
+| 10 Wider source/parity/release audit | Focused technical audit and release-content checks completed; commercial rights review remains external |
+
+
+The 9/10 follow-up adds native Android gestures, touch cancellation/pause cleanup, safe-area handling, scroll propagation fixes, repeatable OS-input testing and explicit acceptance gaps. See ANDROID_QA.md and CONTRACT_ACCEPTANCE.md. Emulator acceptance is scoped separately from physical-phone acceptance.

@@ -195,6 +195,7 @@ func pick(point: Vector2) -> void:
     return
 
 func input_event(event: InputEvent) -> void:
+ if (event is InputEventMouseButton or event is InputEventMouseMotion) and event.device==InputEvent.DEVICE_ID_EMULATION: return
  if battle==null: return
  if event is InputEventMouseButton:
   if event.button_index==MOUSE_BUTTON_WHEEL_UP: camera.size=clampf(camera.size-1,8,32)
@@ -208,11 +209,19 @@ func input_event(event: InputEvent) -> void:
  elif event is InputEventMouseMotion and pressed:
   if event.position.distance_to(down)>12: dragged=true
   if dragged: camera.position+=Vector3(-event.relative.x-event.relative.y,0,event.relative.x-event.relative.y)*camera.size/900
+ elif event is InputEventPanGesture:
+  var relative=-event.delta*5.0
+  camera.position+=Vector3(-relative.x-relative.y,0,relative.x-relative.y)*camera.size/900
+  dragged=true
  elif event is InputEventMagnifyGesture: camera.size=clampf(camera.size/event.factor,8,32)
  elif event is InputEventScreenTouch:
-  if event.pressed: fingers[event.index]=event.position
-  else: fingers.erase(event.index)
-  if fingers.size()>1: dragged=true
+  if event.pressed:
+   if fingers.is_empty(): down=event.position;dragged=false
+   fingers[event.index]=event.position
+   if fingers.size()>1: dragged=true
+  else:
+   if fingers.has(event.index) and fingers.size()==1 and not dragged and not event.canceled: pick(event.position)
+   fingers.erase(event.index)
  elif event is InputEventScreenDrag and fingers.has(event.index):
   if fingers.size()==2:
    var keys=fingers.keys()
@@ -220,5 +229,13 @@ func input_event(event: InputEvent) -> void:
    var old=fingers[event.index].distance_to(fingers[other])
    var fresh=event.position.distance_to(fingers[other])
    if old>1 and fresh>1: camera.size=clampf(camera.size*old/fresh,8,32)
+   camera.position+=Vector3(-event.relative.x-event.relative.y,0,event.relative.x-event.relative.y)*camera.size/1800
    dragged=true
+  elif fingers.size()==1:
+   if event.position.distance_to(down)>12: dragged=true
+   if dragged: camera.position+=Vector3(-event.relative.x-event.relative.y,0,event.relative.x-event.relative.y)*camera.size/900
   fingers[event.index]=event.position
+
+func _notification(what: int) -> void:
+ if what==NOTIFICATION_APPLICATION_PAUSED:
+  fingers.clear();pressed=false;dragged=true

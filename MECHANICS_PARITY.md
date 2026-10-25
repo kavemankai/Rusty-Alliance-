@@ -18,3 +18,6 @@ The production pass uses independent combat styles, wound severity, medicine/rep
 ## Save hardening and scale follow-up — 2026-10-26
 
 Phases 7 and 8 add typed event/financial/assignment records, structural preflight before migration, verified temporary/backup commits, process-termination recovery coverage, large-map heap routing, cached selection redraws and six 45-day campaign/replay scenarios. See HARDENING_SCALE.md and the raw profile/extended reports for exact evidence and limitations. The physical Android gate (phase 9) and wider source/parity/release audit (phase 10) remain open. No additional JA2 source was copied or newly audited in this follow-up.
+
+
+Phase 10 expands the relationship audit to path plotting, height/perception, opponent/interrupt handling, finance, hiring, close/ranged combat, armour wear, care/repair, strategic reinforcement evaluation and morale. MECHANICS_MAPPING.md now reflects implemented jobs, transport, rooms and exploration instead of stale prototype deferrals. CONTRACT_ACCEPTANCE.md records mandatory gaps without labelling them optional. No numerical or legal parity claim is added.

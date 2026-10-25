@@ -6,3 +6,7 @@ test-results.json
 ui-test-results.json
 *-preview.png.import
 *.keystore
+
+__pycache__/
+*.pyc
+release-audit.json

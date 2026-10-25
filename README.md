@@ -69,3 +69,8 @@ Operations opens peaceful sector visits, transport purchases and local prisoner 
 In combat, select a target to choose style/body area, charge or shield bash. Select an adjacent free tile for deliberate disengagement and read its reaction/AP preview. The side panel offers defensive modes, ally protection, rally, adjacent treatment/repair and actual thrown items. Watch localized injuries, matching ammo type and shield condition. Unused turn AP carries up to four points. Use a prepared four-fighter party or four shield defenders for the deterministic camp fixtures; the mechanical driver does not use every player option.
 
 Night visibility and constructed torches affect perception. Enemy reports have local communication limits, and strategic factions recruit from actual resource budgets. These systems are original bounded rules, not claims of exact JA2 parity. Restart the game to load the changes; new fields contain roof/room/approach metadata, while old visited geometry is preserved.
+
+
+## Android 0.11.0 and audit
+
+Native tap/drag/pinch/pan, cancellation and pause cleanup, safe-area margins and scrollable button panels are verified on the documented Android emulator. See ANDROID_QA.md for repeatable OS-input tests. SOURCE_AUDIT.md and CONTRACT_ACCEPTANCE.md distinguish verified relationships, deliberate replacements and remaining mandatory/physical/commercial gates. Full production-foundation completion is not claimed.

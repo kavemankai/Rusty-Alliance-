@@ -2,20 +2,20 @@
 
 Run `godot --headless --script tests/run.gd`. A structured report is written to test-results.json. Assertions test actual state changes; rules use original catalogue values. `tests/ui_smoke.gd` separately drives visible Control buttons and tactical selection paths under a rendering desktop.
 
-| Requested scenario | Implemented fixture and expected result | Remaining scope |
+| Scenario | Current bounded evidence | Remaining acceptance |
 |---|---|---|
-| 1 Tactical movement | Exact cost 4 for two grass steps, exact AP deduction, stance surcharge, walls, door opening, occupied-door closure rejection, diagonal wall detour, hill ascent cost 5 | Full terrain catalogue, turning cost within movement, friendly pass-through policy |
-| 2 Melee combat | Spear reach 2 accepted, sword reach 2 rejected; rear bonus; AP-funded shield/parry/dodge observed across 60 seeds; armour mitigates same-seed aggregate damage | Complete disengage pressure and engagement matrix |
-| 3 Ranged combat | Aim increases accuracy; ammo consumed; unloaded shot rejected; bow/crossbow reload differences; cover penalty; 20-seed contact roll matches preview | Complete distance/elevation matrix, missile categories, javelin consumption |
-| 4 Defence | Walls/doors/LOS; real persistent levies, combined friendly squads, garrison-only attack, legal combat casualties, ownership loss and continued defence after company withdrawal; UI walkthrough | Rich building/fortification roles and deliberate deployment |
-| 5 Contract | Hire → equip → accept → route → contact → legal battle → capture/payment; duplicate reward rejected; normal UI replay also passes | Additional job variants |
-| 6 Logistics | Separate squad/depot stores, conservative split/merge/transfers, remote/moving refusal, local medical skill and resources, local farm production, weight, shortages, wages/upkeep, recovery/training/repair | Transport modes, deeper logistics balance and resupply AI |
-| 7 Faction war | Existing groups move; bounded weaker attack loses to persistent levy defence | Broad rival war / reinforcement strategy |
-| 8 Persistent campaign | First battle result → return to market → recruit/resupply/recover → second target and real battle → second contract paid | Larger long-lived campaigns and content |
-| 9 Save/load | Tactical RNG/clock/injuries/loadout; friendly/enemy/levy rebinding; exact roundtrip; backup; actual schema-1/2 fixtures migrate to schema 3; supply totals/old garrisons preserved; duplicate membership/ownership rejected | Physical Android / power-loss / actual full-disk hardware cases |
-| 10 Extended simulation | Thirty days, exactly 30 midnight ledger wage entries, exact elapsed time, only one recurring hourly event remains | Full faction/encounter campaign soak with player decisions |
+| Movement | Shared preview/execution, obstacles/corners/elevation, stance, heap/reference equivalence and native Android paid movement | Complete terrain catalogue/geometry matrix |
+| Melee | Reach, body/style choices, paid defence, disengagement, charge/bash/protection and real injuries | Full probability/balance and engagement calibration |
+| Ranged | Owned typed ammo, bows/crossbows/throws, reload, cover/range/elevation and actual Android shot/reload | Complete geometric and probability matrix |
+| Defence | Authored deployment, rooms/roofs/fortifications, combined squads/levies, real casualty/control changes | Multistorey geometry and richer tactical roles |
+| Contract | All six objective types, generated road jobs, idempotent payment, desktop full victory loop, Android board/travel/combat controls | Exhaustive Android full victory/payment player flow |
+| Logistics | Local packs/depots, transfers, care/repair/training, horse/cart ownership, forage and conservation | Broader economy/resupply balance |
+| Faction war | Facility budgets, paid recruitment, reports, raids/withdrawal/patrol and roster clashes | Broad strategic balance and sophisticated manoeuvre |
+| Persistent campaign | Multiple real battles plus six 45-day seeded checkpoints and deterministic replay | Unrestricted campaigns/player decisions |
+| Save/load | Actual legacy fixtures, canonical profiles/items, malformed nested data, verified backups/process-kill checkpoints and Android Home/relaunch | Physical power loss, full-disk and OEM low-memory acceptance |
+| Extended/scale | 270 seeded campaign days, isolated wage clock, desktop 32/80/160 profiles and synthetic Android 25,600-cell save/render | Real low-end phone thermals/battery/soak and full mandatory-rule coverage |
 
-The extended clock fixture excludes active armies and employment to isolate event accounting. Combat defence tests sample fixed seeds and compare behaviour rather than claim probability calibration. The 160×160 assertion verifies lightweight logical capacity, not runtime performance at that size.
+The extended clock fixture excludes active armies and employment to isolate event accounting. Combat defence tests sample fixed seeds and compare behaviour rather than claim probability calibration. The desktop and synthetic Android profiles are described in HARDENING_SCALE.md and ANDROID_QA.md; neither establishes physical-phone performance.
 
 ## Inventory and continuity expansion
 

@@ -30,12 +30,21 @@ func _ready() -> void:
  ui=Control.new()
  ui.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
  add_child(ui)
+ get_viewport().size_changed.connect(func():call_deferred("apply_safe_area"))
+ apply_safe_area()
  var theme=Theme.new()
  theme.default_font_size=18
  ui.theme=theme
  confirm=ConfirmationDialog.new()
  ui.add_child(confirm)
  menu()
+ if OS.is_debug_build() and OS.has_feature("android") and FileAccess.file_exists("user://mobile-qa.enabled"):
+  add_child(preload("res://ui/mobile_probe.gd").new())
+
+func apply_safe_area() -> void:
+ if not OS.has_feature("android") or ui==null: return
+ var padding=preload("res://ui/safe_area.gd").insets(DisplayServer.get_display_safe_area(),DisplayServer.window_get_size(),get_viewport().get_visible_rect().size)
+ ui.offset_left=padding.x;ui.offset_top=padding.y;ui.offset_right=-padding.z;ui.offset_bottom=-padding.w
 
 func clear() -> void:
  for child in ui.get_children():
@@ -46,12 +55,13 @@ func clear() -> void:
 func button(parent: Node,title: String,callback: Callable) -> Button:
  var b=Button.new()
  b.text=title
+ b.mouse_filter=Control.MOUSE_FILTER_PASS
  b.clip_text=true
  b.tooltip_text=title
  b.custom_minimum_size=Vector2(0,48)
  b.size_flags_horizontal=Control.SIZE_EXPAND_FILL
  parent.add_child(b)
- b.pressed.connect(callback)
+ b.pressed.connect(callback,CONNECT_DEFERRED)
  return b
 
 func label(parent: Node,text: String) -> Label:

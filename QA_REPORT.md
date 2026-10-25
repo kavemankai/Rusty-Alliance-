@@ -5,7 +5,7 @@
 | Check | Result |
 |---|---|
 | Godot 4.6.2 standard import / script execution | Passed |
-| Deterministic mechanical/integration suite | 577 passed, 0 failed |
+| Deterministic mechanical/integration suite | 596 passed, 0 failed |
 | Extended campaigns and route equivalence | 796 passed, 0 failed; six seeds, 45 days each |
 | Visibility/AI | 28 new checks: independent fog, remembered unseen changes, legacy/cache persistence, unknown-obstacle routing, flank/elevation/window cover, legal sheltered AI steps, hidden-position-independent pursuit, searched/expired memories and wounded ally support |
 | Phase 3 exploration | 38 new checks: scouting entry, invalid-action guards, movement/patrol pulses, either-side and immediate detection, AP/position continuity, quiet exit, bleeding/death, pending/blocked orders, garrison/combined profiles, malformed records and legacy continuation |
@@ -71,4 +71,12 @@ The normal-control UI suite additionally exercises peaceful timed movement/build
 Phases 7 and 8 add typed event/financial/assignment records, structural preflight before migration, verified temporary/backup commits, process-termination recovery coverage, large-map heap routing, cached selection redraws and six 45-day campaign/replay scenarios. See HARDENING_SCALE.md and the raw profile/extended reports for exact evidence and limitations. The physical Android gate (phase 9) and wider source/parity/release audit (phase 10) remain open. No additional JA2 source was copied or newly audited in this follow-up.
 
 
-Current delivery: 0.10.0-hardening-scale (versionCode 10). Final evidence: 577 mechanical checks, 796 extended checks, each with 0 failures; rendered UI 0 failures; APK export and v2/v3 signature verification pass. Versioned packages retain the previous delivered APK. See HARDENING_SCALE.md.
+Current delivery: 0.11.0-android-audit (versionCode 11). Mechanical checks: 596 passed, 0 failed. Extended checks: 796 passed, 0 failed. Desktop UI: 0 failures. Android emulator results and release-content audit are supplied separately; see ANDROID_QA.md and android-qa-results.json. Earlier APKs remain available.
+
+
+## Android and source follow-up
+
+Native touch/cancel/pause/gesture and safe-area logic has 19 focused regressions. Emulator scenarios exercise actual Android input, including inventory, paid combat and process recreation. The focused source audit now covers the previously uninspected path/LOS/opponent/finance/hiring relationships plus combat, armour, assignments, strategic AI and morale. Exact numeric parity, commercial clearance and full contract acceptance are not inferred from these results. CONTRACT_ACCEPTANCE.md names the remaining mandatory tooling and hardware/release gaps.
+
+
+Final 0.11.0 emulator run: 37 checks passed, 0 failed across six scenarios; no script/fatal errors in the final application runtime log. The delivered APK hash is bound to android-qa-results.json. Physical-phone acceptance and full foundation remain open as described above.

@@ -1,0 +1,268 @@
+{
+  "version": "0.11.0-android-audit",
+  "versionCode": 11,
+  "apk_sha256": "d5c9e84785bfcde0ad3bdb360491ed41f01f622f11e848325c5f45605a8d15a4",
+  "passed": 37,
+  "failed": 0,
+  "runtime_script_errors": [],
+  "environment": {
+    "android": "15",
+    "api": 35,
+    "abi": "x86_64",
+    "resolution": "1280x720 landscape",
+    "density": 240,
+    "vcpus": 2,
+    "ram_mb": 2048,
+    "acceleration": "Windows WHPX, host RTX 3050 Laptop OpenGL translation"
+  },
+  "scenarios": [
+    {
+      "scenario": "basic",
+      "serial": "emulator-5554",
+      "android": "15",
+      "api": "35",
+      "device": "Android SDK built for x86_64",
+      "passed": 10,
+      "failed": 0,
+      "checks": [
+        {
+          "name": "Android native touch starts original campaign",
+          "passed": true
+        },
+        {
+          "name": "Touch scrolling, character selection and hiring change canonical funds/membership",
+          "passed": true
+        },
+        {
+          "name": "Android stockpile transfer, person handover and equipment controls change actual loadout",
+          "passed": true
+        },
+        {
+          "name": "Touch Load restores saved state after hiring",
+          "passed": true
+        },
+        {
+          "name": "Android touch selects intended strategic sector once",
+          "passed": true
+        },
+        {
+          "name": "Android strategic drag pans without changing selected sector",
+          "passed": true
+        },
+        {
+          "name": "On-screen zoom works without a keyboard",
+          "passed": true
+        },
+        {
+          "name": "Android contract board accepts a real contract",
+          "passed": true
+        },
+        {
+          "name": "Touch confirmation plots actual strategic route",
+          "passed": true
+        },
+        {
+          "name": "Android clock advances real travel/events",
+          "passed": true
+        }
+      ],
+      "limits": [
+        "Emulator evidence does not establish physical-phone touch, thermals, battery or sustained low-end performance.",
+        "Optional read-only debug telemetry adds overhead; it does not invoke game commands."
+      ]
+    },
+    {
+      "scenario": "gestures",
+      "serial": "emulator-5554",
+      "android": "15",
+      "api": "35",
+      "device": "Android SDK built for x86_64",
+      "passed": 2,
+      "failed": 0,
+      "checks": [
+        {
+          "name": "Android two-pointer pan changes map offset without selection",
+          "passed": true
+        },
+        {
+          "name": "Android two-pointer pinch changes map zoom without selection",
+          "passed": true
+        }
+      ],
+      "limits": [
+        "Emulator evidence does not establish physical-phone touch, thermals, battery or sustained low-end performance.",
+        "Optional read-only debug telemetry adds overhead; it does not invoke game commands."
+      ]
+    },
+    {
+      "scenario": "tactical",
+      "serial": "emulator-5554",
+      "android": "15",
+      "api": "35",
+      "device": "Android SDK built for x86_64",
+      "passed": 14,
+      "failed": 0,
+      "checks": [
+        {
+          "name": "Actual strategic contact opens Android deployment",
+          "passed": true
+        },
+        {
+          "name": "Native Android tactical tap selects intended fighter",
+          "passed": true
+        },
+        {
+          "name": "Android deployment confirmation starts real combat",
+          "passed": true
+        },
+        {
+          "name": "Touch route confirmation executes the expected two-AP step",
+          "passed": true
+        },
+        {
+          "name": "Android brace spends two AP and changes defence mode",
+          "passed": true
+        },
+        {
+          "name": "Android guard control reserves real reaction state",
+          "passed": true
+        },
+        {
+          "name": "Android visibility exposes real opponents for targeting",
+          "passed": true
+        },
+        {
+          "name": "Android ranged attack spends five AP and one owned arrow",
+          "passed": true
+        },
+        {
+          "name": "Android reload loads the bow and spends two AP",
+          "passed": true
+        },
+        {
+          "name": "Android tactical pinch zooms without changing selected fighter",
+          "passed": true
+        },
+        {
+          "name": "Android two-finger pan changes tactical camera",
+          "passed": true
+        },
+        {
+          "name": "Android single-finger drag pans tactical camera",
+          "passed": true
+        },
+        {
+          "name": "Android active-combat Save/Load preserves AP, wounds, positions and PRNG",
+          "passed": true
+        },
+        {
+          "name": "Android End turn runs enemy AI and returns control",
+          "passed": true
+        }
+      ],
+      "limits": [
+        "Emulator evidence does not establish physical-phone touch, thermals, battery or sustained low-end performance.",
+        "Optional read-only debug telemetry adds overhead; it does not invoke game commands."
+      ]
+    },
+    {
+      "scenario": "lifecycle",
+      "serial": "emulator-5554",
+      "android": "15",
+      "api": "35",
+      "device": "Android SDK built for x86_64",
+      "passed": 5,
+      "failed": 0,
+      "checks": [
+        {
+          "name": "Lifecycle fixture has an active campaign",
+          "passed": true
+        },
+        {
+          "name": "Android Home notification writes current campaign autosave",
+          "passed": true
+        },
+        {
+          "name": "Android process recreation restores phase, clock and funds",
+          "passed": true
+        },
+        {
+          "name": "Android process recreation preserves exact combat profiles, AP, wounds and PRNG",
+          "passed": true
+        },
+        {
+          "name": "Android confirmation Cancel returns to the existing game without leaving",
+          "passed": true
+        }
+      ],
+      "limits": [
+        "Emulator evidence does not establish physical-phone touch, thermals, battery or sustained low-end performance.",
+        "Optional read-only debug telemetry adds overhead; it does not invoke game commands."
+      ]
+    },
+    {
+      "scenario": "cutout",
+      "serial": "emulator-5554",
+      "android": "15",
+      "api": "35",
+      "device": "Android SDK built for x86_64",
+      "passed": 4,
+      "failed": 0,
+      "checks": [
+        {
+          "name": "Simulated Android display cutout is excluded from menu layout",
+          "passed": true
+        },
+        {
+          "name": "Core navigation and Save controls remain inside Android cutout safe area",
+          "passed": true
+        },
+        {
+          "name": "Android touch Save works with a cutout inset",
+          "passed": true
+        },
+        {
+          "name": "Removing simulated cutout restores full landscape layout",
+          "passed": true
+        }
+      ],
+      "limits": [
+        "Emulator evidence does not establish physical-phone touch, thermals, battery or sustained low-end performance.",
+        "Optional read-only debug telemetry adds overhead; it does not invoke game commands."
+      ]
+    },
+    {
+      "scenario": "scale",
+      "serial": "emulator-5554",
+      "android": "15",
+      "api": "35",
+      "device": "Android SDK built for x86_64",
+      "passed": 2,
+      "failed": 0,
+      "checks": [
+        {
+          "name": "Android loads validated synthetic 160 by 160 combat fixture through Load",
+          "passed": true
+        },
+        {
+          "name": "Android writes and validates all 25600 battlefield cells",
+          "passed": true
+        }
+      ],
+      "limits": [
+        "Emulator evidence does not establish physical-phone touch, thermals, battery or sustained low-end performance.",
+        "Optional read-only debug telemetry adds overhead; it does not invoke game commands."
+      ],
+      "tap_to_observed_load_ms": 4375.0,
+      "fixture": "Synthetic partially surveyed logical grid, not an authored gameplay encounter",
+      "debug_observer_frame_ms": {
+        "median": 16.59,
+        "p95": 18.525,
+        "samples": 300
+      },
+      "save_bytes": 6045951,
+      "memory": "Applications Memory Usage (in Kilobytes):\r\nUptime: 3568241 Realtime: 3568241\r\n\r\n** MEMINFO in pid 10484 [org.brokenmarches.foundation] **\r\n                   Pss  Private  Private     Swap      Rss     Heap     Heap     Heap\r\n                 Total    Dirty    Clean    Dirty    Total     Size    Alloc     Free\r\n                ------   ------   ------   ------   ------   ------   ------   ------\r\n  Native Heap   165331   165208        0        0   169268   346000   167733   173185\r\n  Dalvik Heap     1334     1080        0        0     8796     4853     2427     2426\r\n Dalvik Other     6104     1860        0        0    10948                           \r\n        Stack      724      724        0        0      732                           \r\n       Ashmem       31        0        0        0      592                           \r\n    Other dev       15        0       12        0      324                           \r\n     .so mmap    63290     2000    58396        0    97976                           \r\n    .jar mmap     2884        0       64        0    42332                           \r\n    .apk mmap      234        0       64        0     1612                           \r\n    .ttf mmap       38        0        0        0      192                           \r\n    .dex mmap       22        0        0        0      848                           \r\n    .oat mmap       54        0        0        0     1772                           \r\n    .art mmap     8687     7968        0        0    29532                           \r\n   Other mmap     2214        4        0        0     5156                           \r\n      Unknown     8436     8424        0        0     9248                           \r\n        TOTAL   259398   187268    58536        0   379328   350853   170160   175611\r\n \r\n App Summary\r\n                       Pss(KB)                        Rss(KB)\r\n                        ------                         ------\r\n           Java Heap:     9048                          38328\r\n         Native Heap:   165208                         169268\r\n                Code:    60608                         153276\r\n               Stack:      724                            732\r\n            Graphics:        0                              0\r\n       Private Other:    10216\r\n              System:    13594\r\n             Unknown:                                   17724\r\n \r\n           TOTAL PSS:   259398            TOTAL RSS:   379328      TOTAL SWAP (KB):        0\r\n \r\n Objects\r\n               Views:        8         ViewRootImpl:        1\r\n         AppContexts:        5           Activities:        1\r\n              Assets:        9        AssetManagers:        0\r\n       Local Binders:       13        Proxy Binders:       63\r\n       Parcel memory:        5         Parcel count:       22\r\n    Death Recipients:        0             WebViews:        0\r\n \r\n SQL\r\n         MEMORY_USED:        0\r\n  PAGECACHE_OVERFLOW:        0          MALLOC_SIZE:        0"
+    }
+  ],
+  "scope": "User selected emulator acceptance for now; no physical phone testing or full Android victory/payment walkthrough is claimed."
+}

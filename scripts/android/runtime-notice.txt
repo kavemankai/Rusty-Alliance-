@@ -1,0 +1,16 @@
+Android template runtime attribution supplement
+
+The matching official Godot 4.6.2 Android template declares Kotlin standard library 2.1.20 and AndroidX fragment 1.8.6, core-splashscreen 1.0.1 and documentfile 1.1.0, together with their AndroidX/Kotlin runtime dependencies. The component families are attributed to JetBrains (Kotlin standard library and kotlinx.coroutines) and The Android Open Source Project / AndroidX contributors (AndroidX libraries). Their declared licence is Apache License 2.0; the full Apache-2.0 text is included in this notice file above. This is a source-template dependency declaration, not an exact transitive binary SBOM.
+
+Declaration sources:
+https://github.com/godotengine/godot/blob/4.6.2-stable/platform/android/java/app/config.gradle
+https://github.com/godotengine/godot/blob/4.6.2-stable/platform/android/java/lib/build.gradle
+https://github.com/godotengine/godot/blob/4.6.2-stable/platform/android/java/app/build.gradle
+
+Licence metadata checked:
+https://dl.google.com/dl/android/maven2/androidx/fragment/fragment/1.8.6/fragment-1.8.6.pom
+https://dl.google.com/dl/android/maven2/androidx/core/core-splashscreen/1.0.1/core-splashscreen-1.0.1.pom
+https://dl.google.com/dl/android/maven2/androidx/documentfile/documentfile/1.1.0/documentfile-1.1.0.pom
+https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-stdlib/2.1.20/kotlin-stdlib-2.1.20.pom
+
+No project-authored game licence is granted by these notices. A commercial distribution still requires the project's independent rights and complete dependency-notice review.

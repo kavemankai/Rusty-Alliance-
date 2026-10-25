@@ -51,6 +51,7 @@ func _draw() -> void:
    draw_circle(center,4*zoom,Color("ff8d7f"))
 
 func input_event(event: InputEvent) -> void:
+ if (event is InputEventMouseButton or event is InputEventMouseMotion) and event.device==InputEvent.DEVICE_ID_EMULATION: return
  if event is InputEventMouseButton:
   if event.button_index==MOUSE_BUTTON_WHEEL_UP: zoom=clampf(zoom*1.1,0.65,2.8)
   elif event.button_index==MOUSE_BUTTON_WHEEL_DOWN: zoom=clampf(zoom/1.1,0.65,2.8)
@@ -60,26 +61,42 @@ func input_event(event: InputEvent) -> void:
     down=event.position
     dragged=false
    elif not dragged:
-    var point=(event.position-offset)/(32.0*zoom)
-    var x=int(floor(point.x))
-    var y=int(floor(point.y))
-    if x>=0 and x<16 and y>=0 and y<16:
-     selected=y*16+x
-     sector_selected.emit(selected)
+    select_point(event.position)
  elif event is InputEventMouseMotion and pressed:
   if event.position.distance_to(down)>12: dragged=true
   if dragged: offset+=event.relative
+ elif event is InputEventPanGesture:
+  offset-=event.delta*5.0;dragged=true
  elif event is InputEventMagnifyGesture: zoom=clampf(zoom*event.factor,0.65,2.8)
  elif event is InputEventScreenTouch:
-  if event.pressed: fingers[event.index]=event.position
-  else: fingers.erase(event.index)
-  if fingers.size()>1: dragged=true
+  if event.pressed:
+   if fingers.is_empty(): down=event.position;dragged=false
+   fingers[event.index]=event.position
+   if fingers.size()>1: dragged=true
+  else:
+   if fingers.has(event.index) and fingers.size()==1 and not dragged and not event.canceled: select_point(event.position)
+   fingers.erase(event.index)
  elif event is InputEventScreenDrag and fingers.has(event.index):
   if fingers.size()==2:
    var keys=fingers.keys()
    var other=keys[0] if keys[1]==event.index else keys[1]
    var old=fingers[event.index].distance_to(fingers[other])
-   if old>1: zoom=clampf(zoom*event.position.distance_to(fingers[other])/old,0.65,2.8)
+   var fresh=event.position.distance_to(fingers[other])
+   if old>1 and fresh>1: zoom=clampf(zoom*fresh/old,0.65,2.8)
+   offset+=event.relative*0.5
    dragged=true
+  elif fingers.size()==1:
+   if event.position.distance_to(down)>12: dragged=true
+   if dragged: offset+=event.relative
   fingers[event.index]=event.position
  queue_redraw()
+
+func select_point(position: Vector2) -> void:
+ var point=(position-offset)/(32.0*zoom)
+ var x=int(floor(point.x));var y=int(floor(point.y))
+ if x>=0 and x<16 and y>=0 and y<16:
+  selected=y*16+x;sector_selected.emit(selected)
+
+func _notification(what: int) -> void:
+ if what==NOTIFICATION_APPLICATION_PAUSED:
+  fingers.clear();pressed=false;dragged=true

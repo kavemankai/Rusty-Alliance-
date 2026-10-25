@@ -10,7 +10,7 @@ Run mechanics and UI tests before continuing. Use scripts/build.ps1 for a gated 
 
 Saves: Godot user://campaign.json (manual) and user://autosave.json (battle boundaries and application pause), with .bak recovery. Test drivers use separate test-named save/autosave slots and preserve manual playthrough slots.
 
-There is a working central loop and 577 mechanical/integration checks plus the extended campaign suite, but **the full production contract is not completed**. Item ownership, battlefield continuity, per-squad logistics, persistent tactical levies and combined friendly squads are implemented. IMPLEMENTATION_PLAN.md is the authoritative next-work list. The next acceptance phases are physical Android QA and the wider source/parity/release audit.
+There is a working central loop and 596 mechanical/integration checks plus the extended campaign suite, but **the full production contract is not completed**. Item ownership, battlefield continuity, per-squad logistics, persistent tactical levies and combined friendly squads are implemented. IMPLEMENTATION_PLAN.md is the authoritative next-work list. The focused technical source audit and requested emulator work are complete. Next acceptance work is physical Android QA, the remaining mandatory debug tools and independent commercial review.
 
 Repository is locally committed with the provided origin. Reference JA2 content is outside this deliverable. No game code/assets were copied from it, and no commercial publication or paid-service action occurred.
 
@@ -18,3 +18,6 @@ Repository is locally committed with the provided origin. Reference JA2 content 
 ## Save hardening and scale follow-up — 2026-10-26
 
 Phases 7 and 8 add typed event/financial/assignment records, structural preflight before migration, verified temporary/backup commits, process-termination recovery coverage, large-map heap routing, cached selection redraws and six 45-day campaign/replay scenarios. See HARDENING_SCALE.md and the raw profile/extended reports for exact evidence and limitations. The physical Android gate (phase 9) and wider source/parity/release audit (phase 10) remain open. No additional JA2 source was copied or newly audited in this follow-up.
+
+
+Version 0.11.0: read ANDROID_QA.md for the emulator harness and CONTRACT_ACCEPTANCE.md for real remaining gaps. Engine notices come from scripts/export_notices.gd; scripts/audit_release.py checks committed source/archive/APK contents. The observer is opt-in only. A single Android gesture project setting is intentionally committed while unrelated pre-existing project.godot editor changes remain local. No push/publication occurred.

@@ -17,7 +17,7 @@ The production contract is larger than the delivered slice. Preserve working int
 
 ## Work areas and acceptance gates
 
-The numbered work areas below are not the user-facing phase sequence. Current phase status: 7 save hardening and 8 desktop scale/extended verification are implemented; 9 physical Android acceptance and 10 wider source/parity/release audit remain open.
+The numbered work areas below are not the user-facing phase sequence. Current phase status: 7 save hardening and 8 desktop scale/extended verification are implemented; 9 emulator acceptance is verified as requested (physical-phone acceptance remains open); 10 focused technical audit is complete (commercial review remains external).
 
 1. **Android interaction/device gate.** Install supplied APK on mainstream hardware. Test touch select/confirm/cancel, scroll, two-finger pan/zoom, cutouts, pause/resume, OS interruption and low-memory behaviour. Measure frame pacing and input latency; record hardware and results. Device QA is currently an external blocker.
 2. **State model hardening — core ownership/logistics complete.** Item identities, condition/transfers, squad/sector supply stores and schema-1→2→3 migrations are implemented and verified. Conservation, local access, canonical references and basic terrain validation are in place. Typed assignment/financial/event records, structural preflight, malformed-data tests and application/process-interruption injection are now implemented; see HARDENING_SCALE.md.
@@ -26,7 +26,7 @@ The numbered work areas below are not the user-facing phase sequence. Current ph
 5. **Tactical depth — requested melee/world pass implemented.** Deliberate disengagement; styles/body targets/defensive choices; localized injuries and treatment; shield wear; typed ammunition; actual thrown gear; draw costs and four-AP carryover are implemented. Peaceful entry/leave, timed exploration, roofed one-level room footprints/cutaways, more facility variants, selectable edges and paid construction are integrated. The final combat pass adds charges, shield bashes, directional adjacent-ally interception and support actions. More storeys, mounted tactical combat and richer animation are expansion work, not supplied here.
 6. **AI depth — requested scope implemented.** Formations use actual movement/AP, AI can raise shields/treat bleeding and support nearby injured allies, individual sightings share within six tiles, sounds have recency/range priority, rally supplements panic retreat, and night/torch visibility plus oriented construction cover affect rules. Strategic factions earn/spend resources, recruit at staffed bases, react to expiring nearby reports, patrol between objectives and resolve real roster casualties when armies clash. Further sophistication remains possible; no exact JA2 parity or unrestricted grand-strategy intelligence is claimed.
 7. **Scale and tests.** Desktop 32/80/160 map profiles, large-map heap routing and six 45-day campaigns are implemented. Full mandatory-rule parity and physical Android performance remain outside these bounded checks. Add hardware Android smoke CI when available.
-8. **Source audit/parity.** Inspect remaining source systems listed in SOURCE_AUDIT.md, document exact preserved-rule expectations and differences. Keep all new implementation independent. Obtain rights review before any commercial release.
+8. **Source audit/parity.** The focused subsystem audit, classification reconciliation, acceptance inventory and release-content checks are complete. Exact numerical parity is not claimed. Obtain rights/dependency review before commercial release; finish mandatory interactive debug overlays/scenario launcher from CONTRACT_ACCEPTANCE.md.
 
 ## Gate state
 
@@ -47,3 +47,6 @@ The user-requested sequence 1-6 and combat feature pass is tracked separately in
 ## Save hardening and scale follow-up — 2026-10-26
 
 Phases 7 and 8 add typed event/financial/assignment records, structural preflight before migration, verified temporary/backup commits, process-termination recovery coverage, large-map heap routing, cached selection redraws and six 45-day campaign/replay scenarios. See HARDENING_SCALE.md and the raw profile/extended reports for exact evidence and limitations. The physical Android gate (phase 9) and wider source/parity/release audit (phase 10) remain open. No additional JA2 source was copied or newly audited in this follow-up.
+
+
+The next concrete work is the physical-phone acceptance matrix and the mandatory developer-overlay/scenario-launcher gap. Do not treat completion of an audit as implementation of every missing feature.
