@@ -3,6 +3,7 @@ const Data=preload("res://sim/catalog.gd")
 
 static func create(state: Dictionary,kind: String,quantity: int=1,condition: int=100) -> Dictionary:
  var entry=Data.item("item_%d" % state.next_item,kind,quantity,condition)
+ if kind=="ammo": entry.ammo_type="arrows"
  state.next_item+=1
  return entry
 
@@ -16,17 +17,32 @@ static func squad_for(state: Dictionary,id: String) -> Dictionary:
   if id in q.members: return q
  return {}
 
+static func person(state: Dictionary,id: String) -> Dictionary:
+ if state.mercs.has(id): return state.mercs[id]
+ for sector in state.sectors:
+  for defender in sector.levies:
+   if defender.id==id: return defender
+ return {}
+
+static func location(state: Dictionary,id: String) -> int:
+ var q=squad_for(state,id)
+ if not q.is_empty(): return q.sector
+ for sector in state.sectors:
+  for defender in sector.levies:
+   if defender.id==id: return sector.id
+ return -1
+
 static func stash_accessible(campaign,id: String) -> bool:
- if campaign.battle!=null: return false
- var q=squad_for(campaign.s,id)
- return not q.is_empty() and q.sector==campaign.s.stash_sector and q.route.is_empty()
+ return campaign.battle==null and location(campaign.s,id)==campaign.s.stash_sector and actor_error(campaign,id,0)==""
 
 static func actor_error(campaign,id: String,cost: int) -> String:
- if not campaign.s.mercs.has(id) or not campaign.s.mercs[id].hired or campaign.s.mercs[id].dead: return "Select an employed living fighter"
- var m=campaign.s.mercs[id]
- if m.hp<=10: return "Incapacitated fighters cannot manage equipment"
+ var m=person(campaign.s,id)
+ if m.is_empty() or m.hp<=10 or m.dead or m.get("captured",false): return "Select an available capable fighter"
+ if campaign.s.mercs.has(id) and not m.hired: return "Select an employed fighter"
  var q=squad_for(campaign.s,id)
- if q.is_empty() or not q.route.is_empty(): return "Wait until the squad is stationary"
+ if not q.is_empty() and not q.route.is_empty(): return "Wait until the squad is stationary"
+ var at=location(campaign.s,id)
+ if at<0 or (not campaign.s.mercs.has(id) and campaign.s.sectors[at].owner!="company"): return "Defender is not at a controlled depot"
  if campaign.battle!=null:
   var u=campaign.battle.unit(id)
   if u==null or not campaign.battle.can_act(u) or u.ap<cost: return "Need %d AP on an active fighter" % cost
@@ -39,7 +55,7 @@ static func equip(campaign,p: Dictionary) -> String:
  var id=p.get("id","")
  var invalid=actor_error(campaign,id,3)
  if invalid!="": return invalid
- var m=campaign.s.mercs[id]
+ var m=person(campaign.s,id)
  var selector=p.get("item","")
  var entry=find(m.inventory,selector)
  var from_stash=false
@@ -63,7 +79,7 @@ static func equip(campaign,p: Dictionary) -> String:
  var slot=""
  if Data.WEAPONS.has(kind):
   slot="weapon"
-  if kind in ["greatsword","polearm","bow","crossbow"] and Data.shield(m): return "Remove shield before using a two handed weapon"
+  if kind in ["greatsword","polearm","bow","crossbow"] and not Data.equipped(m,"shield").is_empty(): return "Remove shield before using a two handed weapon"
  elif Data.ARMOUR.has(kind):
   slot="body"
   if campaign.battle!=null: return "Change armour outside combat"
@@ -74,20 +90,23 @@ static func equip(campaign,p: Dictionary) -> String:
  elif kind=="ammo":
   if not from_stash: return "Ammunition in the backpack is already available"
  else: return "This item cannot be equipped"
+ if campaign.battle!=null and campaign.battle.unit(id).ap<draw_cost(kind): return "Insufficient AP to draw this equipment"
  if slot!="" and m.equipment.get(slot,"")==entry.id: return "Already equipped"
  if from_stash:
   campaign.s.stash.erase(entry)
   m.inventory.append(entry)
  if slot!="": m.equipment[slot]=entry.id
- if slot=="weapon": m.loaded=false
- pay_ap(campaign,id,3)
+ if slot=="weapon":
+  m.loaded=false
+  if campaign.battle!=null: campaign.battle.unit(id).attack_style="normal"
+ pay_ap(campaign,id,draw_cost(kind))
  return ""
 
 static func unequip(campaign,p: Dictionary) -> String:
  var id=p.get("id","")
  var invalid=actor_error(campaign,id,3)
  if invalid!="": return invalid
- var m=campaign.s.mercs[id]
+ var m=person(campaign.s,id)
  var slot=p.get("slot","shield")
  if Data.equipped(m,slot).is_empty(): return "That slot is empty"
  if slot=="body" and campaign.battle!=null: return "Change armour outside combat"
@@ -106,18 +125,19 @@ static func transfer(campaign,p: Dictionary) -> String:
  if source=="stash" or destination=="stash":
   if not stash_accessible(campaign,actor): return "Visit Ashford to use the stockpile"
  else:
-  if not campaign.s.mercs.has(destination) or not campaign.s.mercs[destination].hired or campaign.s.mercs[destination].hp<=0: return "Recipient unavailable"
+  var recipient_profile=person(campaign.s,destination)
+  if recipient_profile.is_empty() or recipient_profile.hp<=0 or recipient_profile.get("captured",false): return "Recipient unavailable"
   var a=squad_for(campaign.s,source)
   var b=squad_for(campaign.s,destination)
-  if a.is_empty() or b.is_empty() or a.sector!=b.sector or not b.route.is_empty(): return "Recipients must be stationary in the same sector"
+  if location(campaign.s,source)!=location(campaign.s,destination) or (not b.is_empty() and not b.route.is_empty()): return "Recipients must be stationary in the same sector"
   if campaign.battle!=null:
    var receiver=campaign.battle.unit(destination)
    if receiver==null or campaign.battle.distance(campaign.battle.unit(source),receiver)>1: return "Recipient must be adjacent in combat"
- var inventory=campaign.s.stash if source=="stash" else campaign.s.mercs[source].inventory
+ var inventory=campaign.s.stash if source=="stash" else person(campaign.s,source).inventory
  var entry=find(inventory,p.get("item",""))
  if entry.is_empty(): return "Source does not own this item"
- if source!="stash" and entry.id in campaign.s.mercs[source].equipment.values(): return "Unequip this item before transferring it"
- var recipient=campaign.s.stash if destination=="stash" else campaign.s.mercs[destination].inventory
+ if source!="stash" and entry.id in person(campaign.s,source).equipment.values(): return "Unequip this item before transferring it"
+ var recipient=campaign.s.stash if destination=="stash" else person(campaign.s,destination).inventory
  inventory.erase(entry)
  recipient.append(entry)
  pay_ap(campaign,actor,3)
@@ -157,6 +177,8 @@ static func ownership_error(state: Dictionary) -> String:
  for m in state.mercs.values(): owners.append(m)
  for g in state.groups:
   for m in g.get("fighters",[]): owners.append(m)
+ for job in state.jobs:
+  for actor in job.get("actors",[]): owners.append(actor)
  for cell in state.sectors:
   for p in cell.levies: owners.append(p)
   for ground in cell.get("battlefield",{}).get("ground",[]):
@@ -168,9 +190,10 @@ static func ownership_error(state: Dictionary) -> String:
   for entry in owner.inventory:
    if not entry is Dictionary or not entry.has_all(["id","kind","quantity","condition"]): return "Invalid item"
    if not entry.id is String or entry.id=="" or ids.has(entry.id): return "Duplicate item ownership: "+str(entry.id)
-   if not Data.WEAPONS.has(entry.kind) and not Data.ARMOUR.has(entry.kind) and entry.kind not in ["ammo","shield","helmet"]: return "Unknown item kind"
+   if not Data.WEAPONS.has(entry.kind) and not Data.ARMOUR.has(entry.kind) and entry.kind not in ["ammo","shield","helmet","stone"]: return "Unknown item kind"
    if not (entry.quantity is int or entry.quantity is float) or entry.quantity<1 or entry.quantity!=floor(entry.quantity): return "Invalid item quantity"
-   if entry.kind!="ammo" and entry.quantity!=1: return "Equipment cannot be stacked"
+   if entry.kind not in ["ammo","stone"] and entry.quantity!=1: return "Equipment cannot be stacked"
+   if entry.kind=="ammo" and entry.get("ammo_type","arrows") not in ["arrows","bolts","javelins"]: return "Invalid ammunition type"
    if not (entry.condition is int or entry.condition is float) or entry.condition<0 or entry.condition>100 or entry.condition!=floor(entry.condition): return "Invalid item condition"
    if entry.id.begins_with("item_"):
     var suffix=entry.id.trim_prefix("item_")
@@ -183,3 +206,6 @@ static func ownership_error(state: Dictionary) -> String:
    var kind=local[id].kind
    if (slot=="weapon" and not Data.WEAPONS.has(kind)) or (slot=="body" and not Data.ARMOUR.has(kind)) or (slot in ["shield","helmet"] and kind!=slot) or slot not in ["weapon","body","shield","helmet"]: return "Invalid equipment slot"
  return ""
+
+static func draw_cost(kind: String) -> int:
+ return 4 if kind in ["greatsword","polearm","crossbow","helmet"] else 3

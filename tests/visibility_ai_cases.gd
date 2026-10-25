@@ -15,6 +15,7 @@ static func hidden_memory(y: int=2):
  enemy.ap=4
  b.t.turn="enemy"
  b.t.knowledge.enemy.mara={"x":12,"y":2,"round":b.t.round,"visible":false}
+ enemy.memory={"mara":b.t.knowledge.enemy.mara.duplicate()}
  b.refresh_knowledge()
  return c
 

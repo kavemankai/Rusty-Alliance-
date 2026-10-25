@@ -21,3 +21,5 @@ Godot 4.6.2 standard, GDScript, Compatibility renderer, Android landscape. Read 
 - Update source audit, test evidence, parity and continuation instructions when behaviour changes.
 
 No parallel agents are required for this repository.
+
+Production-pass invariants: ammo_type must match the weapon; throws move actual item IDs; injuries belong to canonical people. Convoy actors belong to jobs, are included in ownership validation and rebind by contract after load. Peaceful visits cannot award victories. Transport assets conserve through split/merge; recruitment and construction spend actual local resources. Mode changes never grant AP; turn carryover is capped at four and requires prior activation.

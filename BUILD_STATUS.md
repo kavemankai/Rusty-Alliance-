@@ -1,4 +1,4 @@
-# Build status — 2026-10-25
+# Build status — 2026-10-26
 
 **Playable integrated slice delivered; full production foundation incomplete.**
 
@@ -8,7 +8,7 @@ Engine: standard Godot 4.6.2 stable, official 71f334935. GDScript, Compatibility
 
 Verified on Windows with NVIDIA RTX 3050 Laptop GPU:
 
-- 431 mechanical/integration assertions pass with zero failures.
+- 522 mechanical/integration assertions pass with zero failures.
 - Phase 1 deployment is complete for the current encounter template: legal highlighted western placement, free facing changes, explicit combat confirmation, frozen actions/knowledge, company/combined/garrison formations and saved unconfirmed formations. Existing active saves resume combat. Phase 2 adds authored settlement, farm, mine and camp layouts plus terrain-based wilderness fallbacks. Geometry, deployment zones and hostile spawn pools persist with the sector.
 - Normal-control desktop UI scenarios pass company/item management, supply deposit/load, a capture contract battle and a separate stocked garrison defending while the company is elsewhere, with active/post-victory save/load.
 - Six objective types use authoritative travel/battle hooks, exclusive deadlines and exactly-once payments. Patrol/escort progress and freight survive save/load; road postings repeat after one day. Old boards are retained unchanged.
@@ -24,11 +24,12 @@ Verified on Windows with NVIDIA RTX 3050 Laptop GPU:
 - Company and garrison legal-action victories pass on all four layout types. Rendered controls verify each layout, placement, reload and paid movement; doors and ground loot survive retreat/re-entry. Older battlefields retain their exact geometry.
 - Phase 3 adds opt-in command-based exploration, local movement/patrol/bleeding pulses, immediate either-side detection into combat, retained AP/positions and a three-quiet-round return to scouting. Mode, pending paths and patrol state persist.
 - Visibility/AI phase adds per-team explored terrain memory, current sight, hidden loot/obstacle suppression, provisional unknown-ground routes, directional geometry-derived cover, cover-seeking ranged AI, bounded last-seen pursuit and wounded-ally support. No hidden opponent coordinates enter pursuit goals.
+- The requested items 1-6 and offensive/defensive pass add paid combat choices, localized injury/treatment, typed projectiles, peaceful construction/rooms/timed scouting, prisoners/levy gear/transport, protected caravans/procedural jobs, local AI communications/lighting/formations and resource-backed strategic responses. See REQUEST_PROGRESS.md.
 - Godot imports and runs. Signed Android debug export succeeds; APK inspected with SDK package tools and signature verification.
 
 No connected adb device or installed emulator was available. Android install, launch, physical touch, pause/resume under the OS and performance are **not verified**. No mobile FPS claim is made. The GitHub Actions workflow has not been run remotely.
 
-Production gaps include independently targetable escort carts, levy loadout management, full prisoner handling, broader AI coordination, lighting, transport modes, broader malformed-save/OS interruption coverage and scale profiling. See IMPLEMENTATION_PLAN.md for ordered acceptance work.
+Remaining acceptance work includes broader malformed-save and disk/OS interruption coverage, typed service records, scale profiling, Android hardware/touch testing, and the wider source/release audit. The six requested gameplay areas and subsequent offensive/defensive pass are implemented as described in REQUEST_PROGRESS.md; multistorey buildings and mounted tactical combat are not claimed.
 
 Build notes: the preinstalled executable was the .NET editor and requested .mono templates. A separate official standard 4.6.2 executable was downloaded into the workspace work/ directory. The initial standard export's blank validation error was fixed by enabling Android ETC2/ASTC texture import. Project has an original primitive icon; final export should run without the earlier missing-icon error. Debug signing uses existing local development tooling; signing files/passwords are not placed in the repository.
 

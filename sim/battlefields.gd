@@ -12,6 +12,7 @@ static func create(sector: Dictionary) -> Dictionary:
  for y in range(14):
   for x in range(18):
    field.tiles.append({"x":x,"y":y,"cost":2,"elevation":0,"block":false,"cover":0,"conceal":0,"door":false,"open":false,"kind":"grass"})
+ field.entry_zones={"west":field.deployment_zones.duplicate(true),"east":[{"x":15,"y":0,"w":3,"h":14}],"north":[{"x":0,"y":0,"w":18,"h":2}],"south":[{"x":0,"y":12,"w":18,"h":2}]}
  var preferred=[Vector2i(11,3),Vector2i(12,6),Vector2i(13,9)]
  match kind:
   "farm":
@@ -62,6 +63,10 @@ static func create(sector: Dictionary) -> Dictionary:
      for x in range(9,14): paint(field,x,y,{"kind":"mud","cost":5})
    elif sector.terrain=="forest":
     for y in [2,5,8,11]: paint(field,10,y,{"kind":"tree","block":true})
+ field.entry_zones.west=field.deployment_zones.duplicate(true)
+ if kind=="settlement" and sector.facility=="training":
+  for x in [6,8,10]: paint(field,x,10,{"kind":"dummy","cover":15})
+ if kind=="settlement" and sector.facility=="workshop": paint(field,7,3,{"kind":"workbench","cover":30})
  for point in preferred:
   if not field.tiles[point.y*18+point.x].block: field.enemy_spawns.append({"x":point.x,"y":point.y})
  for y in range(2,12):
@@ -80,7 +85,7 @@ static func house(field: Dictionary,x: int,y: int,w: int,h: int,dx: int,dy: int)
  for cy in range(y,y+h):
   for cx in range(x,x+w):
    var edge=cx==x or cy==y or cx==x+w-1 or cy==y+h-1
-   paint(field,cx,cy,{"kind":"wall" if edge else "floor","block":edge})
+   paint(field,cx,cy,{"kind":"wall" if edge else "floor","block":edge,"room":"%d_%d" % [x,y],"roof":true,"interior":not edge})
  door(field,dx,dy)
 
 static func valid_metadata(field: Dictionary) -> bool:
@@ -89,6 +94,10 @@ static func valid_metadata(field: Dictionary) -> bool:
   if field.has(key): present+=1
  if present==0: return true # Older battlefields retain their exact geometry.
  if present!=META.size() or field.layout not in KINDS or field.layout_version!=1: return false
+ if field.has("entry_zones"):
+  if not field.entry_zones is Dictionary: return false
+  for direction in field.entry_zones:
+   if direction not in ["north","south","east","west"] or not valid_zones(field.entry_zones[direction],field.width,field.height): return false
  if not field.deployment_zones is Array or field.deployment_zones.is_empty() or not field.enemy_spawns is Array or field.enemy_spawns.is_empty(): return false
  for zone in field.deployment_zones:
   if not zone is Dictionary or not zone.has_all(["x","y","w","h"]): return false
@@ -102,3 +111,12 @@ static func valid_metadata(field: Dictionary) -> bool:
 
 static func integer(value: Variant) -> bool:
  return (value is int or value is float) and value==floor(value)
+
+static func valid_zones(zones: Variant,w: int,h: int) -> bool:
+ if not zones is Array or zones.is_empty(): return false
+ for zone in zones:
+  if not zone is Dictionary or not zone.has_all(["x","y","w","h"]): return false
+  for key in ["x","y","w","h"]:
+   if not integer(zone[key]): return false
+  if zone.x<0 or zone.y<0 or zone.w<1 or zone.h<1 or zone.x+zone.w>w or zone.y+zone.h>h: return false
+ return true

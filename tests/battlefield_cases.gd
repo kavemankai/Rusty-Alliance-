@@ -9,10 +9,11 @@ static func contact(index: int,garrison: bool=false):
  c.s.groups=[]
  if garrison:
   c.s.sectors[index].owner="company"
-  for i in range(3): c.command("levy",{"sector":index})
+  for i in range(4 if index==52 else 3): c.command("levy",{"sector":index})
   c.s.squads.first.sector=1
  else:
   c.command("hire",{"id":"ada"})
+  if index==52: c.command("hire",{"id":"bram"})
   c.s.squads.first.sector=index
   c.s.sectors[index].owner="bandits"
  force.sector=index;force.objective=index;force.stationary=true

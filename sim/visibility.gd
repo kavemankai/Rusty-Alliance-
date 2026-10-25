@@ -10,15 +10,16 @@ static func reveal(b,team: String,cell: Dictionary) -> void:
  if b.t.fog[team].get(key,{})!=cell: b.t.fog[team][key]=cell.duplicate(true)
 
 static func refresh(b) -> void:
+ b.lighting()
  var terrain_hash=b.t.tiles.hash()
- var signature=[b.t.phase,b.t.width,b.t.height,terrain_hash]
+ var signature=[b.t.get("night",false),b.t.get("active_entry","west"),b.t.phase,b.t.width,b.t.height,terrain_hash]
  for u in b.t.units: signature.append([u.id,u.x,u.y,u.facing,u.person.hp,u.person.perception])
  var stamp=signature.hash()
  if b.fog_signature==stamp: return
  b.fog_signature=stamp
  ensure(b)
  if b.t.phase=="deployment":
-  for zone in b.t.get("deployment_zones",[{"x":0,"y":0,"w":mini(6,int(b.t.width)),"h":b.t.height}]):
+  for zone in b.t.get("active_zones",b.t.get("deployment_zones",[{"x":0,"y":0,"w":mini(6,int(b.t.width)),"h":b.t.height}])):
    for y in range(zone.y,zone.y+zone.h):
     for x in range(zone.x,zone.x+zone.w): reveal(b,"company",b.tile(x,y))
   return
@@ -26,11 +27,11 @@ static func refresh(b) -> void:
   if observer.person.hp<=0: continue
   reveal(b,observer.team,b.tile(observer.x,observer.y))
   if observer.person.hp<=10: continue
-  var stamp_observer=[observer.x,observer.y,observer.facing,observer.person.perception,terrain_hash].hash()
+  var stamp_observer=[observer.x,observer.y,observer.facing,observer.person.perception,b.t.get("night",false),terrain_hash].hash()
   var entry=b.fog_observers.get(observer.id,{})
   if entry.get("stamp",-1)!=stamp_observer:
    var cells=[]
-   var radius=5+int(observer.person.perception/10)
+   var radius=8+int(observer.person.perception/10)
    for y in range(maxi(0,observer.y-radius),mini(b.t.height,observer.y+radius+1)):
     for x in range(maxi(0,observer.x-radius),mini(b.t.width,observer.x+radius+1)):
      var cell=b.tile(x,y)

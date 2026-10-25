@@ -119,6 +119,7 @@ static func run(test) -> void:
  c=Campaign.new()
  c.autosave_path="user://contracts-test-autosave.json"
  c.command("hire",{"id":"ada"})
+ c.command("hire",{"id":"bram"})
  test.check(c.command("accept",{"id":"camp"}),"Occupied original camp accepts assault contract")
  var camp=Jobs.group(c.s,"briar_guard")
  c.faction_tick()

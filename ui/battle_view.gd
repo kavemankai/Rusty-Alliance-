@@ -7,6 +7,7 @@ var geometry: Node3D
 var camera: Camera3D
 var selected="mara"
 var preview=[]
+var show_roofs=true
 var pressed=false
 var dragged=false
 var down=Vector2.ZERO
@@ -77,6 +78,11 @@ func redraw() -> void:
  multi.mesh=cube
  multi.instance_count=battle.t.tiles.size()
  var chosen=battle.unit(selected)
+ var cutaways={}
+ for fighter in battle.t.units:
+  if fighter.team=="company" or battle.known("company",fighter.id):
+   var occupied=battle.Visibility.cell(battle,fighter.x,fighter.y)
+   if occupied.has("room"): cutaways[occupied.room]=true
  var surfaces={"road":"77664b","floor":"777773","crop":"8b8143","quarry":"626971","mud":"55483b"}
  var obstacles={"palisade":"806044","rock":"656c75","tree":"344a36"}
  for i in range(battle.t.tiles.size()):
@@ -88,12 +94,16 @@ func redraw() -> void:
   if c.cost>2 and not surfaces.has(c.kind): color=Color("62604a")
   if c.conceal>0: color=Color("2d523a")
   if battle.t.phase=="deployment" and battle.deployment_tile(battle.t,c.x,c.y): color=Color("397a58")
+  if battle.t.get("night",false) and not (level==2 and battle.t.get("illumination",{}).get(str(i),0)>0): color=color.darkened(0.35)
   if level==0: color=Color("11191f")
   elif level==1: color=color.darkened(0.65)
   if i in preview and level>0: color=Color("a69745")
   if chosen!=null and c.x==chosen.x and c.y==chosen.y: color=Color("2898b4")
   multi.set_instance_transform(i,Transform3D(Basis.IDENTITY,Vector3(c.x,c.elevation*0.5,c.y)))
   multi.set_instance_color(i,color)
+  if show_roofs and level>0 and c.get("roof",false) and not cutaways.has(c.get("room","")):
+   box(geometry,Vector3(c.x,2.0+c.elevation*0.5,c.y),Vector3(0.96,0.15,0.96),Color("594c3d").darkened(0.4 if level==1 else 0.0))
+  if level>0 and c.get("light",0)>0: box(geometry,Vector3(c.x,0.6,c.y),Vector3(0.15,1.0,0.15),Color("ffd16d"))
   if c.block and level>0:
    var obstacle=Color(obstacles.get(c.kind,"8c8170")) if not c.door else Color("8e663f")
    var structure=box(geometry,Vector3(c.x,0.65+c.elevation*0.5,c.y),Vector3(0.85,1.25 if c.kind!="window" else 0.5,0.85),obstacle.darkened(0.65) if level==1 else obstacle)
@@ -117,10 +127,10 @@ func redraw() -> void:
   if u.team!="company" and not battle.known("company",u.id): continue
   var elevation=battle.tile(u.x,u.y).elevation*0.5
   var mesh=MeshInstance3D.new()
-  var capsule=CapsuleMesh.new()
-  capsule.radius=0.24
-  capsule.height=1.2
-  mesh.mesh=capsule
+  if u.role=="cart":
+   var cart=BoxMesh.new();cart.size=Vector3(1.1,0.7,0.8);mesh.mesh=cart
+  else:
+   var capsule=CapsuleMesh.new();capsule.radius=0.24;capsule.height=1.2;mesh.mesh=capsule
   mesh.material_override=material(Color("74cbe3") if u.team=="company" else Color("e77b62"))
   mesh.position=Vector3(u.x,elevation+0.7,u.y)
   geometry.add_child(mesh)

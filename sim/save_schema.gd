@@ -7,7 +7,7 @@ const Garrison=preload("res://sim/garrison.gd")
 # Upgrade detached parsed data. Never mutate the currently running campaign.
 static func upgrade(data: Variant) -> Dictionary:
  if not data is Dictionary: return {}
- if data.get("version",0)==3: return data
+ if data.get("version",0)==3: return normalize_combat(data)
  if data.get("version",0)==2: return upgrade_v2(data)
  if data.get("version",0)!=1 or not legacy_shape(data): return {}
  data.version=2
@@ -85,7 +85,7 @@ static func upgrade_v2(data: Dictionary) -> Dictionary:
     u.squad=q.id
     if q.id not in data.battle.squads: data.battle.squads.append(q.id)
  data.version=3
- return data
+ return normalize_combat(data)
 
 static func legacy_shape(data: Dictionary) -> bool:
  if not data.has_all(["sectors","mercs","stash","groups","battle","encounter"]): return false
@@ -110,3 +110,36 @@ static func legacy_shape(data: Dictionary) -> bool:
   for kind in p.inventory:
    if not kind is String: return false
  return true
+
+static func normalize_combat(data: Dictionary) -> Dictionary:
+ if not data.get("mercs") is Dictionary or not data.get("groups") is Array or not data.get("sectors") is Array or not data.get("jobs") is Array or not data.get("battle") is Dictionary or not data.get("stash") is Array: return {}
+ var people=data.mercs.values()
+ var placements=[]
+ for job in data.jobs:
+  if not job is Dictionary or not job.get("actors",[]) is Array: return {}
+  people.append_array(job.get("actors",[]))
+ for group in data.groups:
+  if not group is Dictionary or not group.get("fighters",[]) is Array: return {}
+  people.append_array(group.get("fighters",[]))
+ for sector in data.sectors:
+  if not sector is Dictionary or not sector.get("levies",[]) is Array or not sector.get("battlefield",{}) is Dictionary: return {}
+  people.append_array(sector.get("levies",[]))
+  var ground=sector.get("battlefield",{}).get("ground",[])
+  if not ground is Array: return {}
+  placements.append_array(ground)
+ if not data.battle.get("units",[]) is Array or not data.battle.get("ground",[]) is Array: return {}
+ for unit in data.battle.get("units",[]):
+  if not unit is Dictionary or not unit.get("person") is Dictionary: return {}
+  people.append(unit.person)
+ placements.append_array(data.battle.get("ground",[]))
+ var loose=data.stash.duplicate()
+ for placement in placements:
+  if not placement is Dictionary or not placement.get("item") is Dictionary: return {}
+  loose.append(placement.item)
+ for person in people:
+  if not person is Dictionary: return {}
+  Data.normalize_person(person)
+ for item in loose:
+  if not item is Dictionary: return {}
+  if item.get("kind","")=="ammo" and not item.has("ammo_type"): item.ammo_type="arrows"
+ return data

@@ -1,4 +1,5 @@
 extends RefCounted
+const Combat=preload("res://sim/combat_rules.gd")
 const Tactics=preload("res://sim/tactics.gd")
 const Visibility=preload("res://sim/visibility.gd")
 const Exploration=preload("res://sim/exploration.gd")
@@ -12,6 +13,7 @@ var t: Dictionary
 var error = ""
 var fog_signature=-1
 var fog_observers={}
+var light_signature=-1
 
 func _init(owner, restored: Dictionary = {}) -> void:
  campaign_ref=weakref(owner)
@@ -20,21 +22,22 @@ func _init(owner, restored: Dictionary = {}) -> void:
   if not t.has("phase"): t.phase="combat"
   if not t.has("quiet_rounds"): t.quiet_rounds=0
   if not t.has("ai_state"): t.ai_state={}
+  if t.has("exploration"): t.exploration.running=false
   Visibility.refresh(self)
   return
- t={"ai_state":{},"quiet_rounds":0,"phase":"deployment","width":18,"height":14,"tiles":[],"units":[],"squads":[],"turn":"company","round":1,"knowledge":{"company":{},"enemy":{}},"log":[],"ai":[],"noise":[],"ground":[]}
+ t={"night":int(campaign.s.time/60)%24<6 or int(campaign.s.time/60)%24>=20,"peaceful":campaign.s.encounter.get("peaceful",false),"ai_state":{},"quiet_rounds":0,"phase":"deployment","width":18,"height":14,"tiles":[],"units":[],"squads":[],"turn":"company","round":1,"knowledge":{"company":{},"enemy":{}},"log":[],"ai":[],"noise":[],"ground":[]}
  build_map(18,14)
  var sector=campaign.s.sectors[campaign.s.encounter.sector]
  if not sector.has("battlefield"): sector.battlefield=Layouts.create(sector)
  var saved=sector.battlefield
- for key in ["width","height","tiles","ground","fog"]+Layouts.META:
+ for key in ["width","height","tiles","ground","fog","entry_zones"]+Layouts.META:
   if saved.has(key): t[key]=saved[key]
  campaign.ensure_group_rosters()
  var count=0
  for g in campaign.s.groups:
   if g.sector == sector.id and g.faction!="company":
    for p in g.fighters:
-    if p.hp<=10 or p.get("captured",false): continue
+    if p.hp<=10 or p.get("captured",false) or p.get("released",false): continue
     var spawn={"x":11+count%3,"y":3+(count*3)%9}
     if t.has("enemy_spawns") and count<t.enemy_spawns.size(): spawn=t.enemy_spawns[count]
     var position=g.positions.get(p.id,spawn)
@@ -61,11 +64,18 @@ func _init(owner, restored: Dictionary = {}) -> void:
    u.sector=sector.id
    place_deploying_unit(u)
    index+=1
+ for job in campaign.s.jobs:
+  if job.type!="escort" or job.status!="active" or job.squad not in t.squads: continue
+  for actor in job.get("actors",[]):
+   if actor.hp<=0: continue
+   var u=make_unit(actor.id,"company",actor,2+int(index/5),3+(index%5)*2)
+   u.role=actor.merchant_role;u.contract=job.id;u.squad=job.squad
+   place_deploying_unit(u);index+=1
  refresh_knowledge()
  sector.battlefield=field_state()
 
 func make_unit(id: String, team: String, p: Dictionary, x: int, y: int) -> Dictionary:
- return {"id":id,"team":team,"role":"merc" if team=="company" else "enemy","person":p,"x":x,"y":y,"ap":Data.ap(p),"stance":"stand","mode":"walk","facing":0 if team=="company" else 4,"guard":false,"reason":"guarding"}
+ return {"id":id,"team":team,"role":"merc" if team=="company" else "enemy","person":p,"x":x,"y":y,"ap":Data.ap(p),"stance":"stand","mode":"walk","facing":0 if team=="company" else 4,"attack_style":"normal","defence_mode":"balanced","aim_location":"auto","activated":team=="company","guard":false,"reason":"guarding"}
 
 func place_unit(u: Dictionary) -> void:
  var cell=tile(u.x,u.y)
@@ -125,6 +135,11 @@ func at(x: int,y: int,ignore: String=""):
  return null
 
 func can_act(u: Dictionary) -> bool:
+ if u.role=="cart":
+  var driving=false
+  for driver in t.units:
+   if driver.role=="driver" and driver.get("contract","")==u.get("contract","") and driver.person.hp>10 and distance(u,driver)<=2: driving=true
+  if not driving: return false
  return (t.phase=="combat" or (t.phase=="exploration" and u.team=="company")) and t.turn == u.team and u.person.hp>10 and outcome()=="ongoing"
 
 func fail(message: String) -> bool:
@@ -158,6 +173,7 @@ func step_cost(u: Dictionary, from: Dictionary, dest: Dictionary,charted: bool=f
  if absi(dest.elevation-from.elevation)>1: return -1
  var cost=dest.cost+maxi(0,dest.elevation-from.elevation)*2
  if dx!=0 and dy!=0: cost=int(ceil(cost*1.4))
+ if u.role=="cart": cost+=1
  if u.stance=="crouch": cost+=1
  if u.stance=="prone": cost+=3
  if u.mode=="run": cost=maxi(1,cost-1)
@@ -202,6 +218,8 @@ func heuristic(a: int,b: int) -> int:
 func visible(a: Dictionary,b: Dictionary) -> bool:
  var d=distance(a,b)
  var radius=5+int(a.person.perception/10)
+ if t.get("night",false): radius=maxi(2,radius-3)
+ radius+=t.get("illumination",{}).get(str(b.y*int(t.width)+b.x),0)
  if rear(b,a): radius=maxi(2,int(radius*0.65))
  if b.get("stance","stand")=="prone": radius-=2
  radius-=int(tile(b.x,b.y).conceal/10)
@@ -235,6 +253,18 @@ func refresh_knowledge() -> void:
     if visible(observer,other):
      t.knowledge[team][other.id]={"x":other.x,"y":other.y,"round":t.round,"visible":true}
 
+ for receiver in t.units:
+  if receiver.person.hp<=10: continue
+  if not receiver.has("memory"): receiver.memory={}
+  for other in t.units:
+   if other.team==receiver.team or other.person.hp<=0: continue
+   var informed=visible(receiver,other)
+   if not informed:
+    for ally in t.units:
+     if ally.team==receiver.team and ally.person.hp>10 and distance(receiver,ally)<=6 and visible(ally,other): informed=true;break
+   if informed: receiver.memory[other.id]={"x":other.x,"y":other.y,"round":t.round,"visible":true}
+   elif receiver.memory.has(other.id): receiver.memory[other.id].visible=false
+ campaign.Contracts.tick(campaign)
  if t.phase=="exploration" and Exploration.contact(self): Exploration.combat(self,"Opponents detected")
  elif t.phase=="combat" and Exploration.contact(self): t.quiet_rounds=0
 
@@ -255,7 +285,7 @@ func move(u: Dictionary,x: int,y: int) -> bool:
   for enemy in t.units:
    if enemy.team==u.team or enemy.person.hp<=10 or not enemy.guard: continue
    var w=Data.WEAPONS[Data.weapon(enemy.person)]
-   if w.reach>0 and distance(enemy,u)<=w.reach and maxi(absi(enemy.x-dest.x),absi(enemy.y-dest.y))>w.reach:
+   if w.reach>0 and not u.get("disengaging",false) and enemy.ap>=w.ap and known(enemy.team,u.id) and los(enemy,u) and distance(enemy,u)<=w.reach and maxi(absi(enemy.x-dest.x),absi(enemy.y-dest.y))>w.reach:
     attack(enemy,u,0,true)
     enemy.guard=false
   if u.person.hp<=10: break
@@ -281,7 +311,7 @@ func hit_chance(a: Dictionary,b: Dictionary,aim: int=0) -> int:
  var ranged=w.reach==0
  var d=distance(a,b)
  var skill=a.person.ranged if ranged else a.person.melee
- var chance=50+int(skill*0.6)-int(b.person.agility*0.25)+w.accuracy+aim*7
+ var chance=Combat.accuracy(a)+50+int(skill*0.6)-int(b.person.agility*0.25)+w.accuracy+aim*7
  chance-=int(a.person.fatigue/5)+int((a.person.max_hp-a.person.hp)/5)
  chance+=int((a.person.morale-50)/10)+int(a.person.experience*2)
  chance+=5*(tile(a.x,a.y).elevation-tile(b.x,b.y).elevation)
@@ -308,7 +338,7 @@ func attack(a: Dictionary,b: Dictionary,aim: int=0,reaction: bool=false) -> bool
  if not reaction and not can_act(a): return fail("Unit cannot act")
  var w=Data.WEAPONS[Data.weapon(a.person)]
  var ranged=w.reach==0
- var cost=w.ap+aim
+ var cost=Combat.cost(a,aim)
  if distance(a,b)>w.range or not los(a,b): return fail("Out of reach or blocked line of sight")
  if not known(a.team,b.id): return fail("Target not perceived")
  if ranged and (Data.ammo(a.person)<=0 or not a.person.loaded): return fail("Reload with ammunition first")
@@ -323,7 +353,7 @@ func attack(a: Dictionary,b: Dictionary,aim: int=0,reaction: bool=false) -> bool
  var used_weapon=Data.equipped(a.person,"weapon")
  if not used_weapon.is_empty(): used_weapon.condition=maxi(0,used_weapon.condition-1)
  # Acoustic information records a location, never the unseen target entity.
- t.noise.append({"x":a.x,"y":a.y,"round":t.round,"team":a.team})
+ t.noise.append({"x":a.x,"y":a.y,"round":t.round,"team":a.team,"strength":1 if ranged else 2})
  if campaign.roll(100)>=chance:
   log_event(a.person.name+" missed (%d%%)" % chance)
   return true
@@ -331,17 +361,18 @@ func attack(a: Dictionary,b: Dictionary,aim: int=0,reaction: bool=false) -> bool
  var back=rear(a,b)
  if not back and b.ap>=2 and b.person.hp>10 and b.person.morale>=20:
   var shield=Data.equipped(b.person,"shield")
-  var block=int((20+b.person.dexterity/4.0)*shield.condition/100.0) if not shield.is_empty() else 0
+  var block=int((20+b.person.dexterity/4.0+Combat.defence_bonus(b,"shield"))*shield.condition/100.0) if not shield.is_empty() else 0
+  if a.get("attack_style","normal")=="feint": block=int(block/2)
   if block>0 and campaign.roll(100)<block:
    b.ap-=2
-   shield.condition=maxi(0,shield.condition-1)
+   shield.condition=maxi(0,shield.condition-5-int(w.damage/8))
    defence="shield block"
-  elif not ranged and Data.WEAPONS[Data.weapon(b.person)].defence>0 and campaign.roll(100)<int(b.person.melee/5)+Data.WEAPONS[Data.weapon(b.person)].defence:
+  elif not ranged and Data.WEAPONS[Data.weapon(b.person)].defence>0 and campaign.roll(100)<Combat.parry_chance(a,b):
    b.ap-=2
    var parrying=Data.equipped(b.person,"weapon")
    parrying.condition=maxi(0,parrying.condition-1)
    defence="parry"
-  elif campaign.roll(100)<int(b.person.agility/7):
+  elif campaign.roll(100)<Combat.dodge_chance(a,b):
    b.ap-=2
    defence="dodge"
  if defence!="":
@@ -349,28 +380,10 @@ func attack(a: Dictionary,b: Dictionary,aim: int=0,reaction: bool=false) -> bool
   return true
  var raw=w.damage+int(a.person.strength/12) if not ranged else w.damage
  raw=int(raw*(0.65+Data.condition(a.person)/285.0))
- var location=["torso","torso","arms","legs","head"][campaign.roll(5)]
- var body=Data.equipped(b.person,"body")
- var armour=int(Data.ARMOUR[Data.armour(b.person)][w.kind]*body.get("condition",100)/100.0)
- if location=="head":
-  armour=int(8*Data.equipped(b.person,"helmet").get("condition",0)/100.0)
-  raw=int(raw*1.3)
- var damage=maxi(1,raw-armour)
- var protection=Data.equipped(b.person,"helmet") if location=="head" else body
- if armour>0 and not protection.is_empty(): protection.condition=maxi(0,protection.condition-1)
- b.person.hp=maxi(0,b.person.hp-damage)
- b.person.wounds+=1
- if w.kind!="blunt": b.person.bleeding+=maxi(1,int(damage/14))
- b.person.morale=maxi(0,b.person.morale-8-int(damage/5))
- a.person.morale=mini(100,a.person.morale+2)
- if b.person.hp==0:
-  b.person.dead=true
-  a.person.kills+=1
-  if int(a.person.kills)%3==0: a.person.experience+=1
-  for other in t.units:
-   if other.team==b.team and distance(other,b)<7: other.person.morale=maxi(0,other.person.morale-12)
-  campaign.drop_inventory(b.person,b.x,b.y,t.ground)
- log_event("%s hit %s %s: %d - %d armour = %d (%d%%)" % [a.person.name,b.person.name,location,raw,armour,damage,chance])
+ raw=int(raw*Combat.ATTACKS[a.get("attack_style","normal")].damage)
+ if b.get("defence_mode","balanced")=="brace": raw=int(raw*0.8)
+ if Combat.intercept(self,a,b): raw=int(raw*0.65)
+ Combat.hit(self,a,b,raw,"pierce" if a.get("attack_style","normal")=="thrust" and w.reach>0 else w.kind,a.get("aim_location","auto"))
  refresh_knowledge()
  return true
 
@@ -379,7 +392,35 @@ func action(id: String,kind: String,p: Dictionary={}) -> bool:
  var u=unit(id)
  if u==null or not can_act(u): return fail("Select an active unit")
  if t.phase=="exploration" and kind in ["attack","guard"]: return fail("Enter combat before attacking or guarding")
+ if u.role=="cart" and kind!="move": return fail("Carts can only move while a living driver is nearby")
  match kind:
+  "charge": return Combat.charge(self,u,p)
+  "bash": return Combat.bash(self,u,p)
+  "protect": return Combat.protect(self,u,p)
+  "repair_cart":
+   var cart=unit(p.get("target",""));var pack=Supplies.for_person(campaign.s,u.id)
+   if cart==null or cart.role!="cart" or cart.person.hp<=0 or distance(u,cart)>1 or u.ap<5 or pack.get("tools",0)<1: return fail("Repair an adjacent surviving cart for 5 AP and one local tool")
+   pack.tools-=1;u.ap-=5;cart.person.hp=mini(cart.person.max_hp,cart.person.hp+12+int(u.person.smithing/10));Data.treat(cart.person,u.person.smithing)
+  "rally":
+   if u.ap<4 or u.get("rallied_round",-1)==t.round: return fail("Rally costs 4 AP and can be used once per round")
+   u.ap-=4;u.rallied_round=t.round
+   for ally in t.units:
+    if ally.team==u.team and ally.person.hp>10 and distance(u,ally)<=3: ally.person.morale=mini(100,ally.person.morale+4+int(u.person.leadership/15))
+  "formation": return formation(u,p)
+  "build": return campaign.Operations.build(self,u,p)
+  "attack_style":
+   if Data.WEAPONS[Data.weapon(u.person)].reach==0 and p.get("value","")!="normal": return fail("Melee styles require a melee weapon")
+   if not Combat.ATTACKS.has(p.get("value","")): return fail("Unknown attack style")
+   u.attack_style=p.value
+  "defence_mode":
+   if p.get("value","") not in Combat.DEFENCES or u.ap<2: return fail("Choose a defence with 2 AP")
+   if p.value=="shield" and not Data.shield(u.person): return fail("A functional shield is required")
+   u.ap-=2;u.defence_mode=p.value
+  "aim_location":
+   if p.get("value","") not in Combat.LOCATIONS: return fail("Unknown body target")
+   u.aim_location=p.value
+  "disengage": return Combat.disengage(self,u,p)
+  "throw": return Combat.throw_item(self,u,p)
   "move": return move(u,p.x,p.y)
   "attack":
    var target=unit(p.get("target",""))
@@ -411,10 +452,11 @@ func action(id: String,kind: String,p: Dictionary={}) -> bool:
   "aid":
    var target=unit(p.get("target",id))
    var provisions=Supplies.for_person(campaign.s,id)
-   if target==null or target.team!=u.team or target.person.hp<=0 or distance(u,target)>1 or u.ap<5 or provisions.get("medicine",0)<=0: return fail("Need nearby survivor, medicine in the actor's local pack and 5 AP")
+   if target==null or target.role=="cart" or target.team!=u.team or target.person.hp<=0 or distance(u,target)>1 or u.ap<5 or provisions.get("medicine",0)<=0: return fail("Need nearby survivor, medicine in the actor's local pack and 5 AP")
    u.ap-=5
    provisions.medicine-=1
    target.person.bleeding=0
+   Data.treat(target.person,u.person.medical)
    target.person.hp=mini(target.person.max_hp,target.person.hp+2+int(u.person.medical/12))
   "guard": u.guard=true
   "loot":
@@ -436,10 +478,10 @@ func outcome() -> String:
  var enemies=0
  for u in t.units:
   if u.person.hp>10:
-   if u.team=="company": friends+=1
-   else: enemies+=1
+   if u.team=="company" and u.role not in ["cart","driver"]: friends+=1
+   elif u.team=="enemy": enemies+=1
  if friends==0: return "defeat"
- if enemies==0: return "victory"
+ if enemies==0: return "ongoing" if t.get("peaceful",false) else "victory"
  return "ongoing"
 
 func start_turn(team: String) -> void:
@@ -452,7 +494,10 @@ func start_turn(team: String) -> void:
    if u.person.hp==0:
     u.person.dead=true
     campaign.drop_inventory(u.person,u.x,u.y,t.ground)
-  u.ap=Data.ap(u.person)
+  var carry=mini(4,u.ap) if u.get("activated",false) else 0
+  u.ap=mini(26,Data.ap(u.person)+carry)
+  u.activated=true
+  u.protecting=""
   u.guard=false
  refresh_knowledge()
 
@@ -474,7 +519,7 @@ func ai_unit(u: Dictionary) -> void:
 static func deployment_tile(state: Dictionary,x: int,y: int) -> bool:
  if x<0 or y<0 or x>=state.width or y>=state.height: return false
  var inside=false
- for zone in state.get("deployment_zones",[{"x":0,"y":0,"w":mini(6,int(state.width)),"h":state.height}]):
+ for zone in state.get("active_zones",state.get("deployment_zones",[{"x":0,"y":0,"w":mini(6,int(state.width)),"h":state.height}])):
   if x>=zone.x and y>=zone.y and x<zone.x+zone.w and y<zone.y+zone.h: inside=true
  if not inside: return false
  var cell=state.tiles[y*int(state.width)+x]
@@ -533,7 +578,7 @@ func confirm_deployment(explore: bool=false) -> bool:
 
 func field_state() -> Dictionary:
  var field={"width":t.width,"height":t.height,"tiles":t.tiles,"ground":t.ground,"fog":t.get("fog",{"company":{},"enemy":{}})}
- for key in Layouts.META:
+ for key in Layouts.META+["entry_zones"]:
   if t.has(key): field[key]=t[key]
  return field
 
@@ -548,7 +593,10 @@ func planned_occupant(u: Dictionary,x: int,y: int,charted: bool):
  return null
 
 func directional_cover(attacker: Dictionary,defender: Dictionary) -> int:
- var protection=tile(defender.x,defender.y).cover
+ var own=tile(defender.x,defender.y)
+ var protection=own.cover
+ var incoming=heading(attacker.x-defender.x,attacker.y-defender.y)
+ if own.has("cover_edge") and mini(posmod(incoming-own.cover_edge,8),posmod(own.cover_edge-incoming,8))>1: protection=0
  var dx=signi(attacker.x-defender.x);var dy=signi(attacker.y-defender.y)
  if dx==0 and dy==0: return protection
  var edges=[{"x":defender.x+dx,"y":defender.y+dy,"weight":1.0}]
@@ -559,6 +607,46 @@ func directional_cover(attacker: Dictionary,defender: Dictionary) -> int:
   var c=tile(edge.x,edge.y)
   if c.is_empty(): continue
   var value=maxi(c.cover,35 if c.block else 0)
+  if c.has("cover_edge") and mini(posmod(incoming-c.cover_edge,8),posmod(c.cover_edge-incoming,8))>1: value=0
   protection=maxi(protection,int(value*edge.weight))
  protection-=maxi(0,tile(attacker.x,attacker.y).elevation-tile(defender.x,defender.y).elevation)*10
  return clampi(protection,0,60)
+
+func choose_entry(direction: String) -> bool:
+ if t.phase!="deployment" or not t.get("entry_zones",{}).has(direction): return fail("Choose an authored approach before deployment is confirmed")
+ t.active_zones=t.entry_zones[direction].duplicate(true);t.active_entry=direction
+ var friends=t.units.filter(func(u):return u.team=="company")
+ t.units=t.units.filter(func(u):return u.team!="company")
+ for u in friends:
+  u.x=-1;u.y=-1;place_deploying_unit(u)
+ refresh_knowledge()
+ return true
+
+func lighting() -> void:
+ var stamp=t.tiles.hash()
+ if light_signature==stamp: return
+ light_signature=stamp;t.illumination={}
+ for cell in t.tiles:
+  var radius=cell.get("light",0)
+  if radius<=0: continue
+  for y in range(maxi(0,cell.y-radius),mini(t.height,cell.y+radius+1)):
+   for x in range(maxi(0,cell.x-radius),mini(t.width,cell.x+radius+1)):
+    if los(cell,tile(x,y)): t.illumination[str(y*int(t.width)+x)]=3
+
+func formation(leader: Dictionary,p: Dictionary) -> bool:
+ var style=p.get("style","line")
+ if style not in ["line","column","wedge"]: return fail("Choose line, column or wedge")
+ var plans=[];var reserved={};var index=0
+ for u in t.units:
+  if u.team!="company" or u.person.hp<=10 or u.get("role","") in ["cart","driver"]: continue
+  var x=p.get("x",leader.x)+(index%3-1 if style!="column" else 0)
+  var y=p.get("y",leader.y)+(int(index/3) if style=="line" else (index if style=="column" else absi(index%3-1)+int(index/3)))
+  var key=str(x)+":"+str(y)
+  var route=path(u,x,y,true)
+  if reserved.has(key) or route.cost<0 or (t.phase=="combat" and route.cost>u.ap): return fail("Formation needs distinct reachable destinations and enough AP for every fighter")
+  reserved[key]=true;plans.append({"id":u.id,"x":x,"y":y});index+=1
+ for plan in plans:
+  if unit(plan.id).x==plan.x and unit(plan.id).y==plan.y: continue
+  if not action(plan.id,"move",plan): break
+  if outcome()!="ongoing": break
+ return true

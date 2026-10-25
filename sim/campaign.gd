@@ -1,4 +1,6 @@
 extends RefCounted
+const Strategy=preload("res://sim/strategy.gd")
+const Operations=preload("res://sim/operations.gd")
 const Data = preload("res://sim/catalog.gd")
 const Battle = preload("res://sim/tactical.gd")
 const Items = preload("res://sim/inventory.gd")
@@ -85,6 +87,7 @@ func reject(message: String) -> bool:
 func command(kind: String, p: Dictionary = {}) -> bool:
  error = ""
  match kind:
+  "visit", "leave", "transport", "prisoner": return Operations.run(self,kind,p)
   "hire":
    if battle != null: return reject("Resolve battle first")
    if not s.mercs.has(p.get("id","")): return reject("Unknown recruit")
@@ -96,29 +99,37 @@ func command(kind: String, p: Dictionary = {}) -> bool:
    m.expires = s.time + 7*1440
    schedule(m.expires,"employment",{"id":m.id})
    q.members.append(m.id)
+   if q.leader=="": q.leader=m.id
    note(m.name + " hired for seven days")
   "dismiss":
    if battle != null: return reject("Cannot dismiss during combat")
    if not s.mercs.has(p.id) or not s.mercs[p.id].hired: return reject("Not employed")
    remove_member(p.id)
   "accept": return Contracts.accept(self,p.get("id",""),p.get("squad","first"))
+  "post_jobs": return Contracts.post(self)
   "repost": return Contracts.repost(self,p.get("id",""))
   "buy":
    if battle != null: return reject("Market inaccessible in battle")
    var q = s.squads.get(p.get("squad","first"),{})
    if q.is_empty() or q.sector!=s.stash_sector or s.sectors[q.sector].facility != "market" or not q.route.is_empty(): return reject("Visit the Ashford market")
    var item = p.item
+   var projectile=item if item in ["arrows","bolts","javelins"] else p.get("ammo_type","arrows")
+   if item in ["arrows","bolts","javelins"]: item="ammo"
+   if item=="ammo" and projectile not in ["arrows","bolts","javelins"]: return reject("Choose arrows, bolts or javelins")
    var price = 0
    if Data.WEAPONS.has(item): price = Data.WEAPONS[item].price
    elif Data.ARMOUR.has(item): price = Data.ARMOUR[item].price
-   elif item in ["food","medicine","tools","ammo","shield","helmet"]: price = {"food":20,"medicine":30,"tools":25,"ammo":15,"shield":65,"helmet":45}[item]
+   elif item in ["food","medicine","tools","ammo","shield","helmet","stone"]: price = {"food":20,"medicine":30,"tools":25,"ammo":15,"shield":65,"helmet":45,"stone":5}[item]
    else: return reject("Unknown item")
    if s.funds < price: return reject("Insufficient funds")
    record(-price,"Purchase " + item)
    if item == "food": q.supplies.food += 20
    elif item == "medicine": q.supplies.medicine += 5
    elif item == "tools": q.supplies.tools += 5
-   else: s.stash.append(Items.create(s,item,16 if item=="ammo" else 1))
+   else:
+    var purchased=Items.create(s,item,16 if item=="ammo" else (4 if item=="stone" else 1))
+    if item=="ammo": purchased.ammo_type=projectile
+    s.stash.append(purchased)
   "equip":
    var invalid=Items.equip(self,p)
    if invalid!="": return reject(invalid)
@@ -150,9 +161,13 @@ func command(kind: String, p: Dictionary = {}) -> bool:
    var id = "squad_" + p.id
    if s.squads.has(id): return reject("Squad already exists")
    var provisions=Supplies.split(q.supplies,q.members.size())
+   var vehicles={"horses":0,"carts":0}
+   for asset in vehicles:
+    vehicles[asset]=int(q.get("transport",{}).get(asset,0)/q.members.size())
+    if q.has("transport"): q.transport[asset]-=vehicles[asset]
    q.members.erase(p.id)
    if q.leader == p.id: q.leader = q.members[0]
-   s.squads[id] = {"id":id,"name":s.mercs[p.id].name+" squad","members":[p.id],"leader":p.id,"sector":q.sector,"route":[],"due":0,"assignment":"rest","supplies":provisions}
+   s.squads[id] = {"id":id,"name":s.mercs[p.id].name+" squad","members":[p.id],"leader":p.id,"sector":q.sector,"route":[],"due":0,"assignment":"rest","supplies":provisions,"transport":vehicles}
   "merge":
    if battle != null: return reject("Resolve battle first")
    var a = s.squads.get(p.get("from",""),{})
@@ -160,6 +175,8 @@ func command(kind: String, p: Dictionary = {}) -> bool:
    if a.is_empty() or b.is_empty() or a.id == b.id or a.sector != b.sector or not a.route.is_empty() or not b.route.is_empty(): return reject("Merge stationary squads in same sector")
    b.members.append_array(a.members)
    Supplies.combine(a.supplies,b.supplies)
+   if not b.has("transport"): b.transport={"horses":0,"carts":0}
+   for asset in b.transport: b.transport[asset]+=a.get("transport",{}).get(asset,0)
    s.squads.erase(a.id)
   "route":
    if battle != null or not s.encounter.is_empty(): return reject("Resolve encounter first")
@@ -176,6 +193,11 @@ func command(kind: String, p: Dictionary = {}) -> bool:
    if s.encounter.is_empty() or battle != null: return reject("No encounter")
    battle = Battle.new(self)
    s.battle = battle.t
+  "entry":
+   if battle==null or not battle.choose_entry(p.get("direction","")): return reject("Invalid deployment approach")
+  "exploration_running":
+   if battle==null or battle.t.phase!="exploration": return reject("Not exploring")
+   battle.t.exploration.running=not battle.t.exploration.get("running",false)
   "deploy":
    if battle==null: return reject("No deployment")
    if not battle.deploy(p.get("id",""),p): return reject(battle.error)
@@ -189,7 +211,7 @@ func command(kind: String, p: Dictionary = {}) -> bool:
    if battle==null: return reject("No exploration")
    if not battle.Exploration.advance(battle,p.get("pulses",1)): return reject(battle.error)
   "combat":
-   if battle==null or battle.t.phase!="exploration": return reject("Not exploring")
+   if battle==null or battle.t.phase!="exploration" or battle.t.get("peaceful",false): return reject("No hostile tactical encounter")
    battle.Exploration.combat(battle,"Combat chosen")
   "resolve": return resolve_battle(false)
   "retreat": return resolve_battle(true)
@@ -229,9 +251,12 @@ func travel_cost(q: Dictionary, sector: int) -> int:
  var freight=0
  for j in s.jobs:
   if j.type=="escort" and j.status=="active" and j.squad==q.id: freight+=j.cargo
- var pack_weight=(Supplies.carried_weight(q.supplies)+freight*0.1)/maxi(1,q.members.size())
+ var vehicles=q.get("transport",{})
+ var pack_weight=maxf(0,Supplies.carried_weight(q.supplies)+freight*0.1-vehicles.get("carts",0)*30)/maxi(1,q.members.size())
  burden+=pack_weight/60.0
  if q.supplies.food <= 0: burden *= 1.3
+ if vehicles.get("horses",0)>=q.members.size() and vehicles.get("horses",0)>0 and vehicles.get("carts",0)==0: burden*=0.7 if s.sectors[sector].terrain not in ["hills","marsh"] else 1.0
+ if vehicles.get("carts",0)>0 and s.sectors[sector].terrain in ["forest","marsh"]: burden*=1.15
  return int(ceil(cost*burden))
 
 func strategic_path(start: int, goal: int, q: Dictionary) -> Array:
@@ -325,6 +350,7 @@ func hourly() -> void:
        m.hp = mini(m.max_hp,m.hp+2+int(medic/15))
        m.bleeding = 0
        m.wounds = maxi(0,m.wounds-1)
+       Data.treat(m,medic)
     "training":
      m.training += 1+int(m.wisdom/40)+(2 if local_sector.facility=="training" else 0)
      if m.training >= 12:
@@ -383,6 +409,7 @@ func hourly() -> void:
  Contracts.tick(self)
 
 func daily() -> void:
+ for q in s.squads.values(): q.supplies.food=maxi(0,q.supplies.food-2*q.get("transport",{}).get("horses",0))
  var wages = 0
  for m in s.mercs.values():
   if m.hired: wages += m.wage
@@ -402,6 +429,7 @@ func daily() -> void:
   for q in s.squads.values():
    if not q.members.is_empty() and s.mercs.has(q.leader):
     for id in q.members: s.mercs[id].morale=mini(100,s.mercs[id].morale+1+int(s.mercs[q.leader].leadership/25))
+ Strategy.daily(self)
  faction_tick()
 
 func ensure_group_rosters() -> void:
@@ -418,13 +446,13 @@ func ensure_group_rosters() -> void:
 func force_strength(g: Dictionary) -> int:
  var count=0
  for m in g.get("fighters",[]):
-  if m.hp>10 and not m.get("captured",false): count+=1
+  if m.hp>10 and not m.get("captured",false) and not m.get("released",false): count+=1
  return count if g.has("fighters") else g.get("strength",0)
 
 func group_losses(g: Dictionary,amount: int) -> void:
  for m in g.fighters:
   if amount<=0: break
-  if m.hp>10 and not m.get("captured",false):
+  if m.hp>10 and not m.get("captured",false) and not m.get("released",false):
    m.hp=0
    m.dead=true
    amount-=1
@@ -433,7 +461,7 @@ func group_losses(g: Dictionary,amount: int) -> void:
 func record_group_losses(g: Dictionary) -> void:
  var count=0
  for m in g.fighters:
-  if m.hp<=0 or m.get("captured",false): count+=1
+  if m.hp<=0 or m.get("captured",false) or m.get("released",false): count+=1
  var fresh=maxi(0,count-g.get("losses_accounted",0))
  s.factions[g.faction].losses+=fresh
  g.losses_accounted=count
@@ -461,6 +489,7 @@ func faction_tick() -> void:
  ensure_group_rosters()
  for g in s.groups:
   if force_strength(g)<=0: continue
+  if g.faction in ["bandits","nobles"]: Strategy.orders(self,g)
   var target = g.objective
   if s.sectors[g.sector].owner != g.faction:
    target = g.sector
@@ -486,6 +515,8 @@ func faction_tick() -> void:
   if sector.owner=="company" and Garrison.strength(sector)>0:
    encounter({},sector.id)
    continue
+  Strategy.clash(self,g)
+  if force_strength(g)<=0: continue
   if sector.owner != g.faction:
    var defence = Garrison.strength(sector) * (1.0+sector.training/100.0)
    if force_strength(g) > defence:
@@ -603,11 +634,13 @@ func resolve_battle(retreat: bool) -> bool:
  if victory:
   sector.owner="company"
   sector.cleared=true
+  Operations.rescue(self,sector.id)
   for g in s.groups:
    if g.sector == sector.id and g.faction != "company":
     for m in g.fighters:
      if m.hp>0:
       m.captured=true
+      m.captured_sector=sector.id
       drop_inventory(m,g.positions.get(m.id,{"x":11,"y":6}).x,g.positions.get(m.id,{"x":11,"y":6}).y,battle.t.ground)
   # Collected loot is carried by survivors, never teleported into the base stash.
   var survivors=[]
@@ -625,6 +658,7 @@ func resolve_battle(retreat: bool) -> bool:
    for u in battle.t.units:
     if u.team=="company" and u.person.hp>0:
      u.person.captured=true
+     u.person.captured_sector=sector.id
      if u.role=="merc": remove_member(u.id)
   for id in participating:
    var q=s.squads[id]
@@ -655,6 +689,7 @@ func resolve_battle(retreat: bool) -> bool:
  note("Battle "+s.result.outcome+" at "+sector.name)
  battle=null
  s.battle={}
+ Contracts.normalize(s)
  Contracts.tick(self)
  next_encounter()
  if not victory and hostile_at(sector.id):
@@ -703,6 +738,11 @@ func load_from(path: String) -> bool:
   for u in battle.t.units:
    if u.team == "company":
     if u.role=="merc": u.person=s.mercs[u.id]
+    elif u.role in ["cart","driver"]:
+     for job in s.jobs:
+      if job.id==u.contract:
+       for actor in job.actors:
+        if actor.id==u.id: u.person=actor
     else:
      for p in s.sectors[u.sector].levies:
       if p.id==u.id: u.person=p
@@ -725,6 +765,16 @@ func valid_save(data: Variant) -> bool:
  if not data.pending_encounters is Array or not data.groups is Array or not data.stash is Array: return false
  if not (data.next_levy is int or data.next_levy is float) or data.next_levy<1 or data.next_levy!=floor(data.next_levy): return false
  if data.has("food") or data.has("medicine") or data.has("tools"): return false
+ if not data.factions is Dictionary: return false
+ for faction in data.factions.values():
+  if not faction is Dictionary or not (faction.get("resources",0) is int or faction.get("resources",0) is float) or faction.get("resources",0)<0: return false
+  if not faction.get("intel",{}) is Dictionary: return false
+  for key in faction.get("intel",{}):
+   var info=faction.intel[key]
+   if not key is String or not key.is_valid_int() or int(key)<0 or int(key)>=256 or not info is Dictionary or not info.has_all(["sector","time","strength"]): return false
+   for stat in ["sector","time","strength"]:
+    if not (info[stat] is int or info[stat] is float) or info[stat]!=floor(info[stat]) or info[stat]<0: return false
+   if info.sector!=int(key) or info.time>data.time: return false
  if not data.events is Array or not data.battle is Dictionary or not data.encounter is Dictionary: return false
  if not (data.time is int or data.time is float) or not (data.rng is int or data.rng is float): return false
  if data.time<0 or data.rng<=0 or data.rng>=2147483647: return false
@@ -740,6 +790,8 @@ func valid_save(data: Variant) -> bool:
     var suffix=levy.id.trim_prefix("levy_")
     if not suffix.is_valid_int() or int(suffix)>=data.next_levy: return false
  var people=data.mercs.values()
+ for job in data.jobs:
+  for actor in job.get("actors",[]): people.append(actor)
  for sector in data.sectors: people.append_array(sector.levies)
  for g in data.groups:
   if not g is Dictionary or not g.has_all(["id","sector","fighters","positions","faction","objective"]) or not g.fighters is Array or not g.positions is Dictionary: return false
@@ -755,6 +807,7 @@ func valid_save(data: Variant) -> bool:
   entity_ids[m.id]=m
   for stat in ["hp","max_hp","fatigue","morale","strength","agility","dexterity","endurance","perception","wisdom","leadership","melee","ranged","medical","smithing","experience","bleeding","wounds"]:
    if not (m[stat] is int or m[stat] is float): return false
+  if not Battle.Combat.valid_person(m): return false
   if m.max_hp<=0 or m.hp<0 or m.hp>m.max_hp: return false
  var assigned={}
  for q in data.squads.values():
@@ -763,6 +816,10 @@ func valid_save(data: Variant) -> bool:
    if not q.has(key): return false
   if not q.members is Array or not q.route is Array or q.sector<0 or q.sector>=256: return false
   if not Supplies.valid(q.supplies): return false
+  if q.has("transport"):
+   if not q.transport is Dictionary or not q.transport.has_all(["horses","carts"]): return false
+   for quantity in q.transport.values():
+    if not (quantity is int or quantity is float) or quantity<0 or quantity!=floor(quantity): return false
   for id in q.members:
    if not data.mercs.has(id) or assigned.has(id): return false
    assigned[id]=q.id
@@ -784,6 +841,9 @@ func valid_save(data: Variant) -> bool:
   if field.get("fog")!=data.battle.get("fog"): return false
   for key in Layouts.META:
    if field.get(key)!=data.battle.get(key): return false
+  if data.battle.has("active_zones"):
+   if not Layouts.valid_zones(data.battle.active_zones,int(data.battle.width),int(data.battle.height)): return false
+   if data.battle.get("entry_zones",{}).get(data.battle.get("active_entry",""),[])!=data.battle.active_zones: return false
   var phase=data.battle.get("phase","combat")
   if phase not in ["deployment","exploration","combat"]: return false
   if phase=="deployment" and (data.battle.turn!="company" or data.battle.round!=1 or data.battle.knowledge!={"company":{},"enemy":{}} or not data.battle.ai.is_empty() or not data.battle.noise.is_empty()): return false
@@ -803,9 +863,15 @@ func valid_save(data: Variant) -> bool:
     if u.person.hp>0: occupied[position]=true
     if u.team=="company":
      if not u.get("deployed") is bool: return false
+   if u.get("attack_style","normal") not in Battle.Combat.ATTACKS or u.get("defence_mode","balanced") not in Battle.Combat.DEFENCES or u.get("aim_location","auto") not in Battle.Combat.LOCATIONS: return false
    if u.team=="company":
     if u.role=="merc":
      if not data.mercs.has(u.id) or not u.has("squad") or not data.squads.has(u.squad) or u.id not in data.squads[u.squad].members: return false
+    elif u.role in ["cart","driver"]:
+     var merchant=false
+     for job in data.jobs:
+      if job.id==u.get("contract","") and u.person in job.get("actors",[]): merchant=true
+     if not merchant: return false
     elif u.role=="levy":
      if not u.has("sector") or u.sector!=data.encounter.sector or u.person not in data.sectors[u.sector].levies: return false
     else: return false

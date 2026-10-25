@@ -46,6 +46,8 @@ func clear() -> void:
 func button(parent: Node,title: String,callback: Callable) -> Button:
  var b=Button.new()
  b.text=title
+ b.clip_text=true
+ b.tooltip_text=title
  b.custom_minimum_size=Vector2(0,48)
  b.size_flags_horizontal=Control.SIZE_EXPAND_FILL
  parent.add_child(b)
@@ -91,7 +93,7 @@ func rebuild() -> void:
  header=label(root,"")
  var nav=HBoxContainer.new()
  root.add_child(nav)
- for item in [["Map","sector"],["Company","company"],["Contracts","contracts"],["Inventory","inventory"],["Supplies","supplies"],["Ledger","ledger"],["Inspector","debug"],["Settings","settings"]]:
+ for item in [["Map","sector"],["Operations","operations"],["Company","company"],["Contracts","contracts"],["Inventory","inventory"],["Supplies","supplies"],["Ledger","ledger"],["Inspector","debug"],["Settings","settings"]]:
   button(nav,item[0],change_tab.bind(item[1]))
  content=HBoxContainer.new()
  content.size_flags_vertical=Control.SIZE_EXPAND_FILL
@@ -142,19 +144,22 @@ func rebuild() -> void:
    button(bar,"Begin combat",func():run_command("confirm_deployment"))
    button(bar,"Scout before contact",func():run_command("confirm_deployment",{"explore":true}))
   elif game.battle.t.phase=="exploration":
+   button(bar,"Pause exploration" if game.battle.t.exploration.get("running",false) else "Run exploration",func():run_command("exploration_running"))
    button(bar,"Wait / scout",func():run_command("explore_wait"))
-   button(bar,"Enter combat",func():run_command("combat"))
-   button(bar,"Resolve",func():run_command("resolve"))
+   if not game.battle.t.get("peaceful",false): button(bar,"Enter combat",func():run_command("combat"))
+   if not game.battle.t.get("peaceful",false): button(bar,"Resolve",func():run_command("resolve"))
   else:
    button(bar,"End turn",func():
     if not game.battle.end_turn(): status(game.battle.error)
     else: status("Enemy turn resolved")
     refresh())
    button(bar,"Resolve",func():run_command("resolve"))
-  button(bar,"Retreat",func():
-   var exits=game.retreat_options()
-   var place="no safe exit" if exits.is_empty() else game.s.sectors[exits[0]].name
-   ask("Withdraw to "+place+"? Injuries and losses persist.",func():run_command("retreat")))
+  if game.battle.t.get("peaceful",false): button(bar,"Leave sector",func():run_command("leave"))
+  if not game.battle.t.get("peaceful",false):
+   button(bar,"Retreat",func():
+    var exits=game.retreat_options()
+    var place="no safe exit" if exits.is_empty() else game.s.sectors[exits[0]].name
+    ask("Withdraw to "+place+"? Injuries and losses persist.",func():run_command("retreat")))
   button(bar,"−",func():battle_view.camera.size=clampf(battle_view.camera.size+2,8,32))
   button(bar,"+",func():battle_view.camera.size=clampf(battle_view.camera.size-2,8,32))
  message=label(root,last_message)
@@ -202,7 +207,7 @@ func run_command(kind: String,p: Dictionary={}) -> void:
   if not game.s.log.is_empty() and str(game.s.log.back())!=previous_log: update+=". "+str(game.s.log.back())
   status(update)
   if kind=="deploy": destination={}
-  if kind in ["resolve","retreat","enter","load","confirm_deployment"] or had_battle!=(game.battle!=null) or (game.battle!=null and previous_phase!=game.battle.t.phase): rebuild()
+  if kind in ["resolve","retreat","enter","load","confirm_deployment","exploration_running"] or had_battle!=(game.battle!=null) or (game.battle!=null and previous_phase!=game.battle.t.phase): rebuild()
   else: refresh()
  else: status(game.error)
 
@@ -215,6 +220,7 @@ func show_panel() -> void:
   tactical_panel()
   return
  match tab:
+  "operations": operations_panel()
   "company": company_panel()
   "contracts": contracts_panel()
   "inventory": inventory_panel()
@@ -312,9 +318,11 @@ func inventory_panel() -> void:
  label(side,"INVENTORY · select fighter")
  for m in game.s.mercs.values():
   if m.hired: button(side,("● " if selected==m.id else "")+m.name,func():selected=m.id;show_panel())
- var m=game.s.mercs.get(selected,{})
+ for defender in game.s.sectors[sector].levies:
+  if game.s.sectors[sector].owner=="company": button(side,("● " if selected==defender.id else "")+defender.name,func():selected=defender.id;show_panel())
+ var m=game.Items.person(game.s,selected)
  if not m.is_empty():
-  label(side,"%s · %s · ammo %d\nArmour %s · Shield %s\nWeapon condition %d%% · carried weight %d\nEquipment changes cost 3 AP in battle." % [m.name,Data.weapon(m),Data.ammo(m),Data.armour(m),str(Data.shield(m)),Data.condition(m),Data.weight(m)])
+  label(side,"%s · %s · ammo %d\nArmour %s · Shield %s\nWeapon condition %d%% · carried weight %d\nDraw costs: 3 AP; heavy weapons and helmets 4 AP." % [m.name,Data.weapon(m),Data.ammo(m),Data.armour(m),str(Data.shield(m)),Data.condition(m),Data.weight(m)])
   label(side,"CARRIED ITEMS · tap to manage")
   for entry in m.inventory:
    var slot=""
@@ -326,15 +334,17 @@ func inventory_panel() -> void:
    elif entry.kind!="ammo": button(side,"Equip carried item",run_command.bind("equip",{"id":selected,"item":entry.id}))
    if slot=="":
     button(side,"Deposit at Ashford",run_command.bind("transfer",{"from":selected,"to":"stash","item":entry.id}))
-    for other in game.s.mercs.values():
-     if other.hired and other.id!=selected: button(side,"Give to "+other.name,run_command.bind("transfer",{"from":selected,"to":other.id,"item":entry.id}))
+    for other in game.s.mercs.values()+game.s.sectors[sector].levies:
+     if other.get("hired",false) or other in game.s.sectors[sector].levies:
+      if other.id==selected: continue
+      button(side,"Give to "+other.name,run_command.bind("transfer",{"from":selected,"to":other.id,"item":entry.id}))
  label(side,"ASHFORD STOCKPILE · visit to collect")
  for item in game.s.stash:
   button(side,"Take "+Data.item_label(item),run_command.bind("transfer",{"from":"stash","to":selected,"item":item.id}))
   button(side,"Equip "+Data.item_label(item),run_command.bind("equip",{"id":selected,"item":item.id}))
  label(side,"MARKET · visit Ashford")
- for item in ["food","medicine","tools","ammo","shield","helmet","sword","spear","axe","mace","bow","crossbow","mail","plate"]:
-  var price=Data.WEAPONS[item].price if Data.WEAPONS.has(item) else (Data.ARMOUR[item].price if Data.ARMOUR.has(item) else {"food":20,"medicine":30,"tools":25,"ammo":15,"shield":65,"helmet":45}[item])
+ for item in ["food","medicine","tools","ammo","arrows","bolts","javelins","stone","shield","helmet","sword","spear","axe","mace","bow","crossbow","mail","plate"]:
+  var price=Data.WEAPONS[item].price if Data.WEAPONS.has(item) else (Data.ARMOUR[item].price if Data.ARMOUR.has(item) else {"food":20,"medicine":30,"tools":25,"ammo":15,"shield":65,"helmet":45,"arrows":15,"bolts":15,"javelins":15,"stone":5}[item])
   button(side,"Buy %s · %d crowns" % [item,price],run_command.bind("buy",{"item":item,"squad":squad}))
 
 func tactical_cell(x: int,y: int) -> void:
@@ -381,6 +391,7 @@ func tactical_panel() -> void:
  if b.t.phase=="deployment":
   deployment_panel()
   return
+ button(side,"Toggle roofs",func():battle_view.show_roofs=not battle_view.show_roofs;battle_view.redraw())
  label(side,"Fog: dark is unexplored; dim is remembered terrain.")
  label(side,"FIELD · "+game.s.sectors[game.s.encounter.sector].name+" · "+b.t.get("layout","legacy"))
  if b.t.phase=="exploration":
@@ -394,12 +405,24 @@ func tactical_panel() -> void:
   if u.team=="company" and u.person.hp>0: button(side,("● " if selected==u.id else "")+u.person.name+" · %d AP / %d HP" % [u.ap,u.person.hp],func():selected=u.id;target="";destination={};battle_view.selected=selected;refresh())
  var u=b.unit(selected)
  if u==null: return
+ if u.role=="cart":
+  label(side,"Provision cart · %d HP. A living driver must remain within two tiles." % u.person.hp)
+  if not destination.is_empty(): button(side,"Confirm movement",battle_action.bind("move",destination.duplicate()))
+  return
  label(side,"%s · %s · %s\nAP %d · Fatigue %d · Morale %d\nBleeding %d · %s · Ammo %d" % [u.person.name,u.stance,u.mode,u.ap,u.person.fatigue,u.person.morale,u.person.bleeding,Data.weapon(u.person),Data.ammo(u.person)])
  if target!="":
   var enemy=b.unit(target)
-  label(side,"Target %s · HP %d\nRange %d · Hit %d%% · aim %d\nAttack cost %d AP · defence may negate hit" % [enemy.person.name,enemy.person.hp,b.distance(u,enemy),b.hit_chance(u,enemy,aim),aim,Data.WEAPONS[Data.weapon(u.person)].ap+aim])
+  label(side,"Target %s · HP %d\nRange %d · Hit %d%% · aim %d\nAttack cost %d AP · defence may negate hit" % [enemy.person.name,enemy.person.hp,b.distance(u,enemy),b.hit_chance(u,enemy,aim),aim,b.Combat.cost(u,aim)])
   label(side,"Directional cover against this attack: %d" % b.directional_cover(u,enemy))
   button(side,"Aim + (max 3)",func():aim=(aim+1)%4;show_panel())
+  if Data.WEAPONS[Data.weapon(u.person)].reach>0: button(side,"Attack style: "+u.get("attack_style","normal"),func():var values=b.Combat.ATTACKS.keys();battle_action("attack_style",{"value":values[(values.find(u.get("attack_style","normal"))+1)%values.size()]}))
+  button(side,"Aim at: "+u.get("aim_location","auto"),func():var values=b.Combat.LOCATIONS;battle_action("aim_location",{"value":values[(values.find(u.get("aim_location","auto"))+1)%values.size()]}))
+  if Data.WEAPONS[Data.weapon(u.person)].reach>0:
+   var charge=b.Combat.charge_preview(b,u,enemy)
+   label(side,"Charge: %d movement + %d strike AP · %d%% contact chance · %d visible reaction threats" % [charge.movement,charge.strike,charge.hit,charge.reactions])
+   var charge_button=button(side,"Charge target · movement + power strike",battle_action.bind("charge",{"target":target}))
+   charge_button.disabled=b.distance(u,enemy)<2 or b.distance(u,enemy)>6 or charge.movement<=0 or charge.movement+charge.strike>u.ap
+  if Data.shield(u.person): button(side,"Shield bash · 5 AP",battle_action.bind("bash",{"target":target}))
   button(side,"Confirm attack",battle_action.bind("attack",{"target":target,"aim":aim}))
  elif not destination.is_empty():
   var route=b.path(u,destination.x,destination.y,true)
@@ -411,13 +434,31 @@ func tactical_panel() -> void:
   for placement in b.t.ground:
    if b.Visibility.level(b,placement.x,placement.y)==2 and placement.x==destination.x and placement.y==destination.y: label(side,"Ground: "+Data.item_label(placement.item))
   button(side,"Confirm movement",battle_action.bind("move",destination.duplicate()))
+  if b.t.get("peaceful",false):
+   for build_kind in ["barricade","palisade","gate","torch"]: button(side,"Build "+build_kind+" · 8 AP",battle_action.bind("build",{"x":destination.x,"y":destination.y,"kind":build_kind}))
+  for formation_style in ["line","column","wedge"]: button(side,"Order "+formation_style+" formation",battle_action.bind("formation",{"x":destination.x,"y":destination.y,"style":formation_style}))
+  var withdrawal=b.Combat.risk(b,u,destination.x,destination.y)
+  label(side,"Visible melee reactions: %d · deliberate disengage %d AP. Unseen or ranged threats may still react." % [withdrawal.threats.size(),withdrawal.disengage_ap])
+  if b.t.phase=="combat": button(side,"Disengage to tile",battle_action.bind("disengage",destination.duplicate()))
   if cell.door and b.Visibility.level(b,destination.x,destination.y)==2: button(side,"Open / close door · 3 AP",battle_action.bind("door",destination.duplicate()))
  button(side,"Cancel selection",func():target="";destination={};battle_view.preview=[];refresh())
+ if u.get("protecting","")!="": label(side,"Protecting an adjacent ally: each frontal interception needs another 3 AP and shield condition.")
+ label(side,"Defence: %s · shield condition %d%%\nInjuries: %s" % [u.get("defence_mode","balanced"),Data.equipped(u.person,"shield").get("condition",0),Data.injury_summary(u.person)])
+ for defence in b.Combat.DEFENCES: button(side,"Defence "+defence+" · 2 AP",battle_action.bind("defence_mode",{"value":defence}))
+ if target!="":
+  for entry in u.person.inventory:
+   if entry.kind in ["stone","dagger","javelin"]: button(side,"Throw "+Data.item_label(entry)+" · 6 AP",battle_action.bind("throw",{"item":entry.id,"target":target}))
  button(side,"Reload",battle_action.bind("reload",{}))
  for value in ["stand","crouch","prone"]: button(side,value.capitalize()+" · 2 AP",battle_action.bind("stance",{"value":value}))
  for value in ["walk","run","cautious"]: button(side,value.capitalize(),battle_action.bind("mode",{"value":value}))
  button(side,"Turn 45° · 1 AP",battle_action.bind("turn",{}))
  if b.t.phase=="combat": button(side,"Guard / disengagement reaction",battle_action.bind("guard",{}))
+ button(side,"Rally nearby allies · 4 AP",battle_action.bind("rally",{}))
+ for ally in b.t.units:
+  if ally.team!=u.team or ally.id==u.id or ally.person.hp<=0 or b.distance(u,ally)>1: continue
+  if ally.role=="cart": button(side,"Repair "+ally.person.name+" · 5 AP + tool",battle_action.bind("repair_cart",{"target":ally.id}))
+  else: button(side,"Aid "+ally.person.name+" · 5 AP",battle_action.bind("aid",{"target":ally.id}))
+  if Data.shield(u.person): button(side,"Protect "+ally.person.name+" · 3 AP",battle_action.bind("protect",{"target":ally.id}))
  button(side,"First aid self · 5 AP",battle_action.bind("aid",{}))
  button(side,"Loot adjacent · 3 AP",battle_action.bind("loot",{}))
  for text in b.t.log.slice(maxi(0,b.t.log.size()-6)): label(side,text)
@@ -429,6 +470,15 @@ func ask(text: String,callback: Callable) -> void:
  confirm.popup_centered(Vector2i(500,200))
 
 func _process(delta: float) -> void:
+ if game!=null and game.battle!=null and game.battle.t.phase=="exploration" and game.battle.t.exploration.get("running",false):
+  timer+=delta
+  if timer>=0.4:
+   timer=0
+   var previous=game.battle.t.phase
+   game.battle.Exploration.advance(game.battle,1)
+   if game.battle.t.phase!=previous: rebuild()
+   else: refresh()
+  return
  if game==null or auto_minutes==0 or game.battle!=null: return
  timer+=delta
  if timer>=1:
@@ -442,10 +492,13 @@ func _process(delta: float) -> void:
 func _notification(what: int) -> void:
  if what==NOTIFICATION_APPLICATION_PAUSED and game!=null:
   auto_minutes=0
+  if game.battle!=null and game.battle.t.has("exploration"): game.battle.t.exploration.running=false
+  call_deferred("rebuild")
   game.save_to(game.autosave_path)
 
 func contracts_panel() -> void:
  label(side,"CONTRACT BOARD · selected squad: "+squad)
+ button(side,"Request new postings",run_command.bind("post_jobs",{}))
  label(side,"Finish before the listed deadline. Road work reposts one day after closing.")
  for j in game.s.jobs:
   label(side,"%s · %s · %s\n%d crowns · sector %d:%d\nDeadline day %d, %02d:%02d" % [j.name,j.type,j.status,j.reward,int(j.sector)%16+1,int(j.sector/16)+1,int(j.deadline/1440)+1,int(j.deadline%1440/60),int(j.deadline%60)])
@@ -458,6 +511,7 @@ func contracts_panel() -> void:
 
 func deployment_panel() -> void:
  var b=game.battle
+ for entry_side in b.t.get("entry_zones",{}): button(side,"Approach from "+entry_side,run_command.bind("entry",{"direction":entry_side}))
  label(side,"DEPLOYMENT · "+game.s.sectors[game.s.encounter.sector].name+" · "+b.t.get("layout","legacy"))
  label(side,"Select a fighter, then tap a green deployment tile. Confirm placement and choose facing. Begin combat when the formation is ready. Placement costs no AP.")
  for fighter in b.t.units:
@@ -475,3 +529,21 @@ func deployment_panel() -> void:
  button(side,"Rotate facing · free",run_command.bind("deploy",{"id":u.id,"x":u.x,"y":u.y,"facing":posmod(u.facing+1,8)}))
  button(side,"Cancel placement",func():destination={};refresh())
  label(side,"Enemy turns, attacks, equipment changes and world time remain frozen until Begin combat.")
+
+func operations_panel() -> void:
+ label(side,"FIELD OPERATIONS")
+ var q=game.s.squads.get(squad,{})
+ if q.is_empty(): return
+ label(side,q.name+" · "+game.s.sectors[q.sector].name)
+ button(side,"Visit sector peacefully",run_command.bind("visit",{"squad":squad}))
+ var transport=q.get("transport",{"horses":0,"carts":0})
+ label(side,"Horses %d · carts %d. Horse: 120 crowns; cart: 160 crowns. One horse per member enables mounted travel; carts reduce pack burden." % [transport.horses,transport.carts])
+ for asset in ["horses","carts"]:
+  button(side,"Buy "+asset,run_command.bind("transport",{"asset":asset,"squad":squad}))
+  button(side,"Sell "+asset,run_command.bind("transport",{"asset":asset,"squad":squad,"sell":true}))
+ label(side,"LOCAL PRISONERS")
+ for g in game.s.groups:
+  for prisoner in g.fighters:
+   if prisoner.get("captured",false) and prisoner.hp>0 and not prisoner.get("released",false) and prisoner.get("captured_sector",g.sector)==q.sector:
+    label(side,prisoner.name+" · detained")
+    for choice in ["release","ransom","recruit"]: button(side,choice.capitalize()+" "+prisoner.name,run_command.bind("prisoner",{"id":prisoner.id,"choice":choice,"squad":squad}))

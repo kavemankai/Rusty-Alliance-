@@ -12,6 +12,9 @@ func enemy(b):
  return null
 
 func loadout(p: Dictionary,slot: String,kind: String) -> void:
+ if slot=="weapon":
+  for ammo_entry in p.inventory:
+   if ammo_entry.kind=="ammo": ammo_entry.ammo_type=Data.ammo_kind_for(kind)
  var entry=Data.equipped(p,slot)
  if entry.is_empty():
   entry=Data.item(p.id+":fixture_"+slot,kind)
@@ -382,6 +385,8 @@ func run() -> void:
  preload("res://tests/battlefield_cases.gd").run(self)
  preload("res://tests/exploration_cases.gd").run(self)
  preload("res://tests/visibility_ai_cases.gd").run(self)
+ preload("res://tests/melee_cases.gd").run(self)
+ preload("res://tests/production_cases.gd").run(self)
  var results={"checks":checks,"passed":checks.size()-failed,"failed":failed,"contract_rounds":rounds,"engine":Engine.get_version_info().string}
  var f=FileAccess.open("res://test-results.json",FileAccess.WRITE)
  f.store_string(JSON.stringify(results,"  "))

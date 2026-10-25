@@ -18,7 +18,7 @@ static func begin(b) -> bool:
  b.t.turn="company"
  b.t.quiet_rounds=0
  var elapsed=b.t.get("exploration",{}).get("elapsed",0)
- b.t.exploration={"elapsed":elapsed,"orders":{},"patrol":{}}
+ b.t.exploration={"elapsed":elapsed,"orders":{},"patrol":{},"running":false}
  for u in b.t.units:
   u.guard=false
   if u.team=="enemy" and u.person.hp>10: b.t.exploration.patrol[u.id]={"x":u.x,"y":u.y,"side":1}
@@ -31,6 +31,7 @@ static func combat(b,reason: String) -> void:
  b.t.turn="company"
  b.t.quiet_rounds=0
  b.t.exploration.orders.clear()
+ b.t.exploration.running=false
  b.log_event(reason+"; company turn begins with remaining AP")
 
 static func order(b,id: String,x: int,y: int) -> bool:
@@ -40,6 +41,7 @@ static func order(b,id: String,x: int,y: int) -> bool:
  var route=b.path(actor,x,y,true)
  if route.cost<=0: return b.fail("Unreachable exploration destination")
  b.t.exploration.orders[id]=route.path.duplicate()
+ if b.t.exploration.get("running",false): return true
  # Commands are discrete. Each local pulse moves both sides at most one tile.
  # Stop immediately on detection; never execute the rest of a queued path.
  for i in range(512):
@@ -74,7 +76,7 @@ static func advance(b,count: int=1) -> bool:
      u.person.dead=true
      b.campaign.drop_inventory(u.person,u.x,u.y,b.t.ground)
   if b.outcome()!="ongoing":
-   e.orders.clear()
+   e.orders.clear();e.running=false
    break
   var ids=e.orders.keys();ids.sort()
   for id in ids:
@@ -106,6 +108,7 @@ static func valid(t: Dictionary) -> bool:
  if t.has("quiet_rounds") and (not integer(t.quiet_rounds) or t.quiet_rounds<0 or t.quiet_rounds>3): return false
  if not t.has("exploration"): return t.get("phase","combat")!="exploration"
  var e=t.exploration
+ if e is Dictionary and not e.get("running",false) is bool: return false
  if not e is Dictionary or not e.has_all(["elapsed","orders","patrol"]) or not integer(e.elapsed) or e.elapsed<0 or not e.orders is Dictionary or not e.patrol is Dictionary: return false
  var units={}
  for u in t.units: units[u.id]=u

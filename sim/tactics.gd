@@ -1,10 +1,10 @@
 extends RefCounted
 
 static func memory_goal(b,u: Dictionary,state: Dictionary) -> Dictionary:
- var ids=b.t.knowledge[u.team].keys();ids.sort()
+ var memories=u.get("memory",{});var ids=memories.keys();ids.sort()
  var best={};var recent=-1
  for id in ids:
-  var info=b.t.knowledge[u.team][id]
+  var info=memories[id]
   var key=id+":"+str(info.round)
   if info.visible or b.t.round-info.round>3 or state.get("searched","")==key: continue
   if info.round>recent:
@@ -38,6 +38,15 @@ static func cover_step(b,u: Dictionary,target: Dictionary,weapon: Dictionary) ->
 
 static func act(b,u: Dictionary) -> void:
  if b.t.phase!="combat" or not b.can_act(u): return
+ if u.role=="cart": return
+ if u.role=="driver":
+  for cart in b.t.units:
+   if cart.role=="cart" and cart.get("contract","")==u.get("contract",""):
+    if b.distance(u,cart)>1:
+     var path=b.path(u,cart.x-1,cart.y)
+     if not path.path.is_empty():
+      var cell=b.t.tiles[path.path[0]];b.move(u,cell.x,cell.y)
+    return
  var state=b.t.ai_state.get(u.id,{})
  b.t.ai_state[u.id]=state
  var actions=[];var covered=false
@@ -47,13 +56,19 @@ static func act(b,u: Dictionary) -> void:
   b.refresh_knowledge()
   var targets=[]
   # Current coordinates are read only for opponents currently perceived by team.
-  for id in b.t.knowledge[u.team]:
-   if b.known(u.team,id):
+  for id in u.get("memory",{}):
+   if u.memory[id].visible:
     var candidate=b.unit(id)
     if candidate!=null and candidate.person.hp>10: targets.append(candidate)
   var ally=wounded_ally(b,u)
+  var medicine=b.Supplies.for_person(b.campaign.s,u.id).get("medicine",0)
+  if medicine>0 and u.ap>=5:
+   if u.person.bleeding>0 and b.action(u.id,"aid",{}): actions.append("treat own bleeding");continue
+   if ally!=null and b.distance(u,ally)<=1 and u.person.medical>=50 and b.action(u.id,"aid",{"target":ally.id}): actions.append("treat wounded ally");continue
   targets.sort_custom(func(a,z):return b.distance(a,ally if ally!=null else u)<b.distance(z,ally if ally!=null else u))
   var target=targets[0] if not targets.is_empty() else null
+  if target!=null and b.Data.shield(u.person) and u.get("defence_mode","balanced")=="balanced" and u.ap>=2:
+   b.action(u.id,"defence_mode",{"value":"shield"});actions.append("raise shield defence")
   var w=b.Data.WEAPONS[b.Data.weapon(u.person)]
   if u.person.morale<15:
    var best={};var safety=-9999
@@ -82,9 +97,11 @@ static func act(b,u: Dictionary) -> void:
    goal=memory_goal(b,u,state)
    if not goal.is_empty(): u.reason="investigate last seen contact"
    if goal.is_empty():
+    var priority=-9999
     for noise in b.t.noise:
      if noise.team!=u.team and b.t.round-noise.round<=2 and b.distance(u,noise)<=10:
-      goal={"x":noise.x,"y":noise.y};u.reason="investigate sound"
+      var value=(3-(b.t.round-noise.round))*10+noise.get("strength",1)*4-b.distance(u,noise)
+      if value>priority: priority=value;goal={"x":noise.x,"y":noise.y};u.reason="investigate sound"
    if goal.is_empty() and ally!=null:
     if b.distance(u,ally)<=1: u.reason="guard wounded ally";actions.append(u.reason);break
     goal={"x":ally.x,"y":ally.y};u.reason="support wounded ally"
@@ -134,6 +151,14 @@ static func valid(t: Dictionary) -> bool:
  if not t.ai_state is Dictionary: return false
  var ids={}
  for u in t.units: ids[u.id]=true
+ for u in t.units:
+  if not u.get("memory",{}) is Dictionary: return false
+  for target in u.get("memory",{}):
+   var info=u.memory[target]
+   if not ids.has(target) or not info is Dictionary or not info.has_all(["x","y","round","visible"]): return false
+   for key in ["x","y","round"]:
+    if not (info[key] is int or info[key] is float) or info[key]!=floor(info[key]) or info[key]<0: return false
+   if info.x>=t.width or info.y>=t.height or not info.visible is bool: return false
  for id in t.ai_state:
   var state=t.ai_state[id]
   if not ids.has(id) or not state is Dictionary: return false
