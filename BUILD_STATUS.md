@@ -2,7 +2,7 @@
 
 **Playable integrated slice delivered; full production foundation incomplete.**
 
-Target repository was empty when cloned. Local Godot source lives in this directory; origin remains https://github.com/kavemankai/Rusty-Alliance-.git. Changes are committed locally; no remote push or commercial publication is performed.
+Target repository was empty when cloned. Godot source, tests, documentation and the asset inventory are tracked in this directory; origin is https://github.com/kavemankai/Rusty-Alliance-.git. Generated builds and local development tools are stored separately from the source repository.
 
 Engine: standard Godot 4.6.2 stable, official 71f334935. GDScript, Compatibility/OpenGL renderer, landscape, Android min SDK 24 / target SDK 35. arm64-v8a, armeabi-v7a and x86_64 debug architectures. No paid services or final-art assets.
 
