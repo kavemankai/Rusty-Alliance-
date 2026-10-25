@@ -359,7 +359,7 @@ func tactical_cell(x: int,y: int) -> void:
  else:
   var actor=b.unit(selected)
   if actor!=null:
-   var route=b.path(actor,x,y)
+   var route=b.path(actor,x,y,true)
    battle_view.preview=route.path
  battle_view.selected=selected
  battle_view.redraw()
@@ -381,6 +381,7 @@ func tactical_panel() -> void:
  if b.t.phase=="deployment":
   deployment_panel()
   return
+ label(side,"Fog: dark is unexplored; dim is remembered terrain.")
  label(side,"FIELD · "+game.s.sectors[game.s.encounter.sector].name+" · "+b.t.get("layout","legacy"))
  if b.t.phase=="exploration":
   label(side,"EXPLORATION · local pulses %d" % b.t.exploration.elapsed)
@@ -397,19 +398,20 @@ func tactical_panel() -> void:
  if target!="":
   var enemy=b.unit(target)
   label(side,"Target %s · HP %d\nRange %d · Hit %d%% · aim %d\nAttack cost %d AP · defence may negate hit" % [enemy.person.name,enemy.person.hp,b.distance(u,enemy),b.hit_chance(u,enemy,aim),aim,Data.WEAPONS[Data.weapon(u.person)].ap+aim])
+  label(side,"Directional cover against this attack: %d" % b.directional_cover(u,enemy))
   button(side,"Aim + (max 3)",func():aim=(aim+1)%4;show_panel())
   button(side,"Confirm attack",battle_action.bind("attack",{"target":target,"aim":aim}))
  elif not destination.is_empty():
-  var route=b.path(u,destination.x,destination.y)
-  var cell=b.tile(destination.x,destination.y)
-  if b.t.phase=="exploration":
-   label(side,"Route %d AP of steps · local time advances\nMovement stops on detection or obstruction." % route.cost)
+  var route=b.path(u,destination.x,destination.y,true)
+  var cell=b.Visibility.cell(b,destination.x,destination.y)
+  if b.t.phase=="exploration" or route.path.any(func(index):return b.Visibility.level(b,int(index)%int(b.t.width),int(index)/int(b.t.width))<2):
+   label(side,"Estimated route %d AP of steps · local time advances\nUnseen ground is provisional. Stops on contact, obstruction or insufficient AP." % route.cost)
   else:
    label(side,"Tile %d:%d · move cost %d AP\nRemaining %d · %s\nElevation %d · Cover %d · Concealment %d" % [destination.x,destination.y,route.cost,u.ap-maxi(0,route.cost),cell.kind.capitalize(),cell.elevation,cell.cover,cell.conceal])
   for placement in b.t.ground:
-   if placement.x==destination.x and placement.y==destination.y: label(side,"Ground: "+Data.item_label(placement.item))
+   if b.Visibility.level(b,placement.x,placement.y)==2 and placement.x==destination.x and placement.y==destination.y: label(side,"Ground: "+Data.item_label(placement.item))
   button(side,"Confirm movement",battle_action.bind("move",destination.duplicate()))
-  button(side,"Open / close door · 3 AP",battle_action.bind("door",destination.duplicate()))
+  if cell.door and b.Visibility.level(b,destination.x,destination.y)==2: button(side,"Open / close door · 3 AP",battle_action.bind("door",destination.duplicate()))
  button(side,"Cancel selection",func():target="";destination={};battle_view.preview=[];refresh())
  button(side,"Reload",battle_action.bind("reload",{}))
  for value in ["stand","crouch","prone"]: button(side,value.capitalize()+" · 2 AP",battle_action.bind("stance",{"value":value}))

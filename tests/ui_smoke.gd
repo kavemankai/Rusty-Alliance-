@@ -357,7 +357,34 @@ func run() -> void:
  var quiet_ap=app.game.battle.unit("mara").ap
  await click("Resume exploration")
  if app.game.battle.t.phase!="exploration" or app.game.battle.unit("mara").ap!=quiet_ap: failures.append("Quiet exit control reset AP or failed to resume exploration")
- var result={"failed":failures.size(),"failures":failures,"scope":"Desktop controls: review/place/face/save/confirm company and garrison deployment, authored settlement/farm/mine/camp rendering and normal-control movement, scouting/waiting/save-load/detection-interrupted route, combat transition and quiet-round return, company and item management, supply deposit/load, capture contract battle, then recruit and stock levies, march company away, advance to an actual strategic attack, garrison-only defence, settlement defence payment, escorted freight, ordered patrol return and active/paid save/load"}
+ # Hidden terrain and loot must be absent from rendered geometry, then
+ # appear only after the company actually approaches through scouting controls.
+ app.game=preload("res://tests/exploration_cases.gd").field()
+ app.game.autosave_path="user://ui-test-autosave.json"
+ app.game.battle.tile(15,4).merge({"block":true,"kind":"rock"},true)
+ app.game.battle.t.ground.append({"x":14,"y":4,"item":app.game.s.stash.pop_back()})
+ app.selected="mara";app.tab="sector";app.sector=90
+ app.game.battle.refresh_knowledge()
+ app.rebuild()
+ await settle()
+ await click("Scout before contact")
+ var leaked=false
+ for object in app.battle_view.geometry.get_children():
+  if object.get_meta("terrain_cell",-1)==87 or object.get_meta("ground_pile",false): leaked=true
+ if leaked: failures.append("Unexplored terrain or loot leaked into visible geometry")
+ await click("Save")
+ await click("Load")
+ await capture("fog-preview.png")
+ app.battle_view.pick(app.battle_view.camera.unproject_position(Vector3(11,0,4))*app.battle_view.size/Vector2(app.battle_view.viewport.size))
+ await settle()
+ await click("Confirm movement")
+ var rock_seen=false;var loot_seen=false
+ for object in app.battle_view.geometry.get_children():
+  rock_seen=rock_seen or object.get_meta("terrain_cell",-1)==87
+  loot_seen=loot_seen or object.get_meta("ground_pile",false)
+ if not rock_seen or not loot_seen: failures.append("Actual scouting approach did not reveal obstacle and loot geometry")
+ await capture("fog-revealed-preview.png")
+ var result={"failed":failures.size(),"failures":failures,"scope":"Desktop controls: review/place/face/save/confirm company and garrison deployment, authored settlement/farm/mine/camp rendering and normal-control movement, scouting/waiting/save-load/detection-interrupted route, combat transition and quiet-round return, hidden terrain/loot render suppression and actual approach reveal, company and item management, supply deposit/load, capture contract battle, then recruit and stock levies, march company away, advance to an actual strategic attack, garrison-only defence, settlement defence payment, escorted freight, ordered patrol return and active/paid save/load"}
  var report=FileAccess.open("res://ui-test-results.json",FileAccess.WRITE)
  report.store_string(JSON.stringify(result,"  "))
  report.close()

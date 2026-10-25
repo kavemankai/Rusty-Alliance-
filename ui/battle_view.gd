@@ -47,7 +47,7 @@ func material(color: Color) -> StandardMaterial3D:
  mat.roughness=1.0
  return mat
 
-func box(parent: Node3D,pos: Vector3,dimensions: Vector3,color: Color) -> void:
+func box(parent: Node3D,pos: Vector3,dimensions: Vector3,color: Color) -> MeshInstance3D:
  var mesh=MeshInstance3D.new()
  var primitive=BoxMesh.new()
  primitive.size=dimensions
@@ -55,6 +55,7 @@ func box(parent: Node3D,pos: Vector3,dimensions: Vector3,color: Color) -> void:
  mesh.material_override=material(color)
  mesh.position=pos
  parent.add_child(mesh)
+ return mesh
 
 func redraw() -> void:
  if world==null or battle==null: return
@@ -79,31 +80,38 @@ func redraw() -> void:
  var surfaces={"road":"77664b","floor":"777773","crop":"8b8143","quarry":"626971","mud":"55483b"}
  var obstacles={"palisade":"806044","rock":"656c75","tree":"344a36"}
  for i in range(battle.t.tiles.size()):
-  var c=battle.t.tiles[i]
+  var actual=battle.t.tiles[i]
+  var level=battle.Visibility.level(battle,actual.x,actual.y)
+  var c=battle.Visibility.cell(battle,actual.x,actual.y)
   var color=Color("485546") if int(c.x+c.y)%2==0 else Color("404d3f")
   if surfaces.has(c.kind): color=Color(surfaces[c.kind])
   if c.cost>2 and not surfaces.has(c.kind): color=Color("62604a")
   if c.conceal>0: color=Color("2d523a")
   if battle.t.phase=="deployment" and battle.deployment_tile(battle.t,c.x,c.y): color=Color("397a58")
-  if i in preview: color=Color("a69745")
+  if level==0: color=Color("11191f")
+  elif level==1: color=color.darkened(0.65)
+  if i in preview and level>0: color=Color("a69745")
   if chosen!=null and c.x==chosen.x and c.y==chosen.y: color=Color("2898b4")
   multi.set_instance_transform(i,Transform3D(Basis.IDENTITY,Vector3(c.x,c.elevation*0.5,c.y)))
   multi.set_instance_color(i,color)
-  if c.block:
+  if c.block and level>0:
    var obstacle=Color(obstacles.get(c.kind,"8c8170")) if not c.door else Color("8e663f")
-   box(geometry,Vector3(c.x,0.65+c.elevation*0.5,c.y),Vector3(0.85,1.25 if c.kind!="window" else 0.5,0.85),obstacle)
-  elif c.cover>0:
-   box(geometry,Vector3(c.x,0.3+c.elevation*0.5,c.y),Vector3(0.9,0.5,1.1 if c.kind=="tent" else 0.4),Color("8a7356"))
+   var structure=box(geometry,Vector3(c.x,0.65+c.elevation*0.5,c.y),Vector3(0.85,1.25 if c.kind!="window" else 0.5,0.85),obstacle.darkened(0.65) if level==1 else obstacle)
+   structure.set_meta("terrain_cell",i)
+  elif c.cover>0 and level>0:
+   box(geometry,Vector3(c.x,0.3+c.elevation*0.5,c.y),Vector3(0.9,0.5,1.1 if c.kind=="tent" else 0.4),Color("8a7356").darkened(0.65) if level==1 else Color("8a7356"))
  instance.multimesh=multi
  geometry.add_child(instance)
  var piles={}
  for placement in battle.t.ground:
+  if battle.Visibility.level(battle,placement.x,placement.y)!=2: continue
   var key="%d:%d" % [placement.x,placement.y]
   if not piles.has(key): piles[key]={"x":placement.x,"y":placement.y,"count":0}
   piles[key].count+=1
  for pile in piles.values():
   var height=battle.tile(pile.x,pile.y).elevation*0.5
-  box(geometry,Vector3(pile.x,height+0.2,pile.y),Vector3(0.35,0.25,0.35),Color("e7c969"))
+  var loot=box(geometry,Vector3(pile.x,height+0.2,pile.y),Vector3(0.35,0.25,0.35),Color("e7c969"))
+  loot.set_meta("ground_pile",true)
  for u in battle.t.units:
   if u.person.hp<=0: continue
   if u.team!="company" and not battle.known("company",u.id): continue
@@ -137,7 +145,7 @@ func pick(point: Vector2) -> void:
   if hit!=null:
    var x=int(round(hit.x))
    var y=int(round(hit.z))
-   var c=battle.tile(x,y)
+   var c=battle.Visibility.cell(battle,x,y)
    if not c.is_empty() and c.elevation==level:
     cell_selected.emit(x,y)
     return

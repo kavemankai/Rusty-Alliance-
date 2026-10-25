@@ -37,7 +37,7 @@ static func order(b,id: String,x: int,y: int) -> bool:
  if b.t.phase!="exploration": return b.fail("Not exploring")
  var actor=b.unit(id)
  if actor==null or actor.team!="company" or actor.person.hp<=10 or b.outcome()!="ongoing": return b.fail("Select a capable company fighter")
- var route=b.path(actor,x,y)
+ var route=b.path(actor,x,y,true)
  if route.cost<=0: return b.fail("Unreachable exploration destination")
  b.t.exploration.orders[id]=route.path.duplicate()
  # Commands are discrete. Each local pulse moves both sides at most one tile.

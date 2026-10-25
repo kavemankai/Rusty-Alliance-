@@ -10,6 +10,7 @@ Godot 4.6.2 standard, GDScript, Compatibility renderer, Android landscape. Read 
 - Base stockpile access requires Ashford; character transfers require co-location, and combat transfers require adjacency plus 3 AP. Preserve IDs when equipping, transferring, looting or repairing.
 - Battlefields own layout/version/deployment_zones/enemy_spawns alongside tiles/ground. Preserve all metadata through field_state(); never regenerate a visited sector or attach new geometry to a legacy active save.
 - Exploration is command-based. Preserve phase/quiet_rounds/exploration orders and patrol anchors. Perception by either side interrupts movement into combat with remaining AP; do not refill AP on a mode switch.
+- Fog stores last observed tile snapshots per team in the sector field. Render remembered snapshots, not unseen live state; loot needs current sight. Company route estimates must not route around hidden obstacles. AI may read opponent coordinates only through current knowledge or stored last-seen locations.
 - Rules belong in sim/, presentation in ui/. Commands reject invalid actions before spending resources.
 - New mechanics need deterministic behavioural checks. Run tests/run.gd and tests/ui_smoke.gd. An exit code alone is insufficient: reject SCRIPT ERROR and ERROR output.
 - Movement preview and execution must use the same step_cost. Displayed accuracy uses hit_chance before condition/fatigue mutations.

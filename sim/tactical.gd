@@ -1,4 +1,6 @@
 extends RefCounted
+const Tactics=preload("res://sim/tactics.gd")
+const Visibility=preload("res://sim/visibility.gd")
 const Exploration=preload("res://sim/exploration.gd")
 const Data = preload("res://sim/catalog.gd")
 const Layouts=preload("res://sim/battlefields.gd")
@@ -8,6 +10,8 @@ var campaign:
  get: return campaign_ref.get_ref()
 var t: Dictionary
 var error = ""
+var fog_signature=-1
+var fog_observers={}
 
 func _init(owner, restored: Dictionary = {}) -> void:
  campaign_ref=weakref(owner)
@@ -15,13 +19,15 @@ func _init(owner, restored: Dictionary = {}) -> void:
   t=restored
   if not t.has("phase"): t.phase="combat"
   if not t.has("quiet_rounds"): t.quiet_rounds=0
+  if not t.has("ai_state"): t.ai_state={}
+  Visibility.refresh(self)
   return
- t={"quiet_rounds":0,"phase":"deployment","width":18,"height":14,"tiles":[],"units":[],"squads":[],"turn":"company","round":1,"knowledge":{"company":{},"enemy":{}},"log":[],"ai":[],"noise":[],"ground":[]}
+ t={"ai_state":{},"quiet_rounds":0,"phase":"deployment","width":18,"height":14,"tiles":[],"units":[],"squads":[],"turn":"company","round":1,"knowledge":{"company":{},"enemy":{}},"log":[],"ai":[],"noise":[],"ground":[]}
  build_map(18,14)
  var sector=campaign.s.sectors[campaign.s.encounter.sector]
  if not sector.has("battlefield"): sector.battlefield=Layouts.create(sector)
  var saved=sector.battlefield
- for key in ["width","height","tiles","ground"]+Layouts.META:
+ for key in ["width","height","tiles","ground","fog"]+Layouts.META:
   if saved.has(key): t[key]=saved[key]
  campaign.ensure_group_rosters()
  var count=0
@@ -56,6 +62,7 @@ func _init(owner, restored: Dictionary = {}) -> void:
    place_deploying_unit(u)
    index+=1
  refresh_knowledge()
+ sector.battlefield=field_state()
 
 func make_unit(id: String, team: String, p: Dictionary, x: int, y: int) -> Dictionary:
  return {"id":id,"team":team,"role":"merc" if team=="company" else "enemy","person":p,"x":x,"y":y,"ap":Data.ap(p),"stance":"stand","mode":"walk","facing":0 if team=="company" else 4,"guard":false,"reason":"guarding"}
@@ -139,15 +146,15 @@ func rear(a: Dictionary,b: Dictionary) -> bool:
  var dir=heading(a.x-b.x,a.y-b.y)
  return mini(posmod(dir-b.facing,8),posmod(b.facing-dir,8))>=3
 
-func step_cost(u: Dictionary, from: Dictionary, dest: Dictionary) -> int:
- if dest.is_empty() or dest.block or at(dest.x,dest.y,u.id)!=null: return -1
+func step_cost(u: Dictionary, from: Dictionary, dest: Dictionary,charted: bool=false) -> int:
+ if dest.is_empty() or dest.block or planned_occupant(u,dest.x,dest.y,charted)!=null: return -1
  var dx=dest.x-from.x
  var dy=dest.y-from.y
  if absi(dx)>1 or absi(dy)>1 or (dx==0 and dy==0): return -1
  if dx!=0 and dy!=0:
-  var a=tile(from.x+dx,from.y)
-  var b=tile(from.x,from.y+dy)
-  if a.is_empty() or b.is_empty() or a.block or b.block or at(a.x,a.y,u.id)!=null or at(b.x,b.y,u.id)!=null: return -1
+  var a=Visibility.cell(self,from.x+dx,from.y,u.team) if charted else tile(from.x+dx,from.y)
+  var b=Visibility.cell(self,from.x,from.y+dy,u.team) if charted else tile(from.x,from.y+dy)
+  if a.is_empty() or b.is_empty() or a.block or b.block or planned_occupant(u,a.x,a.y,charted)!=null or planned_occupant(u,b.x,b.y,charted)!=null: return -1
  if absi(dest.elevation-from.elevation)>1: return -1
  var cost=dest.cost+maxi(0,dest.elevation-from.elevation)*2
  if dx!=0 and dy!=0: cost=int(ceil(cost*1.4))
@@ -157,9 +164,9 @@ func step_cost(u: Dictionary, from: Dictionary, dest: Dictionary) -> int:
  if u.mode=="cautious": cost+=1
  return cost
 
-func path(u: Dictionary,x: int,y: int) -> Dictionary:
- var goal=tile(x,y)
- if goal.is_empty() or goal.block or at(x,y,u.id)!=null: return {"path":[],"cost":-1}
+func path(u: Dictionary,x: int,y: int,charted: bool=false) -> Dictionary:
+ var goal=Visibility.cell(self,x,y,u.team) if charted else tile(x,y)
+ if goal.is_empty() or goal.block or planned_occupant(u,x,y,charted)!=null: return {"path":[],"cost":-1}
  var start=int(u.y*t.width+u.x)
  var end=y*t.width+x
  if end==start: return {"path":[],"cost":0}
@@ -175,11 +182,11 @@ func path(u: Dictionary,x: int,y: int) -> Dictionary:
     route.push_front(pos)
     pos=previous[pos]
    return {"path":route,"cost":costs[end]}
-  var from=t.tiles[pos]
+  var from=Visibility.cell(self,int(pos)%int(t.width),int(pos)/int(t.width),u.team) if charted else t.tiles[pos]
   for dy in range(-1,2):
    for dx in range(-1,2):
-    var dest=tile(from.x+dx,from.y+dy)
-    var c=step_cost(u,from,dest)
+    var dest=Visibility.cell(self,from.x+dx,from.y+dy,u.team) if charted else tile(from.x+dx,from.y+dy)
+    var c=step_cost(u,from,dest,charted)
     if c<0: continue
     var next=dest.y*t.width+dest.x
     var total=costs[pos]+c
@@ -217,6 +224,7 @@ func los(a: Dictionary,b: Dictionary) -> bool:
  return true
 
 func refresh_knowledge() -> void:
+ Visibility.refresh(self)
  if t.phase=="deployment": return
  for team in ["company","enemy"]:
   for key in t.knowledge[team]: t.knowledge[team][key].visible=false
@@ -237,7 +245,7 @@ func move(u: Dictionary,x: int,y: int) -> bool:
  error=""
  if t.phase=="exploration": return Exploration.order(self,u.id,x,y)
  if not can_act(u): return fail("Unit cannot act")
- var preview=path(u,x,y)
+ var preview=path(u,x,y,u.team=="company")
  if preview.cost<=0 or preview.cost>u.ap: return fail("Unreachable or insufficient AP")
  # Step execution permits reactions and halts on new contact, matching path costs.
  for index in preview.path:
@@ -279,7 +287,7 @@ func hit_chance(a: Dictionary,b: Dictionary,aim: int=0) -> int:
  chance+=5*(tile(a.x,a.y).elevation-tile(b.x,b.y).elevation)
  if ranged:
   chance-=maxi(0,d-w.effective)*7
-  chance-=tile(b.x,b.y).cover+tile(b.x,b.y).conceal
+  chance-=directional_cover(a,b)+tile(b.x,b.y).conceal
   if b.stance=="crouch": chance-=8
   if b.stance=="prone": chance-=15
   if a.stance=="crouch": chance+=5
@@ -460,74 +468,7 @@ func end_turn() -> bool:
  return true
 
 func ai_unit(u: Dictionary) -> void:
- if t.phase!="combat": return
- # Only perceived opponents and stored coordinates can inform decisions.
- var budget=24
- while u.ap>0 and u.person.hp>10 and budget>0 and outcome()=="ongoing":
-  budget-=1
-  refresh_knowledge()
-  var targets=[]
-  for id in t.knowledge[u.team]:
-   if known(u.team,id):
-    var candidate=unit(id)
-    if candidate!=null and candidate.person.hp>10: targets.append(candidate)
-  targets.sort_custom(func(a,b):return distance(u,a)<distance(u,b))
-  var w=Data.WEAPONS[Data.weapon(u.person)]
-  if u.person.morale<15:
-   u.reason="morale retreat"
-   var retreat=path(u,mini(t.width-1,u.x+1),u.y)
-   if retreat.cost>0 and retreat.cost<=u.ap: move(u,mini(t.width-1,u.x+1),u.y)
-   break
-  if w.reach==0 and not u.person.loaded and Data.ammo(u.person)>0 and u.ap>=w.reload:
-   u.ap-=w.reload
-   u.person.loaded=true
-   u.reason="reload"
-   continue
-  var target=targets[0] if not targets.is_empty() else null
-  if target!=null and distance(u,target)<=w.range and u.ap>=w.ap:
-   if attack(u,target):
-    u.reason="attack perceived opponent"
-    continue
-  var goal={}
-  if target!=null: goal={"x":target.x,"y":target.y}
-  elif not t.knowledge[u.team].is_empty():
-   for id in t.knowledge[u.team]: goal=t.knowledge[u.team][id]
-   u.reason="investigate last known position"
-  else:
-   for noise in t.noise:
-    if noise.team!=u.team and t.round-noise.round<=2 and distance(u,noise)<=10:
-     goal=noise
-     u.reason="investigate heard sound"
-   if goal.is_empty():
-    goal={"x":maxi(1,u.x-1),"y":u.y}
-    u.reason="patrol west"
-  var best={}
-  var score=-100000.0
-  for dy in range(-1,2):
-   for dx in range(-1,2):
-    var cell=tile(u.x+dx,u.y+dy)
-    var cost=step_cost(u,tile(u.x,u.y),cell)
-    if cost<0 or cost>u.ap: continue
-    var d=distance(cell,goal)
-    var value=-d*10.0-cost+cell.cover*0.2+cell.elevation*2
-    if target!=null and w.reach==0 and d<3: value-=40
-    if value>score:
-     score=value
-     best=cell
-  if best.is_empty():
-   # Doors use the exact same action validation as a player.
-   if u.ap>=3:
-    for d in [Vector2i.LEFT,Vector2i.RIGHT,Vector2i.UP,Vector2i.DOWN]:
-     var cell=tile(u.x+d.x,u.y+d.y)
-     if not cell.is_empty() and cell.door and not cell.open:
-      action(u.id,"door",{"x":cell.x,"y":cell.y})
-      u.reason="open obstructing door"
-      break
-   break
-  if not move(u,best.x,best.y): break
-  if target!=null: u.reason="reposition toward perceived threat"
- u.guard=true
- t.ai.append({"id":u.id,"reason":u.reason,"remaining_ap":u.ap})
+ Tactics.act(self,u)
 
 # Authored zones persist with each battlefield; legacy maps keep the western strip.
 static func deployment_tile(state: Dictionary,x: int,y: int) -> bool:
@@ -591,7 +532,7 @@ func confirm_deployment(explore: bool=false) -> bool:
  return true
 
 func field_state() -> Dictionary:
- var field={"width":t.width,"height":t.height,"tiles":t.tiles,"ground":t.ground}
+ var field={"width":t.width,"height":t.height,"tiles":t.tiles,"ground":t.ground,"fog":t.get("fog",{"company":{},"enemy":{}})}
  for key in Layouts.META:
   if t.has(key): field[key]=t[key]
  return field
@@ -600,3 +541,24 @@ func resume_exploration() -> bool:
  if t.phase!="combat" or outcome()!="ongoing" or t.quiet_rounds<3: return fail("Need three full rounds without either side detecting opponents")
  if Exploration.current_contact(self): return fail("Opponents remain in contact")
  return Exploration.begin(self)
+
+func planned_occupant(u: Dictionary,x: int,y: int,charted: bool):
+ var other=at(x,y,u.id)
+ if other==null or not charted or other.team==u.team or known(u.team,other.id): return other
+ return null
+
+func directional_cover(attacker: Dictionary,defender: Dictionary) -> int:
+ var protection=tile(defender.x,defender.y).cover
+ var dx=signi(attacker.x-defender.x);var dy=signi(attacker.y-defender.y)
+ if dx==0 and dy==0: return protection
+ var edges=[{"x":defender.x+dx,"y":defender.y+dy,"weight":1.0}]
+ if dx!=0 and dy!=0:
+  edges.append({"x":defender.x+dx,"y":defender.y,"weight":0.5})
+  edges.append({"x":defender.x,"y":defender.y+dy,"weight":0.5})
+ for edge in edges:
+  var c=tile(edge.x,edge.y)
+  if c.is_empty(): continue
+  var value=maxi(c.cover,35 if c.block else 0)
+  protection=maxi(protection,int(value*edge.weight))
+ protection-=maxi(0,tile(attacker.x,attacker.y).elevation-tile(defender.x,defender.y).elevation)*10
+ return clampi(protection,0,60)

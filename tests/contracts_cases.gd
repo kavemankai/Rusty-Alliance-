@@ -118,6 +118,7 @@ static func run(test) -> void:
  test.check(c.s.sectors[17].owner=="bandits" and job(c,"defence").status=="failed","Undefended settlement loss fails defence through faction simulation")
  c=Campaign.new()
  c.autosave_path="user://contracts-test-autosave.json"
+ c.command("hire",{"id":"ada"})
  test.check(c.command("accept",{"id":"camp"}),"Occupied original camp accepts assault contract")
  var camp=Jobs.group(c.s,"briar_guard")
  c.faction_tick()

@@ -781,6 +781,7 @@ func valid_save(data: Variant) -> bool:
   if data.encounter.sector<0 or data.encounter.sector>=256: return false
   var field=data.sectors[data.encounter.sector].get("battlefield",{})
   if not valid_battlefield(field) or field.tiles!=data.battle.tiles or field.ground!=data.battle.ground: return false
+  if field.get("fog")!=data.battle.get("fog"): return false
   for key in Layouts.META:
    if field.get(key)!=data.battle.get(key): return false
   var phase=data.battle.get("phase","combat")
@@ -813,6 +814,8 @@ func valid_save(data: Variant) -> bool:
     for g in data.groups:
      if g.id==u.get("group","") and u.person in g.fighters: bound=true
     if not bound: return false
+  if not Battle.Tactics.valid(data.battle): return false
+  if not Battle.Visibility.valid(data.battle): return false
   if not Battle.Exploration.valid(data.battle): return false
   if phase=="exploration" and data.battle.turn!="company": return false
   if phase=="deployment":
@@ -824,6 +827,7 @@ func valid_battlefield(field: Variant) -> bool:
  if not field is Dictionary or not field.has_all(["width","height","tiles","ground"]): return false
  if not (field.width is int or field.width is float) or not (field.height is int or field.height is float): return false
  if field.width<1 or field.height<1 or field.width>160 or field.height>160: return false
+ if not Battle.Visibility.valid(field): return false
  if not Layouts.valid_metadata(field): return false
  if not field.tiles is Array or field.tiles.size()!=int(field.width)*int(field.height) or not field.ground is Array: return false
  for cell in field.tiles:
