@@ -314,7 +314,50 @@ func run() -> void:
   await settle()
   await click("Confirm movement")
   if actor.ap>=prior_ap or actor.x!=step.x or actor.y!=step.y: failures.append("Normal combat movement failed on "+spec[1])
- var result={"failed":failures.size(),"failures":failures,"scope":"Desktop controls: review/place/face/save/confirm company and garrison deployment, authored settlement/farm/mine/camp rendering and normal-control movement, company and item management, supply deposit/load, capture contract battle, then recruit and stock levies, march company away, advance to an actual strategic attack, garrison-only defence, settlement defence payment, escorted freight, ordered patrol return and active/paid save/load"}
+ # Controlled open/low-perception fixture isolates the actual scouting UI.
+ app.game=preload("res://tests/exploration_cases.gd").field()
+ app.game.autosave_path="user://ui-test-autosave.json"
+ app.selected="mara";app.tab="sector";app.sector=90
+ app.rebuild()
+ await settle()
+ await click("Scout before contact")
+ if app.game.battle.t.phase!="exploration": failures.append("Scouting control did not enter exploration")
+ await click("Wait / scout")
+ if app.game.battle.t.exploration.elapsed!=1: failures.append("Wait control did not advance local patrol time")
+ app.battle_view.pick(app.battle_view.camera.unproject_position(Vector3(2,0,2))*app.battle_view.size/Vector2(app.battle_view.viewport.size))
+ await settle()
+ await click("Confirm movement")
+ if app.game.battle.unit("mara").x!=2 or app.game.battle.t.phase!="exploration": failures.append("Scouting movement control failed")
+ await click("Save")
+ await click("Load")
+ if app.game.battle.t.phase!="exploration" or app.game.battle.unit("mara").x!=2: failures.append("Exploration UI reload lost mode/position")
+ await capture("exploration-preview.png")
+ app.battle_view.pick(app.battle_view.camera.unproject_position(Vector3(15,0,2))*app.battle_view.size/Vector2(app.battle_view.viewport.size))
+ await settle()
+ await click("Confirm movement")
+ if app.game.battle.t.phase!="combat" or app.game.battle.unit("mara").x>=15: failures.append("Detection did not interrupt scouting route and reveal combat controls")
+ var contact_ap=app.game.battle.unit("mara").ap
+ await capture("contact-preview.png")
+ await click("Save")
+ await click("Load")
+ if app.game.battle.t.phase!="combat" or app.game.battle.unit("mara").ap!=contact_ap: failures.append("Contact reload reset combat AP or mode")
+ await click("End turn")
+ if app.game.battle.t.round!=2: failures.append("Combat controls did not work after exploration transition")
+ # A solid LOS barrier fixture verifies quiet-round exit through controls.
+ app.game=preload("res://tests/exploration_cases.gd").field()
+ app.game.autosave_path="user://ui-test-autosave.json"
+ for cell in app.game.battle.t.tiles:
+  if cell.x==8: cell.block=true
+ app.selected="mara";app.tab="sector";app.sector=90
+ app.rebuild()
+ await settle()
+ await click("Begin combat")
+ for quiet_round in range(3): await click("End turn")
+ if app.game.battle.t.quiet_rounds!=3: failures.append("Quiet combat rounds did not accumulate through controls")
+ var quiet_ap=app.game.battle.unit("mara").ap
+ await click("Resume exploration")
+ if app.game.battle.t.phase!="exploration" or app.game.battle.unit("mara").ap!=quiet_ap: failures.append("Quiet exit control reset AP or failed to resume exploration")
+ var result={"failed":failures.size(),"failures":failures,"scope":"Desktop controls: review/place/face/save/confirm company and garrison deployment, authored settlement/farm/mine/camp rendering and normal-control movement, scouting/waiting/save-load/detection-interrupted route, combat transition and quiet-round return, company and item management, supply deposit/load, capture contract battle, then recruit and stock levies, march company away, advance to an actual strategic attack, garrison-only defence, settlement defence payment, escorted freight, ordered patrol return and active/paid save/load"}
  var report=FileAccess.open("res://ui-test-results.json",FileAccess.WRITE)
  report.store_string(JSON.stringify(result,"  "))
  report.close()

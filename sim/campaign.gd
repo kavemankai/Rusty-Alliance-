@@ -181,7 +181,16 @@ func command(kind: String, p: Dictionary = {}) -> bool:
    if not battle.deploy(p.get("id",""),p): return reject(battle.error)
   "confirm_deployment":
    if battle==null: return reject("No deployment")
-   if not battle.confirm_deployment(): return reject(battle.error)
+   if not battle.confirm_deployment(p.get("explore",false)): return reject(battle.error)
+  "explore":
+   if battle==null: return reject("No tactical encounter")
+   if not battle.resume_exploration(): return reject(battle.error)
+  "explore_wait":
+   if battle==null: return reject("No exploration")
+   if not battle.Exploration.advance(battle,p.get("pulses",1)): return reject(battle.error)
+  "combat":
+   if battle==null or battle.t.phase!="exploration": return reject("Not exploring")
+   battle.Exploration.combat(battle,"Combat chosen")
   "resolve": return resolve_battle(false)
   "retreat": return resolve_battle(true)
   "levy":
@@ -775,7 +784,7 @@ func valid_save(data: Variant) -> bool:
   for key in Layouts.META:
    if field.get(key)!=data.battle.get(key): return false
   var phase=data.battle.get("phase","combat")
-  if phase not in ["deployment","combat"]: return false
+  if phase not in ["deployment","exploration","combat"]: return false
   if phase=="deployment" and (data.battle.turn!="company" or data.battle.round!=1 or data.battle.knowledge!={"company":{},"enemy":{}} or not data.battle.ai.is_empty() or not data.battle.noise.is_empty()): return false
   var occupied={}
   var unit_ids={}
@@ -804,6 +813,8 @@ func valid_save(data: Variant) -> bool:
     for g in data.groups:
      if g.id==u.get("group","") and u.person in g.fighters: bound=true
     if not bound: return false
+  if not Battle.Exploration.valid(data.battle): return false
+  if phase=="exploration" and data.battle.turn!="company": return false
   if phase=="deployment":
    for u in data.battle.units:
     if u.team=="company" and u.deployed and not Battle.deployment_tile(data.battle,int(u.x),int(u.y)): return false

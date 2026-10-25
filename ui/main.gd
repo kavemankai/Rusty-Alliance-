@@ -140,6 +140,11 @@ func rebuild() -> void:
  else:
   if game.battle.t.phase=="deployment":
    button(bar,"Begin combat",func():run_command("confirm_deployment"))
+   button(bar,"Scout before contact",func():run_command("confirm_deployment",{"explore":true}))
+  elif game.battle.t.phase=="exploration":
+   button(bar,"Wait / scout",func():run_command("explore_wait"))
+   button(bar,"Enter combat",func():run_command("combat"))
+   button(bar,"Resolve",func():run_command("resolve"))
   else:
    button(bar,"End turn",func():
     if not game.battle.end_turn(): status(game.battle.error)
@@ -189,14 +194,15 @@ func refresh() -> void:
 func run_command(kind: String,p: Dictionary={}) -> void:
  if kind=="save" and not p.has("path"): p={"path":save_slot}
  var had_battle=game.battle!=null
+ var previous_phase="" if not had_battle else game.battle.t.phase
  var previous_log="" if game.s.log.is_empty() else str(game.s.log.back())
  if game.command(kind,p):
-  var titles={"supply_transfer":"Supplies transferred","enter":"Deployment ready","deploy":"Placement updated","confirm_deployment":"Combat started","equip":"Equipment updated","unequip":"Item unequipped","unequip_shield":"Shield unequipped","transfer":"Item transferred","resolve":"Battle resolved","retreat":"Company withdrew","levy":"Levy recruited","hire":"Fighter hired","advance":"Time advanced","assignment":"Assignment updated","route":"Route plotted","split":"Squad split","merge":"Squads merged","buy":"Purchase completed","save":"Campaign saved","load":"Campaign loaded"}
+  var titles={"explore_wait":"Scouting advanced","explore":"Exploration resumed","combat":"Combat started","supply_transfer":"Supplies transferred","enter":"Deployment ready","deploy":"Placement updated","confirm_deployment":"Combat started","equip":"Equipment updated","unequip":"Item unequipped","unequip_shield":"Shield unequipped","transfer":"Item transferred","resolve":"Battle resolved","retreat":"Company withdrew","levy":"Levy recruited","hire":"Fighter hired","advance":"Time advanced","assignment":"Assignment updated","route":"Route plotted","split":"Squad split","merge":"Squads merged","buy":"Purchase completed","save":"Campaign saved","load":"Campaign loaded"}
   var update=titles.get(kind,kind.capitalize()+" completed")
   if not game.s.log.is_empty() and str(game.s.log.back())!=previous_log: update+=". "+str(game.s.log.back())
   status(update)
   if kind=="deploy": destination={}
-  if kind in ["resolve","retreat","enter","load","confirm_deployment"] or had_battle!=(game.battle!=null): rebuild()
+  if kind in ["resolve","retreat","enter","load","confirm_deployment"] or had_battle!=(game.battle!=null) or (game.battle!=null and previous_phase!=game.battle.t.phase): rebuild()
   else: refresh()
  else: status(game.error)
 
@@ -360,11 +366,15 @@ func tactical_cell(x: int,y: int) -> void:
  show_panel()
 
 func battle_action(kind: String,p: Dictionary={}) -> void:
+ var previous_phase=game.battle.t.phase
  if game.battle.action(selected,kind,p): status("Done: "+kind)
  else: status(game.battle.error)
  destination={}
  if battle_view!=null: battle_view.preview=[]
- refresh()
+ if previous_phase!=game.battle.t.phase:
+  if not game.battle.t.log.is_empty(): status(game.battle.t.log.back())
+  rebuild()
+ else: refresh()
 
 func tactical_panel() -> void:
  var b=game.battle
@@ -372,7 +382,13 @@ func tactical_panel() -> void:
   deployment_panel()
   return
  label(side,"FIELD · "+game.s.sectors[game.s.encounter.sector].name+" · "+b.t.get("layout","legacy"))
- label(side,"BATTLE · round %d · %s\n%s" % [b.t.round,b.t.turn,b.outcome()])
+ if b.t.phase=="exploration":
+  label(side,"EXPLORATION · local pulses %d" % b.t.exploration.elapsed)
+  label(side,"Movement and Wait / scout advance patrols. Either side detecting opponents starts combat immediately. Positions and remaining AP carry across; the world clock stays paused.")
+ else:
+  label(side,"BATTLE · round %d · %s\n%s" % [b.t.round,b.t.turn,b.outcome()])
+  label(side,"Quiet rounds: %d/3 before exploration may resume" % b.t.quiet_rounds)
+  if b.t.quiet_rounds>=3: button(side,"Resume exploration",run_command.bind("explore",{}))
  for u in b.t.units:
   if u.team=="company" and u.person.hp>0: button(side,("● " if selected==u.id else "")+u.person.name+" · %d AP / %d HP" % [u.ap,u.person.hp],func():selected=u.id;target="";destination={};battle_view.selected=selected;refresh())
  var u=b.unit(selected)
@@ -386,7 +402,10 @@ func tactical_panel() -> void:
  elif not destination.is_empty():
   var route=b.path(u,destination.x,destination.y)
   var cell=b.tile(destination.x,destination.y)
-  label(side,"Tile %d:%d · move cost %d AP\nRemaining %d · %s\nElevation %d · Cover %d · Concealment %d" % [destination.x,destination.y,route.cost,u.ap-maxi(0,route.cost),cell.kind.capitalize(),cell.elevation,cell.cover,cell.conceal])
+  if b.t.phase=="exploration":
+   label(side,"Route %d AP of steps · local time advances\nMovement stops on detection or obstruction." % route.cost)
+  else:
+   label(side,"Tile %d:%d · move cost %d AP\nRemaining %d · %s\nElevation %d · Cover %d · Concealment %d" % [destination.x,destination.y,route.cost,u.ap-maxi(0,route.cost),cell.kind.capitalize(),cell.elevation,cell.cover,cell.conceal])
   for placement in b.t.ground:
    if placement.x==destination.x and placement.y==destination.y: label(side,"Ground: "+Data.item_label(placement.item))
   button(side,"Confirm movement",battle_action.bind("move",destination.duplicate()))
@@ -396,7 +415,7 @@ func tactical_panel() -> void:
  for value in ["stand","crouch","prone"]: button(side,value.capitalize()+" · 2 AP",battle_action.bind("stance",{"value":value}))
  for value in ["walk","run","cautious"]: button(side,value.capitalize(),battle_action.bind("mode",{"value":value}))
  button(side,"Turn 45° · 1 AP",battle_action.bind("turn",{}))
- button(side,"Guard / disengagement reaction",battle_action.bind("guard",{}))
+ if b.t.phase=="combat": button(side,"Guard / disengagement reaction",battle_action.bind("guard",{}))
  button(side,"First aid self · 5 AP",battle_action.bind("aid",{}))
  button(side,"Loot adjacent · 3 AP",battle_action.bind("loot",{}))
  for text in b.t.log.slice(maxi(0,b.t.log.size()-6)): label(side,text)

@@ -1,4 +1,5 @@
 extends RefCounted
+const Exploration=preload("res://sim/exploration.gd")
 const Data = preload("res://sim/catalog.gd")
 const Layouts=preload("res://sim/battlefields.gd")
 const Supplies=preload("res://sim/supplies.gd")
@@ -13,8 +14,9 @@ func _init(owner, restored: Dictionary = {}) -> void:
  if not restored.is_empty():
   t=restored
   if not t.has("phase"): t.phase="combat"
+  if not t.has("quiet_rounds"): t.quiet_rounds=0
   return
- t={"phase":"deployment","width":18,"height":14,"tiles":[],"units":[],"squads":[],"turn":"company","round":1,"knowledge":{"company":{},"enemy":{}},"log":[],"ai":[],"noise":[],"ground":[]}
+ t={"quiet_rounds":0,"phase":"deployment","width":18,"height":14,"tiles":[],"units":[],"squads":[],"turn":"company","round":1,"knowledge":{"company":{},"enemy":{}},"log":[],"ai":[],"noise":[],"ground":[]}
  build_map(18,14)
  var sector=campaign.s.sectors[campaign.s.encounter.sector]
  if not sector.has("battlefield"): sector.battlefield=Layouts.create(sector)
@@ -116,7 +118,7 @@ func at(x: int,y: int,ignore: String=""):
  return null
 
 func can_act(u: Dictionary) -> bool:
- return t.phase=="combat" and t.turn == u.team and u.person.hp>10 and outcome()=="ongoing"
+ return (t.phase=="combat" or (t.phase=="exploration" and u.team=="company")) and t.turn == u.team and u.person.hp>10 and outcome()=="ongoing"
 
 func fail(message: String) -> bool:
  error=message
@@ -225,11 +227,15 @@ func refresh_knowledge() -> void:
     if visible(observer,other):
      t.knowledge[team][other.id]={"x":other.x,"y":other.y,"round":t.round,"visible":true}
 
+ if t.phase=="exploration" and Exploration.contact(self): Exploration.combat(self,"Opponents detected")
+ elif t.phase=="combat" and Exploration.contact(self): t.quiet_rounds=0
+
 func known(team: String,id: String) -> bool:
  return t.knowledge[team].has(id) and t.knowledge[team][id].visible
 
 func move(u: Dictionary,x: int,y: int) -> bool:
  error=""
+ if t.phase=="exploration": return Exploration.order(self,u.id,x,y)
  if not can_act(u): return fail("Unit cannot act")
  var preview=path(u,x,y)
  if preview.cost<=0 or preview.cost>u.ap: return fail("Unreachable or insufficient AP")
@@ -364,6 +370,7 @@ func action(id: String,kind: String,p: Dictionary={}) -> bool:
  error=""
  var u=unit(id)
  if u==null or not can_act(u): return fail("Select an active unit")
+ if t.phase=="exploration" and kind in ["attack","guard"]: return fail("Enter combat before attacking or guarding")
  match kind:
   "move": return move(u,p.x,p.y)
   "attack":
@@ -442,13 +449,14 @@ func start_turn(team: String) -> void:
  refresh_knowledge()
 
 func end_turn() -> bool:
- if t.turn!="company" or outcome()!="ongoing": return fail("No active player turn")
+ if t.phase!="combat" or t.turn!="company" or outcome()!="ongoing": return fail("No active player turn")
  start_turn("enemy")
  t.ai=[]
  for u in t.units:
   if u.team=="enemy" and u.person.hp>10 and outcome()=="ongoing": ai_unit(u)
  t.round+=1
  start_turn("company")
+ if not Exploration.contact(self): t.quiet_rounds=mini(3,t.quiet_rounds+1)
  return true
 
 func ai_unit(u: Dictionary) -> void:
@@ -568,7 +576,7 @@ func deploy(id: String,p: Dictionary) -> bool:
  u.x=int(p.x);u.y=int(p.y);u.facing=int(facing);u.deployed=true
  return true
 
-func confirm_deployment() -> bool:
+func confirm_deployment(explore: bool=false) -> bool:
  error=""
  if t.phase!="deployment": return fail("Deployment is already confirmed")
  for u in t.units:
@@ -577,6 +585,7 @@ func confirm_deployment() -> bool:
   var invalid=deployment_error(u.id,u.x,u.y)
   if invalid!="": return fail(invalid)
  t.phase="combat"
+ if explore: return Exploration.begin(self)
  refresh_knowledge()
  log_event("Deployment confirmed; combat begins")
  return true
@@ -586,3 +595,8 @@ func field_state() -> Dictionary:
  for key in Layouts.META:
   if t.has(key): field[key]=t[key]
  return field
+
+func resume_exploration() -> bool:
+ if t.phase!="combat" or outcome()!="ongoing" or t.quiet_rounds<3: return fail("Need three full rounds without either side detecting opponents")
+ if Exploration.current_contact(self): return fail("Opponents remain in contact")
+ return Exploration.begin(self)
