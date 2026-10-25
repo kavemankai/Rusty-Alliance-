@@ -163,6 +163,21 @@ func run() -> void:
  if app.game.battle==null:
   failures.append("Deploy UI failed")
  else:
+  if app.game.battle.t.phase!="deployment": failures.append("Contact skipped deployment review")
+  await click(("● " if app.selected=="mara" else "")+"Mara · placed")
+  var actor=app.game.battle.unit("mara")
+  var ap_before=actor.ap
+  app.battle_view.pick(app.battle_view.camera.unproject_position(Vector3(3,0,3))*app.battle_view.size/Vector2(app.battle_view.viewport.size))
+  await settle()
+  await click("Confirm placement")
+  await click("Rotate facing · free")
+  if actor.x!=3 or actor.y!=3 or actor.facing!=1 or actor.ap!=ap_before: failures.append("Deployment controls did not place and turn without AP cost")
+  await click("Save")
+  await click("Load")
+  if app.game.battle.t.phase!="deployment" or app.game.battle.unit("mara").x!=3: failures.append("UI save/load lost unconfirmed formation")
+  await capture("deployment-preview.png")
+  await click("Begin combat")
+  if app.game.battle.t.phase!="combat": failures.append("Begin combat did not confirm deployment")
   await click("End turn")
   if app.game.battle.t.round!=2: failures.append("End turn UI failed")
   await capture("tactical-preview.png")
@@ -213,6 +228,17 @@ func run() -> void:
  if app.game.battle==null: failures.append("Garrison deployment UI failed")
  else:
   if app.target!="": failures.append("New garrison battle retained a stale enemy selection")
+  if app.game.battle.t.phase!="deployment": failures.append("Garrison did not enter deployment")
+  var levy=app.game.battle.unit(app.selected)
+  var old_ap=levy.ap
+  app.battle_view.pick(app.battle_view.camera.unproject_position(Vector3(3,0,3))*app.battle_view.size/Vector2(app.battle_view.viewport.size))
+  await settle()
+  await click("Confirm placement")
+  if levy.x!=3 or levy.y!=3 or levy.ap!=old_ap: failures.append("Garrison placement control failed")
+  await click("Save")
+  await click("Load")
+  if app.game.battle.t.phase!="deployment": failures.append("UI save/load skipped garrison deployment")
+  await click("Begin combat")
   await capture("garrison-preview.png")
   await click("Save")
   await click("Load")
@@ -255,7 +281,7 @@ func run() -> void:
  await click("Save")
  await click("Load")
  if app.game.s.jobs[5].status!="paid": failures.append("UI lost paid patrol after reload")
- var result={"failed":failures.size(),"failures":failures,"scope":"Desktop controls: company and item management, supply deposit/load, capture contract battle, then recruit and stock levies, march company away, advance to an actual strategic attack, garrison-only defence, settlement defence payment, escorted freight, ordered patrol return and active/paid save/load"}
+ var result={"failed":failures.size(),"failures":failures,"scope":"Desktop controls: review/place/face/save/confirm company and garrison deployment, company and item management, supply deposit/load, capture contract battle, then recruit and stock levies, march company away, advance to an actual strategic attack, garrison-only defence, settlement defence payment, escorted freight, ordered patrol return and active/paid save/load"}
  var report=FileAccess.open("res://ui-test-results.json",FileAccess.WRITE)
  report.store_string(JSON.stringify(result,"  "))
  report.close()

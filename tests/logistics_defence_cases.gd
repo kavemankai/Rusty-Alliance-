@@ -25,6 +25,7 @@ static func defence(with_mercs: bool=true,count: int=2,split_squad: bool=false):
  if not with_mercs: c.s.squads.first.sector=1
  c.faction_tick()
  c.command("enter")
+ c.command("confirm_deployment")
  return c
 
 static func total(state: Dictionary,resource: String) -> int:
@@ -172,6 +173,7 @@ static func run(test) -> void:
  b.t.turn="company"
  test.check(c.command("retreat") and c.s.squads.first.sector!=17 and not c.s.encounter.is_empty(),"Withdrawing mercenaries leave surviving levies to continue the defence")
  c.command("enter")
+ c.command("confirm_deployment")
  test.check(c.battle.unit(levy.id)==null and c.battle.t.squads.is_empty() and Garrison.strength(cell)==1,"Follow-on garrison defence preserves its casualty without redeploying withdrawn squads")
  # A defeated garrison loses control and cannot respawn captured defenders.
  c=defence(false,1)
@@ -256,4 +258,5 @@ static func run(test) -> void:
  b.unit("mara").person.hp=8
  test.check(c.command("resolve") and c.s.sectors[17].owner=="company" and not c.s.encounter.is_empty(),"An undeployed legacy reserve preserves the defence when the primary squad falls")
  c.command("enter")
+ c.command("confirm_deployment")
  test.check(c.battle.unit("oswin")!=null and c.battle.unit("mara")==null,"Surviving reserve deploys in the follow-on engagement without resurrecting captured troops")

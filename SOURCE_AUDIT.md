@@ -25,3 +25,5 @@ The schema-2 inventory/continuity update uses original rules: an item has one ow
 The schema-3 update adds original squad/depot supply accounting and individual tactical levies. Town Militia.c and the specified training routine were inspected for persistent sector/training relationships; no numeric parity or translation is claimed. Current saves are schema 3 with migration/rebinding for all three tactical profile owners.
 
 The contract-board update is independent original design, using existing strategic arrival and battle-result hooks. No additional JA2 source was inspected or copied for these objectives. Named-force/camp/defence payments, ordered patrols and escorted strategic freight make no numeric or mission-data parity claim.
+
+Phase 1 deployment uses original placement and freeze rules on the existing template. No additional reference source was inspected or copied. The western entry strip, hostile separation, free setup facing and confirmation policy are independent design choices; no JA2 deployment parity is claimed. Sector-specific maps are reserved for Phase 2.

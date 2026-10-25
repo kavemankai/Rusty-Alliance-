@@ -175,6 +175,12 @@ func command(kind: String, p: Dictionary = {}) -> bool:
    if s.encounter.is_empty() or battle != null: return reject("No encounter")
    battle = Battle.new(self)
    s.battle = battle.t
+  "deploy":
+   if battle==null: return reject("No deployment")
+   if not battle.deploy(p.get("id",""),p): return reject(battle.error)
+  "confirm_deployment":
+   if battle==null: return reject("No deployment")
+   if not battle.confirm_deployment(): return reject(battle.error)
   "resolve": return resolve_battle(false)
   "retreat": return resolve_battle(true)
   "levy":
@@ -557,6 +563,7 @@ func drop_inventory(person: Dictionary,x: int,y: int,ground: Array) -> void:
 
 func resolve_battle(retreat: bool) -> bool:
  if battle == null: return reject("No battle")
+ if not retreat and battle.t.phase=="deployment": return reject("Confirm deployment before resolving combat")
  var outcome = battle.outcome()
  if not retreat and outcome == "ongoing": return reject("Battle still active")
  var sector = s.sectors[s.encounter.sector]
@@ -764,6 +771,10 @@ func valid_save(data: Variant) -> bool:
   if data.encounter.sector<0 or data.encounter.sector>=256: return false
   var field=data.sectors[data.encounter.sector].get("battlefield",{})
   if not valid_battlefield(field) or field.tiles!=data.battle.tiles or field.ground!=data.battle.ground: return false
+  var phase=data.battle.get("phase","combat")
+  if phase not in ["deployment","combat"]: return false
+  if phase=="deployment" and (data.battle.turn!="company" or data.battle.round!=1 or data.battle.knowledge!={"company":{},"enemy":{}} or not data.battle.ai.is_empty() or not data.battle.noise.is_empty()): return false
+  var occupied={}
   var unit_ids={}
   for u in data.battle.units:
    if not u is Dictionary or not u.has_all(["id","team","role","person","x","y","ap","stance","mode","facing","guard"]): return false
@@ -772,6 +783,13 @@ func valid_save(data: Variant) -> bool:
    for number in ["x","y","ap"]:
     if not (u[number] is int or u[number] is float): return false
    if u.x<0 or u.y<0 or u.x>=data.battle.width or u.y>=data.battle.height or u.ap<0: return false
+   if phase=="deployment":
+    if u.x!=floor(u.x) or u.y!=floor(u.y) or not (u.facing is int or u.facing is float) or u.facing!=floor(u.facing) or u.facing<0 or u.facing>7: return false
+    var position="%d:%d" % [u.x,u.y]
+    if u.person.hp>0 and occupied.has(position): return false
+    if u.person.hp>0: occupied[position]=true
+    if u.team=="company":
+     if not u.get("deployed") is bool: return false
    if u.team=="company":
     if u.role=="merc":
      if not data.mercs.has(u.id) or not u.has("squad") or not data.squads.has(u.squad) or u.id not in data.squads[u.squad].members: return false
@@ -783,6 +801,9 @@ func valid_save(data: Variant) -> bool:
     for g in data.groups:
      if g.id==u.get("group","") and u.person in g.fighters: bound=true
     if not bound: return false
+  if phase=="deployment":
+   for u in data.battle.units:
+    if u.team=="company" and u.deployed and not Battle.deployment_tile(data.battle,int(u.x),int(u.y)): return false
  return Items.ownership_error(data)==""
 
 func valid_battlefield(field: Variant) -> bool:

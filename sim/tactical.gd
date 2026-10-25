@@ -11,8 +11,9 @@ func _init(owner, restored: Dictionary = {}) -> void:
  campaign_ref=weakref(owner)
  if not restored.is_empty():
   t=restored
+  if not t.has("phase"): t.phase="combat"
   return
- t={"width":18,"height":14,"tiles":[],"units":[],"squads":[],"turn":"company","round":1,"knowledge":{"company":{},"enemy":{}},"log":[],"ai":[],"noise":[],"ground":[]}
+ t={"phase":"deployment","width":18,"height":14,"tiles":[],"units":[],"squads":[],"turn":"company","round":1,"knowledge":{"company":{},"enemy":{}},"log":[],"ai":[],"noise":[],"ground":[]}
  build_map(18,14)
  var sector=campaign.s.sectors[campaign.s.encounter.sector]
  if sector.has("battlefield"):
@@ -22,24 +23,6 @@ func _init(owner, restored: Dictionary = {}) -> void:
   t.tiles=saved.tiles
   t.ground=saved.ground
  else: sector.battlefield={"width":t.width,"height":t.height,"tiles":t.tiles,"ground":t.ground}
- var index=0
- for q in campaign.combat_squads(sector.id):
-  t.squads.append(q.id)
-  for id in q.members:
-   var m=campaign.s.mercs[id]
-   if m.hp<=0 or m.get("captured",false): continue
-   var u=make_unit(id,"company",m,2+int(index/5),3+(index%5)*2)
-   u.squad=q.id
-   place_unit(u)
-   index+=1
- if sector.owner=="company":
-  for p in sector.levies:
-   if p.hp<=0 or p.get("captured",false): continue
-   var u=make_unit(p.id,"company",p,4+int(index/5),3+(index%5)*2)
-   u.role="levy"
-   u.sector=sector.id
-   place_unit(u)
-   index+=1
  campaign.ensure_group_rosters()
  var count=0
  for g in campaign.s.groups:
@@ -52,6 +35,24 @@ func _init(owner, restored: Dictionary = {}) -> void:
     # A later entrant may otherwise collide with a survivor's remembered position.
     place_unit(u)
     count+=1
+ var index=0
+ for q in campaign.combat_squads(sector.id):
+  t.squads.append(q.id)
+  for id in q.members:
+   var m=campaign.s.mercs[id]
+   if m.hp<=0 or m.get("captured",false): continue
+   var u=make_unit(id,"company",m,2+int(index/5),3+(index%5)*2)
+   u.squad=q.id
+   place_deploying_unit(u)
+   index+=1
+ if sector.owner=="company":
+  for p in sector.levies:
+   if p.hp<=0 or p.get("captured",false): continue
+   var u=make_unit(p.id,"company",p,4+int(index/5),3+(index%5)*2)
+   u.role="levy"
+   u.sector=sector.id
+   place_deploying_unit(u)
+   index+=1
  refresh_knowledge()
 
 func make_unit(id: String, team: String, p: Dictionary, x: int, y: int) -> Dictionary:
@@ -109,7 +110,7 @@ func at(x: int,y: int,ignore: String=""):
  return null
 
 func can_act(u: Dictionary) -> bool:
- return t.turn == u.team and u.person.hp>10 and outcome()=="ongoing"
+ return t.phase=="combat" and t.turn == u.team and u.person.hp>10 and outcome()=="ongoing"
 
 func fail(message: String) -> bool:
  error=message
@@ -208,6 +209,7 @@ func los(a: Dictionary,b: Dictionary) -> bool:
  return true
 
 func refresh_knowledge() -> void:
+ if t.phase=="deployment": return
  for team in ["company","enemy"]:
   for key in t.knowledge[team]: t.knowledge[team][key].visible=false
   for observer in t.units:
@@ -280,6 +282,7 @@ func hit_chance(a: Dictionary,b: Dictionary,aim: int=0) -> int:
 
 func attack(a: Dictionary,b: Dictionary,aim: int=0,reaction: bool=false) -> bool:
  error=""
+ if t.phase!="combat": return fail("Confirm deployment before combat")
  if aim<0 or aim>3: return fail("Aim must be 0 to 3")
  if a.team==b.team or a.person.hp<=10 or b.person.hp<=0: return fail("Invalid combatants")
  if not reaction and not can_act(a): return fail("Unit cannot act")
@@ -407,6 +410,7 @@ func action(id: String,kind: String,p: Dictionary={}) -> bool:
  return true
 
 func outcome() -> String:
+ if t.phase=="deployment": return "deployment"
  var friends=0
  var enemies=0
  for u in t.units:
@@ -418,6 +422,7 @@ func outcome() -> String:
  return "ongoing"
 
 func start_turn(team: String) -> void:
+ if t.phase!="combat": return
  t.turn=team
  for u in t.units:
   if u.team!=team: continue
@@ -441,6 +446,7 @@ func end_turn() -> bool:
  return true
 
 func ai_unit(u: Dictionary) -> void:
+ if t.phase!="combat": return
  # Only perceived opponents and stored coordinates can inform decisions.
  var budget=24
  while u.ap>0 and u.person.hp>10 and budget>0 and outcome()=="ongoing":
@@ -508,3 +514,60 @@ func ai_unit(u: Dictionary) -> void:
   if target!=null: u.reason="reposition toward perceived threat"
  u.guard=true
  t.ai.append({"id":u.id,"reason":u.reason,"remaining_ap":u.ap})
+
+# Phase 1 uses one fixed western entry zone on the existing encounter template.
+# Phase 2 will author sector layouts; placement validation is already data driven.
+static func deployment_tile(state: Dictionary,x: int,y: int) -> bool:
+ if x<0 or y<0 or x>=mini(6,int(state.width)) or y>=state.height: return false
+ var cell=state.tiles[y*int(state.width)+x]
+ if cell.block: return false
+ for other in state.units:
+  if other.team=="enemy" and other.person.hp>0 and maxi(absi(other.x-x),absi(other.y-y))<4: return false
+ return true
+
+func place_deploying_unit(u: Dictionary) -> void:
+ u.deployed=false
+ if deployment_tile(t,u.x,u.y) and at(u.x,u.y)==null:
+  u.deployed=true
+ else:
+  for cell in t.tiles:
+   if deployment_tile(t,cell.x,cell.y) and at(cell.x,cell.y)==null:
+    u.x=cell.x;u.y=cell.y;u.deployed=true
+    break
+ # A congested entry zone is reviewable but cannot be confirmed. Never relocate
+ # persistent hostiles to make room for incoming company units.
+ if u.deployed: t.units.append(u)
+ else: place_unit(u)
+
+func deployment_error(id: String,x: int,y: int) -> String:
+ var u=unit(id)
+ if t.phase!="deployment": return "Deployment is already confirmed"
+ if u==null or u.team!="company" or u.person.hp<=0: return "Select a living friendly fighter"
+ if not deployment_tile(t,x,y): return "Choose an available tile in the western deployment zone"
+ if at(x,y,id)!=null: return "Deployment tile is occupied"
+ return ""
+
+func deploy(id: String,p: Dictionary) -> bool:
+ error=""
+ for key in ["x","y"]:
+  if not p.has(key) or not (p[key] is int or p[key] is float) or p[key]!=floor(p[key]): return fail("Choose a whole deployment tile")
+ var invalid=deployment_error(id,p.x,p.y)
+ if invalid!="": return fail(invalid)
+ var facing=p.get("facing",unit(id).facing)
+ if not (facing is int or facing is float) or facing!=floor(facing) or facing<0 or facing>7: return fail("Facing must be 0 to 7")
+ var u=unit(id)
+ u.x=int(p.x);u.y=int(p.y);u.facing=int(facing);u.deployed=true
+ return true
+
+func confirm_deployment() -> bool:
+ error=""
+ if t.phase!="deployment": return fail("Deployment is already confirmed")
+ for u in t.units:
+  if u.team!="company" or u.person.hp<=0: continue
+  if not u.get("deployed",false): return fail("Place every friendly fighter before starting combat")
+  var invalid=deployment_error(u.id,u.x,u.y)
+  if invalid!="": return fail(invalid)
+ t.phase="combat"
+ refresh_knowledge()
+ log_event("Deployment confirmed; combat begins")
+ return true

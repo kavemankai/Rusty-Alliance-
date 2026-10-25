@@ -83,6 +83,7 @@ static func run(test) -> void:
  c.s.groups[0].sector=33
  c.s.sectors[33].owner="bandits"
  test.check(travel(c,33) and c.command("enter"),"Elimination follows a persistent target away from its posted sector")
+ c.command("confirm_deployment")
  test.play_battle(c)
  Jobs.tick(c)
  test.check(job(c,"hunt").status=="active","Neutralized target remains pending until current battle resolves")
@@ -103,6 +104,7 @@ static func run(test) -> void:
  c.s.sectors[18].owner="bandits"
  c.faction_tick()
  c.command("enter")
+ c.command("confirm_deployment")
  test.play_battle(c)
  funds=c.s.funds
  test.check(c.battle.outcome()=="victory" and c.command("resolve") and job(c,"defence").status=="paid" and c.s.funds==funds+400,"Persistent home levies can fulfil actual settlement defence without remote mercenaries")
@@ -123,6 +125,7 @@ static func run(test) -> void:
  c.s.squads.first.sector=51 # Controlled approach fixture, followed by real arrival and combat.
  travel(c,52)
  c.command("enter")
+ c.command("confirm_deployment")
  test.play_battle(c)
  funds=c.s.funds
  test.check(c.battle.outcome()=="victory" and c.command("resolve") and job(c,"camp").status=="paid" and c.s.funds==funds+500 and c.s.sectors[52].owner=="company","Legal camp assault neutralizes its actual roster, captures sector and pays")
@@ -134,6 +137,7 @@ static func run(test) -> void:
  travel(c,49)
  test.check(job(c,"caravan").status=="active" and c.s.sectors[49].supplies.food==0,"Hostile arrival cannot deliver escort before battle")
  c.command("enter")
+ c.command("confirm_deployment")
  c.save_to("user://escort-combat.json")
  loaded=Campaign.new()
  loaded.autosave_path=c.autosave_path
@@ -148,6 +152,7 @@ static func run(test) -> void:
  c.s.sectors[49].owner="bandits"
  travel(c,49)
  c.command("enter")
+ c.command("confirm_deployment")
  test.play_battle(c)
  funds=c.s.funds
  test.check(c.battle.outcome()=="victory" and c.command("resolve") and job(c,"caravan").status=="paid" and c.s.funds==funds+180 and c.s.sectors[49].supplies.food==20,"Winning the arrival ambush delivers surviving caravan through battle hook")
@@ -158,6 +163,7 @@ static func run(test) -> void:
  c.s.sectors[49].owner="bandits"
  travel(c,49)
  c.command("enter")
+ c.command("confirm_deployment")
  # Incapacitated company is a defeat edge fixture, never a success injection.
  for u in c.battle.t.units:
   if u.team=="company": u.person.hp=10

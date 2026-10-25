@@ -138,11 +138,14 @@ func rebuild() -> void:
   button(bar,"−",func():map_view.zoom=clampf(map_view.zoom/1.15,0.65,2.8);map_view.queue_redraw())
   button(bar,"+",func():map_view.zoom=clampf(map_view.zoom*1.15,0.65,2.8);map_view.queue_redraw())
  else:
-  button(bar,"End turn",func():
-   if not game.battle.end_turn(): status(game.battle.error)
-   else: status("Enemy turn resolved")
-   refresh())
-  button(bar,"Resolve",func():run_command("resolve"))
+  if game.battle.t.phase=="deployment":
+   button(bar,"Begin combat",func():run_command("confirm_deployment"))
+  else:
+   button(bar,"End turn",func():
+    if not game.battle.end_turn(): status(game.battle.error)
+    else: status("Enemy turn resolved")
+    refresh())
+   button(bar,"Resolve",func():run_command("resolve"))
   button(bar,"Retreat",func():
    var exits=game.retreat_options()
    var place="no safe exit" if exits.is_empty() else game.s.sectors[exits[0]].name
@@ -188,11 +191,12 @@ func run_command(kind: String,p: Dictionary={}) -> void:
  var had_battle=game.battle!=null
  var previous_log="" if game.s.log.is_empty() else str(game.s.log.back())
  if game.command(kind,p):
-  var titles={"supply_transfer":"Supplies transferred","enter":"Defenders deployed","equip":"Equipment updated","unequip":"Item unequipped","unequip_shield":"Shield unequipped","transfer":"Item transferred","resolve":"Battle resolved","retreat":"Company withdrew","levy":"Levy recruited","hire":"Fighter hired","advance":"Time advanced","assignment":"Assignment updated","route":"Route plotted","split":"Squad split","merge":"Squads merged","buy":"Purchase completed","save":"Campaign saved","load":"Campaign loaded"}
+  var titles={"supply_transfer":"Supplies transferred","enter":"Deployment ready","deploy":"Placement updated","confirm_deployment":"Combat started","equip":"Equipment updated","unequip":"Item unequipped","unequip_shield":"Shield unequipped","transfer":"Item transferred","resolve":"Battle resolved","retreat":"Company withdrew","levy":"Levy recruited","hire":"Fighter hired","advance":"Time advanced","assignment":"Assignment updated","route":"Route plotted","split":"Squad split","merge":"Squads merged","buy":"Purchase completed","save":"Campaign saved","load":"Campaign loaded"}
   var update=titles.get(kind,kind.capitalize()+" completed")
   if not game.s.log.is_empty() and str(game.s.log.back())!=previous_log: update+=". "+str(game.s.log.back())
   status(update)
-  if kind in ["resolve","retreat","enter","load"] or had_battle!=(game.battle!=null): rebuild()
+  if kind=="deploy": destination={}
+  if kind in ["resolve","retreat","enter","load","confirm_deployment"] or had_battle!=(game.battle!=null): rebuild()
   else: refresh()
  else: status(game.error)
 
@@ -334,6 +338,14 @@ func tactical_cell(x: int,y: int) -> void:
  destination={"x":x,"y":y}
  target=""
  battle_view.preview=[]
+ if b.t.phase=="deployment":
+  if u!=null and u.team=="company":
+   selected=u.id
+   destination={}
+  battle_view.selected=selected
+  battle_view.redraw()
+  show_panel()
+  return
  if u!=null and u.team=="company":
   selected=u.id
   destination={}
@@ -356,6 +368,9 @@ func battle_action(kind: String,p: Dictionary={}) -> void:
 
 func tactical_panel() -> void:
  var b=game.battle
+ if b.t.phase=="deployment":
+  deployment_panel()
+  return
  label(side,"BATTLE · round %d · %s\n%s" % [b.t.round,b.t.turn,b.outcome()])
  for u in b.t.units:
   if u.team=="company" and u.person.hp>0: button(side,("● " if selected==u.id else "")+u.person.name+" · %d AP / %d HP" % [u.ap,u.person.hp],func():selected=u.id;target="";destination={};battle_view.selected=selected;refresh())
@@ -418,3 +433,23 @@ func contracts_panel() -> void:
   if j.status=="available": button(side,"Accept "+j.name,run_command.bind("accept",{"id":j.id,"squad":squad}))
   elif j.type in ["escort","patrol"] and j.status in ["paid","failed"] and game.s.time>=j.finished+1440:
    button(side,"Repost "+j.name,run_command.bind("repost",{"id":j.id}))
+
+func deployment_panel() -> void:
+ var b=game.battle
+ label(side,"DEPLOYMENT · combat paused")
+ label(side,"Select a fighter, then tap a green western entry tile. Confirm placement and choose facing. Begin combat when the formation is ready. Placement costs no AP.")
+ for fighter in b.t.units:
+  if fighter.team!="company" or fighter.person.hp<=0: continue
+  var title=("● " if selected==fighter.id else "")+fighter.person.name+" · "+("placed" if fighter.get("deployed",false) else "needs placement")
+  button(side,title,func():selected=fighter.id;destination={};target="";refresh())
+ var u=b.unit(selected)
+ if u==null or u.team!="company": return
+ label(side,"%s · %s\nTile %d:%d · facing %s · %d AP reserved" % [u.person.name,u.get("squad","Home garrison"),u.x,u.y,["East","Southeast","South","Southwest","West","Northwest","North","Northeast"][u.facing],u.ap])
+ if not destination.is_empty():
+  var invalid=b.deployment_error(u.id,destination.x,destination.y)
+  label(side,"Place at %d:%d" % [destination.x,destination.y] if invalid=="" else invalid)
+  var place=button(side,"Confirm placement",run_command.bind("deploy",{"id":u.id,"x":destination.x,"y":destination.y}))
+  place.disabled=invalid!=""
+ button(side,"Rotate facing · free",run_command.bind("deploy",{"id":u.id,"x":u.x,"y":u.y,"facing":posmod(u.facing+1,8)}))
+ button(side,"Cancel placement",func():destination={};refresh())
+ label(side,"Enemy turns, attacks, equipment changes and world time remain frozen until Begin combat.")

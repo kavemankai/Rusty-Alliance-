@@ -38,6 +38,7 @@ func fixture(seed_value: int=731):
  c.command("route",{"sector":34})
  c.command("advance",{"minutes":600})
  c.command("enter")
+ c.command("confirm_deployment")
  return c
 
 func _init() -> void:
@@ -64,6 +65,7 @@ func run() -> void:
  check(not c.s.encounter.is_empty() and c.s.squads.first.sector==34 and c.s.time<old+600,"Hostile arrival interrupts large time advance")
  check(c.s.squads.first.supplies.food<60,"Travel consumes food through clock")
  c.command("enter")
+ c.command("confirm_deployment")
  check(c.battle!=null and Data.weapon(c.battle.unit("mara").person)=="mace","Tactical deployment uses campaign equipment")
  var b=c.battle
  var a=b.unit("mara")
@@ -232,6 +234,7 @@ func run() -> void:
  integrated.command("route",{"sector":34})
  integrated.command("advance",{"minutes":600})
  integrated.command("enter")
+ integrated.command("confirm_deployment")
  var rounds=play_battle(integrated)
  check(integrated.battle.outcome()=="victory","Contract scenario wins through legal movement and attack commands")
  var funds=integrated.s.funds
@@ -252,6 +255,7 @@ func run() -> void:
  integrated.command("route",{"sector":36})
  integrated.command("advance",{"minutes":300})
  integrated.command("enter")
+ integrated.command("confirm_deployment")
  if integrated.battle!=null:
   play_battle(integrated)
   var victory=integrated.battle.outcome()=="victory"
@@ -352,6 +356,7 @@ func run() -> void:
  for i in range(3): c.command("levy",{"sector":17})
  c.faction_tick()
  c.command("enter")
+ c.command("confirm_deployment")
  play_battle(c)
  c.command("resolve")
  check(c.s.sectors[17].owner=="company" and c.force_strength(c.s.groups[0])==0,"Persistent levies defeat a weaker force through tactical combat")
@@ -373,6 +378,7 @@ func run() -> void:
  Continuity.run(self)
  Logistics.run(self)
  preload("res://tests/contracts_cases.gd").run(self)
+ preload("res://tests/deployment_cases.gd").run(self)
  var results={"checks":checks,"passed":checks.size()-failed,"failed":failed,"contract_rounds":rounds,"engine":Engine.get_version_info().string}
  var f=FileAccess.open("res://test-results.json",FileAccess.WRITE)
  f.store_string(JSON.stringify(results,"  "))

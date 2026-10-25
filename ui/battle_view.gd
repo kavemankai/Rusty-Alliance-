@@ -81,6 +81,7 @@ func redraw() -> void:
   var color=Color("485546") if int(c.x+c.y)%2==0 else Color("404d3f")
   if c.cost>2: color=Color("62604a")
   if c.conceal>0: color=Color("2d523a")
+  if battle.t.phase=="deployment" and battle.deployment_tile(battle.t,c.x,c.y): color=Color("397a58")
   if i in preview: color=Color("a69745")
   if chosen!=null and c.x==chosen.x and c.y==chosen.y: color=Color("2898b4")
   multi.set_instance_transform(i,Transform3D(Basis.IDENTITY,Vector3(c.x,c.elevation*0.5,c.y)))

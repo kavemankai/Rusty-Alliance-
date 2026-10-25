@@ -2,7 +2,7 @@
 
 Original Godot 4.6.2 / GDScript medieval mercenary strategy game. This is a **playable integrated foundation slice**, not the complete production contract. Primitive 3D tactical board, touch-oriented controls, 16×16 campaign, persistent company, six contract types and independent strategic forces.
 
-The current update adds state-driven elimination, camp assault, escort, patrol and settlement-defence jobs alongside capture. The prior update added per-squad provisions, local depots, local medical care, persistent tactical levies and combined friendly-squad battles, on top of the item/continuity systems. Schema-1 and schema-2 saves migrate automatically to schema 3 without modifying the original file until you save. Old company supplies are divided between staffed squads; stock local depots before leaving levies to defend.
+The current update adds pre-battle deployment: place friendly fighters in the highlighted western zone, choose facing and press Begin combat. Unconfirmed formations save/load; old active battles resume in combat. The preceding update added state-driven elimination, camp assault, escort, patrol and settlement-defence jobs alongside capture. The prior update added per-squad provisions, local depots, local medical care, persistent tactical levies and combined friendly-squad battles, on top of the item/continuity systems. Schema-1 and schema-2 saves migrate automatically to schema 3 without modifying the original file until you save. Old company supplies are divided between staffed squads; stock local depots before leaving levies to defend.
 
 ## Play
 
@@ -11,7 +11,7 @@ Import project.godot in **standard Godot 4.6.2** and press Run. The .NET engine 
 1. New campaign starts at Ashford (sector 2:2), with Mara and Oswin and 1,200 crowns.
 2. Company → Ada → Hire. Inventory permits market purchases and collecting/equipping items at the Ashford stockpile. Tap a carried item to equip, unequip, give to a co-located fighter or deposit at Ashford. Replaced weapons remain in the backpack and add weight. In battle, equipment changes and adjacent handovers cost 3 AP.
 3. Contracts → Accept Clear Redbank. Map → tap the F tile at 3:3 → Plot route → +6 hours. Time stops at contact.
-4. Deploy company. Select a friendly capsule or its side button. Tap a tile, inspect AP cost, Confirm movement. Tap a visible enemy, set aim if desired, Confirm attack. Reload bows between shots. End turn runs opponents.
+4. Deploy company opens deployment review. Select a fighter, tap a green tile, Confirm placement, and optionally Rotate facing. Begin combat locks the formation and starts the first turn. Placement costs no AP; combat and strategic time stay frozen during review. Select a friendly capsule or its side button. Tap a tile, inspect AP cost, Confirm movement. Tap a visible enemy, set aim if desired, Confirm attack. Reload bows between shots. End turn runs opponents.
 5. Tap a door tile from an adjacent position to open it. Crouching costs 2 AP. Guard reserves remaining AP for reaction opportunities. Drag pans and +/− or pinch zooms. Side panels scroll.
 6. Resolve after actual victory or defeat. Retreat requires confirmation and a safe adjacent sector; the arrival sector is preferred. Capture pays an accepted job and changes ownership. Wounds, ammunition, losses, enemy survivors, doors and uncollected ground items persist. Victory loot is carried by survivors; return to Ashford to deposit it.
 7. Assign medical care, rest, training, repairs, scouting or guard duty. Return to Ashford for recruits and supplies. Iron Hollow at 5:3 is a harder second contract.
@@ -31,7 +31,7 @@ Supplies → select a squad → choose 1/5/10/20 → Load or Store a resource. A
 
 Select an owned sector → Recruit levy (80 crowns). Each levy is a persistent spear-and-shield defender with health, skills and actual equipment. Their hourly food and medical care come from the home depot; upkeep is 3 crowns per living levy per day. Leadership-based garrison training improves their combat skills. New recruitment is capped at 12 living levies per sector in this slice.
 
-Enemy attacks trigger a tactical defence even if the company is elsewhere: Deploy garrison and control the levy units normally. Co-located company squads join the same battle. Withdrawing mercenaries leave the levies defending at home; losing defenders changes ownership. Loot from a garrison-only victory remains on the battlefield for later company recovery.
+Enemy attacks trigger a tactical defence even if the company is elsewhere: Deploy garrison, review/place the levy formation and Begin combat; then control the levy units normally. Co-located company squads join the same battle. Withdrawing mercenaries leave the levies defending at home; losing defenders changes ownership. Loot from a garrison-only victory remains on the battlefield for later company recovery.
 
 ## Verify / build
 
@@ -45,3 +45,5 @@ godot --path . --script tests/ui_smoke.gd
 The build script gates APK export on mechanics and UI checks, then verifies signing. Configure Java 17, Android SDK build-tools 35.0.1 and the Godot 4.6.2 Android debug template. CI provisions these dependencies. CI is supplied but has not been run remotely.
 
 Read BUILD_STATUS.md, QA_REPORT.md and IMPLEMENTATION_PLAN.md for acceptance evidence and remaining work.
+
+Phase 1 uses the existing encounter template and one western entry strip, excluding blocked/occupied cells and cells within three tiles of living hostiles. Persistent hostile positions are retained before friendly placement. An entry zone without capacity leaves units unplaced and prevents confirmation; save or withdraw through a safe exit. Phase 2 will add sector-specific layouts and deployment-zone authoring.

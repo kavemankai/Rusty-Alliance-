@@ -50,6 +50,7 @@ static func run(test) -> void:
  c.command("route",{"sector":34})
  c.command("advance",{"minutes":600})
  c.command("enter")
+ c.command("confirm_deployment")
  var b=c.battle
  var a=b.unit("mara")
  var friend=b.unit("oswin")
@@ -100,6 +101,7 @@ static func run(test) -> void:
  loaded.command("route",{"sector":34})
  loaded.command("advance",{"minutes":120})
  loaded.command("enter")
+ loaded.command("confirm_deployment")
  var returning=loaded.battle
  test.check(returning!=null and returning.unit(dead_id)==null,"Dead enemies do not respawn when the sector is re-entered")
  if returning!=null:
