@@ -120,3 +120,15 @@ The final Windows PCK was tested outside the source folder using the official Go
 An initial export omitted dynamically referenced SVG dependencies. All four plates are now explicitly selected in both exports and the outside-project smoke was repeated successfully. An Android startup assertion initially read the previous title telemetry after a successful tap; OS-input helpers now wait for a fresh post-input observer frame, allowing up to 30 polling seconds for scene loading. A first lifecycle attempt hit the shorter timeout while rebuilding the loaded 3D battle; the completed retry is recorded separately. An accidentally headless UI invocation could not drive the native GUI; the GUI repeat finished **221 passed, 0 failed**. Failed attempts are excluded from accepted counts.
 
 Native touch testing also exposed a real tavern scrolling defect: the profile panel consumed drag events before its scroll container. The panel now passes those events and the role thumbnail ignores them. Native hiring is rerun after that fix; pre-fix Android scenarios are not bound to the final artifact.
+
+## Final packaged/native acceptance — 2026-10-27
+
+The final 0.15.0 APK completed **76 passed, 0 failed** across eight native Android OS-input scenarios. Counts: original campaign 10, gestures 2, tactical combat 14, lifecycle 5, cutout 4, skills/progression 11, Greywake recruitment/shipping 17, opening/battle/paid recovery 13. These are complete runs on the rebuilt APK after the tavern touch fix; earlier candidates are excluded.
+
+Device: dedicated Marches_API35 emulator, Android 15 / API 35, x86_64, 1280×720 landscape, host GPU. The installed APK hash equals the packaged file: `018abf4028f70c6d7d855b2cd8018036052f74868440303d39d3ac484beff776`. APK archive checksums and v2/v3 signature verification pass. The logcat capture contained no SCRIPT ERROR or fatal exception match. Emulator evidence does not establish physical-phone feel, performance, battery or thermals.
+
+The current Windows pack also completed its outside-source-folder launch/render/battle smoke with **0 failures**. Source tests total **3,980 passed, 0 failed**, plus existing no-counter UI checks with zero failures. No passing count includes a shutdown crash or failed earlier attempt.
+
+Runtime implementation: `da37a12` on `main` (pushed). The subsequent evidence commit contains the final reports/screenshots. Player artifacts are separate 0.15 files under the workspace outputs folder; earlier 0.14 files are preserved.
+
+Actual running-game screenshots: [desktop tavern](opening-tavern-preview.png), [desktop island](opening-island-preview.png), [desktop dockside](opening-dockside-preview.png), [Android tavern](opening-android-tavern-preview.png), [Android island](opening-android-island-preview.png), [Android combat/tutorial](opening-android-combat-preview.png). Exact changed paths are listed in [GREYWAKE_OPENING_CHANGED_FILES.md](GREYWAKE_OPENING_CHANGED_FILES.md).

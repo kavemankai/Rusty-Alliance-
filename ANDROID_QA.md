@@ -1,3 +1,9 @@
+# Current 0.15.0 Greywake opening acceptance — 2026-10-27
+
+Final rebuilt APK: **76 native checks passed, 0 failed** (eight scenarios), including the illustrated tavern touch-scroll fix, persistent ship offers, real dockside withdrawal and paid Harth recovery. Installed and packaged APK hashes match. See [current scope and evidence](GREYWAKE_OPENING_STATUS.md) and `opening-android-results.json`. Physical phones, sustained performance and final art/audio remain unverified or unfinished. Historical results below apply only to their named builds.
+
+---
+
 # Phase 9 — Android emulator acceptance, 2026-10-26
 
 Scope agreed with the user: use an emulator for now. This closes the emulator smoke-test work; it does not turn emulator results into physical-phone acceptance.

@@ -1,0 +1,504 @@
+{
+  "version": "0.15.0-greywake-opening",
+  "implementation_commit": "da37a12406ec960158c069bc9bae600450b5aaf9",
+  "apk_sha256": "018abf4028f70c6d7d855b2cd8018036052f74868440303d39d3ac484beff776",
+  "passed": 76,
+  "failed": 0,
+  "scenarios": [
+    {
+      "scenario": "basic",
+      "serial": "emulator-5554",
+      "android": "15",
+      "api": "35",
+      "device": "Android SDK built for x86_64",
+      "passed": 10,
+      "failed": 0,
+      "checks": [
+        {
+          "name": "Android native touch starts original campaign",
+          "passed": true
+        },
+        {
+          "name": "Touch scrolling, character selection and hiring change canonical funds/membership",
+          "passed": true
+        },
+        {
+          "name": "Android stockpile transfer, person handover and equipment controls change actual loadout",
+          "passed": true
+        },
+        {
+          "name": "Touch Load restores saved state after hiring",
+          "passed": true
+        },
+        {
+          "name": "Android touch selects intended strategic sector once",
+          "passed": true
+        },
+        {
+          "name": "Android strategic drag pans without changing selected sector",
+          "passed": true
+        },
+        {
+          "name": "On-screen zoom works without a keyboard",
+          "passed": true
+        },
+        {
+          "name": "Android contract board accepts a real contract",
+          "passed": true
+        },
+        {
+          "name": "Touch confirmation plots actual strategic route",
+          "passed": true
+        },
+        {
+          "name": "Android clock advances real travel/events",
+          "passed": true
+        }
+      ],
+      "limits": [
+        "Emulator evidence does not establish physical-phone touch, thermals, battery or sustained low-end performance.",
+        "Optional read-only debug telemetry adds overhead; it does not invoke game commands."
+      ]
+    },
+    {
+      "scenario": "gestures",
+      "serial": "emulator-5554",
+      "android": "15",
+      "api": "35",
+      "device": "Android SDK built for x86_64",
+      "passed": 2,
+      "failed": 0,
+      "checks": [
+        {
+          "name": "Android two-pointer pan changes map offset without selection",
+          "passed": true
+        },
+        {
+          "name": "Android two-pointer pinch changes map zoom without selection",
+          "passed": true
+        }
+      ],
+      "limits": [
+        "Emulator evidence does not establish physical-phone touch, thermals, battery or sustained low-end performance.",
+        "Optional read-only debug telemetry adds overhead; it does not invoke game commands."
+      ]
+    },
+    {
+      "scenario": "tactical",
+      "serial": "emulator-5554",
+      "android": "15",
+      "api": "35",
+      "device": "Android SDK built for x86_64",
+      "passed": 14,
+      "failed": 0,
+      "checks": [
+        {
+          "name": "Actual strategic contact opens Android deployment",
+          "passed": true
+        },
+        {
+          "name": "Native Android tactical tap selects intended fighter",
+          "passed": true
+        },
+        {
+          "name": "Android deployment confirmation starts real combat",
+          "passed": true
+        },
+        {
+          "name": "Touch route confirmation executes the expected two-AP step",
+          "passed": true
+        },
+        {
+          "name": "Android brace spends two AP and changes defence mode",
+          "passed": true
+        },
+        {
+          "name": "Android guard control reserves real reaction state",
+          "passed": true
+        },
+        {
+          "name": "Android visibility exposes real opponents for targeting",
+          "passed": true
+        },
+        {
+          "name": "Android ranged attack spends five AP and one owned arrow",
+          "passed": true
+        },
+        {
+          "name": "Android reload loads the bow and spends two AP",
+          "passed": true
+        },
+        {
+          "name": "Android tactical pinch zooms without changing selected fighter",
+          "passed": true
+        },
+        {
+          "name": "Android two-finger pan changes tactical camera",
+          "passed": true
+        },
+        {
+          "name": "Android single-finger drag pans tactical camera",
+          "passed": true
+        },
+        {
+          "name": "Android active-combat Save/Load preserves AP, wounds, positions and PRNG",
+          "passed": true
+        },
+        {
+          "name": "Android End turn runs enemy AI and returns control",
+          "passed": true
+        }
+      ],
+      "limits": [
+        "Emulator evidence does not establish physical-phone touch, thermals, battery or sustained low-end performance.",
+        "Optional read-only debug telemetry adds overhead; it does not invoke game commands."
+      ]
+    },
+    {
+      "scenario": "lifecycle",
+      "serial": "emulator-5554",
+      "android": "15",
+      "api": "35",
+      "device": "Android SDK built for x86_64",
+      "passed": 5,
+      "failed": 0,
+      "checks": [
+        {
+          "name": "Lifecycle fixture has an active campaign",
+          "passed": true
+        },
+        {
+          "name": "Android Home notification writes current campaign autosave",
+          "passed": true
+        },
+        {
+          "name": "Android process recreation restores phase, clock and funds",
+          "passed": true
+        },
+        {
+          "name": "Android process recreation preserves exact combat profiles, AP, wounds and PRNG",
+          "passed": true
+        },
+        {
+          "name": "Android confirmation Cancel returns to the existing game without leaving",
+          "passed": true
+        }
+      ],
+      "limits": [
+        "Emulator evidence does not establish physical-phone touch, thermals, battery or sustained low-end performance.",
+        "Optional read-only debug telemetry adds overhead; it does not invoke game commands."
+      ]
+    },
+    {
+      "scenario": "cutout",
+      "serial": "emulator-5554",
+      "android": "15",
+      "api": "35",
+      "device": "Android SDK built for x86_64",
+      "passed": 4,
+      "failed": 0,
+      "checks": [
+        {
+          "name": "Simulated Android display cutout is excluded from menu layout",
+          "passed": true
+        },
+        {
+          "name": "Core navigation and Save controls remain inside Android cutout safe area",
+          "passed": true
+        },
+        {
+          "name": "Android touch Save works with a cutout inset",
+          "passed": true
+        },
+        {
+          "name": "Removing simulated cutout restores full landscape layout",
+          "passed": true
+        }
+      ],
+      "limits": [
+        "Emulator evidence does not establish physical-phone touch, thermals, battery or sustained low-end performance.",
+        "Optional read-only debug telemetry adds overhead; it does not invoke game commands."
+      ]
+    },
+    {
+      "scenario": "skills",
+      "serial": "emulator-5554",
+      "android": "15",
+      "api": "35",
+      "device": "Android SDK built for x86_64",
+      "passed": 11,
+      "failed": 0,
+      "checks": [
+        {
+          "name": "Approved workshop roster enables a separate production Greywake scenario",
+          "passed": true
+        },
+        {
+          "name": "Native touch selects Stealth and the character has seven skills",
+          "passed": true
+        },
+        {
+          "name": "Native skill switching keeps progress separate",
+          "passed": true
+        },
+        {
+          "name": "Returning to Stealth retains its partial progress",
+          "passed": true
+        },
+        {
+          "name": "Native save/load preserves selected skill",
+          "passed": true
+        },
+        {
+          "name": "Paid time increases the selected skill without free experience or forced Melee growth",
+          "passed": true
+        },
+        {
+          "name": "Android repeatable recruitment creates and pays for two independent fighters",
+          "passed": true
+        },
+        {
+          "name": "Saved Android recruits retain unique item ownership and a persistent identity counter",
+          "passed": true
+        },
+        {
+          "name": "Generated fighters keep separate skill selections",
+          "passed": true
+        },
+        {
+          "name": "Android reload preserves generated identities and individual progression",
+          "passed": true
+        },
+        {
+          "name": "Greywake has its own native pause/force-stop autosave continuation",
+          "passed": true
+        }
+      ],
+      "limits": [
+        "Emulator evidence does not establish physical-phone touch, thermals, battery or sustained low-end performance.",
+        "Optional read-only debug telemetry adds overhead; it does not invoke game commands."
+      ],
+      "greywake_roster": "Legacy infrastructure test uses an isolated synthetic fixture; production roster is tested separately."
+    },
+    {
+      "scenario": "greywake",
+      "serial": "emulator-5554",
+      "android": "15",
+      "api": "35",
+      "device": "Android SDK built for x86_64",
+      "passed": 17,
+      "failed": 0,
+      "checks": [
+        {
+          "name": "Native production opening uses separate scenario and exact purse",
+          "passed": true
+        },
+        {
+          "name": "Empty opening party cannot depart",
+          "passed": true
+        },
+        {
+          "name": "Roderic is visible and unaffordable",
+          "passed": true
+        },
+        {
+          "name": "Ysra is visible and unaffordable",
+          "passed": true
+        },
+        {
+          "name": "One recruit still cannot depart",
+          "passed": true
+        },
+        {
+          "name": "Native opening charges every exact fee",
+          "passed": true
+        },
+        {
+          "name": "Opening recruits have unique actual owned equipment",
+          "passed": true
+        },
+        {
+          "name": "Opening selection load restores funds without duplicate hires",
+          "passed": true
+        },
+        {
+          "name": "Android lifecycle resumes the saved pre-voyage phase",
+          "passed": true
+        },
+        {
+          "name": "Paid chosen company arrives together at authored Dock Town",
+          "passed": true
+        },
+        {
+          "name": "Post-departure UI exposes no unrestricted recruitment shortcut",
+          "passed": true
+        },
+        {
+          "name": "Native harbour displays Day 4 06:00 docked vessel",
+          "passed": true
+        },
+        {
+          "name": "Native vessel purchase charges once and binds reserved identity",
+          "passed": true
+        },
+        {
+          "name": "Android save/load retains identical manifest and character inventories",
+          "passed": true
+        },
+        {
+          "name": "Paused Android UI does not consume the recruitment window",
+          "passed": true
+        },
+        {
+          "name": "Blockaded ship hides passenger offers and prevents native hiring",
+          "passed": true
+        },
+        {
+          "name": "Native clock expires offshore vessel exactly at 24 hours without shifting Day 8",
+          "passed": true
+        }
+      ],
+      "limits": [
+        "Emulator evidence does not establish physical-phone touch, thermals, battery or sustained low-end performance.",
+        "Optional read-only debug telemetry adds overhead; it does not invoke game commands."
+      ]
+    },
+    {
+      "scenario": "opening",
+      "serial": "emulator-5554",
+      "android": "15",
+      "api": "35",
+      "device": "Android SDK built for x86_64",
+      "passed": 13,
+      "failed": 0,
+      "checks": [
+        {
+          "name": "Native briefing advances and saves without asking to accept another contract",
+          "passed": true
+        },
+        {
+          "name": "Native company confirmation saves exact two-person company and fees",
+          "passed": true
+        },
+        {
+          "name": "Native crossing arrives on the actual island with Harth and farm positions",
+          "passed": true
+        },
+        {
+          "name": "Native opening enters actual authored dockside deployment",
+          "passed": true
+        },
+        {
+          "name": "Native tactical click selects the actual recruited individual",
+          "passed": true
+        },
+        {
+          "name": "Dismissed tutorial and real battle survive Android save/load",
+          "passed": true
+        },
+        {
+          "name": "Native battlefield contains authoritative water boundaries and cargo cover",
+          "passed": true
+        },
+        {
+          "name": "Native withdrawal returns persistent survivors to island and closes occupied port",
+          "passed": true
+        },
+        {
+          "name": "Withdrawal grants no victory reward",
+          "passed": true
+        },
+        {
+          "name": "Native company follows actual land route to Harth",
+          "passed": true
+        },
+        {
+          "name": "Native paid recovery visits real farmland waypoint",
+          "passed": true
+        },
+        {
+          "name": "Native recovery earns one actual 120-crown contract payment",
+          "passed": true
+        },
+        {
+          "name": "Paid recovery preserves failed tutorial outcome and surviving identities",
+          "passed": true
+        }
+      ],
+      "limits": [
+        "Emulator evidence does not establish physical-phone touch, thermals, battery or sustained low-end performance.",
+        "Optional read-only debug telemetry adds overhead; it does not invoke game commands."
+      ]
+    }
+  ],
+  "source_suites": [
+    {
+      "report": "test-results.json",
+      "passed": 596,
+      "failed": 0
+    },
+    {
+      "report": "extended-results.json",
+      "passed": 796,
+      "failed": 0
+    },
+    {
+      "report": "skills-test-results.json",
+      "passed": 165,
+      "failed": 0
+    },
+    {
+      "report": "asset-test-results.json",
+      "passed": 814,
+      "failed": 0
+    },
+    {
+      "report": "greywake-test-results.json",
+      "passed": 650,
+      "failed": 0
+    },
+    {
+      "report": "greywake-ui-results.json",
+      "passed": 23,
+      "failed": 0
+    },
+    {
+      "report": "ui-test-results.json",
+      "passed": null,
+      "failed": 0
+    },
+    {
+      "report": "skills-ui-results.json",
+      "passed": null,
+      "failed": 0
+    },
+    {
+      "report": "opening-flow-results.json",
+      "passed": 40,
+      "failed": 0
+    },
+    {
+      "report": "island-test-results.json",
+      "passed": 492,
+      "failed": 0
+    },
+    {
+      "report": "dockside-test-results.json",
+      "passed": 183,
+      "failed": 0
+    },
+    {
+      "report": "opening-ui-results.json",
+      "passed": 221,
+      "failed": 0
+    }
+  ],
+  "finalized_workshop_roster_supplied": true,
+  "acceptance": "Playable opening, authored island, Dockside Trouble and bounded paid recovery; full campaign content remains open.",
+  "limits": [
+    "Opening art and role portraits are temporary; production archive and audio are missing.",
+    "Fortress content, political consequences and three endings remain unfinished.",
+    "Emulator tests do not establish physical-phone acceptance, thermals or battery."
+  ],
+  "verification_retry": "One earlier final-candidate basic run read stale observer output during startup; prepare_android_qa.ps1 clears telemetry before launch and android_smoke.py waits for a fresh post-input frame. A short lifecycle timeout was extended for 3D loading. Native tests found and fixed tavern panel drag propagation. All eight accepted scenarios were repeated on the rebuilt APK; pre-fix APK results are excluded."
+}
