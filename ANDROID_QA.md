@@ -43,3 +43,8 @@ https://developer.android.com/studio/run/emulator-commandline
 
 
 Final 0.11.0 emulator run: 37 checks passed, 0 failed across six scenarios; no script/fatal errors in the final application runtime log. The delivered APK hash is bound to android-qa-results.json. Physical-phone acceptance and full foundation remain open as described above.
+
+
+## 0.14.0 Greywake recruitment preview
+
+The final dedicated Android 15/API 35 x86_64 run passed 62 checks with zero failures: original basic 10, gestures 2, tactical 14, lifecycle 5, cutout 4, selected-skill/legacy recruitment 11, and approved production Greywake opening/shipping 16. The final APK is bound by SHA-256 in greywake-android-results.json. Native control screenshots are retained outside Git in work/greywake-android-evidence-shipping. The preparation harness now removes stale observer telemetry before launch after an earlier rejected startup run; only the complete final passing runs are accepted. Signature v2/v3, CRC, included twelve-profile/scenario data and excluded test/source material were checked. Physical-phone and finished-island recovery acceptance remain open.

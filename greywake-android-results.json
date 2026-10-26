@@ -1,7 +1,7 @@
 {
-  "version": "0.13.0-skills-preview",
-  "apk_sha256": "d6e633f126da369a70140415ce4517e5b6bfba0d6ece34ed16f3aa9869457aff",
-  "passed": 46,
+  "version": "0.14.0-greywake-recruitment",
+  "apk_sha256": "e312abb8f9bd531fdddbb1ad8b252b3f38003ae3e6ab5d15d8cd9732bda552d6",
+  "passed": 62,
   "failed": 0,
   "scenarios": [
     {
@@ -229,7 +229,7 @@
       "failed": 0,
       "checks": [
         {
-          "name": "Unsupplied workshop roster cannot start a fabricated production scenario",
+          "name": "Approved workshop roster enables a separate production Greywake scenario",
           "passed": true
         },
         {
@@ -277,13 +277,136 @@
         "Emulator evidence does not establish physical-phone touch, thermals, battery or sustained low-end performance.",
         "Optional read-only debug telemetry adds overhead; it does not invoke game commands."
       ],
-      "greywake_roster": "Synthetic test fixture only; finalized workshop roster is not available."
+      "greywake_roster": "Legacy infrastructure test uses an isolated synthetic fixture; production roster is tested separately."
+    },
+    {
+      "scenario": "greywake",
+      "serial": "emulator-5554",
+      "android": "15",
+      "api": "35",
+      "device": "Android SDK built for x86_64",
+      "passed": 16,
+      "failed": 0,
+      "checks": [
+        {
+          "name": "Native production opening uses separate scenario and exact purse",
+          "passed": true
+        },
+        {
+          "name": "Empty opening party cannot depart",
+          "passed": true
+        },
+        {
+          "name": "Both Elite hires are visible and unaffordable",
+          "passed": true
+        },
+        {
+          "name": "One recruit still cannot depart",
+          "passed": true
+        },
+        {
+          "name": "Native opening charges every exact fee",
+          "passed": true
+        },
+        {
+          "name": "Opening recruits have unique actual owned equipment",
+          "passed": true
+        },
+        {
+          "name": "Opening selection load restores funds without duplicate hires",
+          "passed": true
+        },
+        {
+          "name": "Android lifecycle resumes the saved pre-voyage phase",
+          "passed": true
+        },
+        {
+          "name": "Paid chosen company arrives together at authored Dock Town",
+          "passed": true
+        },
+        {
+          "name": "Post-departure UI exposes no unrestricted recruitment shortcut",
+          "passed": true
+        },
+        {
+          "name": "Native harbour displays Day 4 06:00 docked vessel",
+          "passed": true
+        },
+        {
+          "name": "Native vessel purchase charges once and binds reserved identity",
+          "passed": true
+        },
+        {
+          "name": "Android save/load retains identical manifest and character inventories",
+          "passed": true
+        },
+        {
+          "name": "Paused Android UI does not consume the recruitment window",
+          "passed": true
+        },
+        {
+          "name": "Blockaded ship hides passenger offers and prevents native hiring",
+          "passed": true
+        },
+        {
+          "name": "Native clock expires offshore vessel exactly at 24 hours without shifting Day 8",
+          "passed": true
+        }
+      ],
+      "limits": [
+        "Emulator evidence does not establish physical-phone touch, thermals, battery or sustained low-end performance.",
+        "Optional read-only debug telemetry adds overhead; it does not invoke game commands."
+      ]
     }
   ],
-  "finalized_workshop_roster_supplied": false,
-  "acceptance": "Shared mechanics verified; full Greywake remains blocked on the finalized workshop roster.",
+  "source_suites": [
+    {
+      "report": "test-results.json",
+      "passed": 596,
+      "failed": 0
+    },
+    {
+      "report": "extended-results.json",
+      "passed": 796,
+      "failed": 0
+    },
+    {
+      "report": "skills-test-results.json",
+      "passed": 165,
+      "failed": 0
+    },
+    {
+      "report": "asset-test-results.json",
+      "passed": 812,
+      "failed": 0
+    },
+    {
+      "report": "greywake-test-results.json",
+      "passed": 650,
+      "failed": 0
+    },
+    {
+      "report": "greywake-ui-results.json",
+      "passed": 23,
+      "failed": 0
+    },
+    {
+      "report": "ui-test-results.json",
+      "passed": null,
+      "failed": 0
+    },
+    {
+      "report": "skills-ui-results.json",
+      "passed": null,
+      "failed": 0
+    }
+  ],
+  "finalized_workshop_roster_supplied": true,
+  "acceptance": "Roster/opening/shipping staging preview; full island and economic recovery acceptance remain open.",
   "limits": [
-    "Synthetic recruitment fixture is test-only and excluded from player packages.",
-    "Emulator controls are not physical-phone or performance/thermal acceptance."
-  ]
+    "Dock Town staging UI uses existing internal sector backing; completed 10x10 island/map marker is upstream.",
+    "No authored Greywake paid work/travel recovery loop yet; existing economy is unchanged.",
+    "Emulator tests do not establish physical-phone acceptance, thermals or battery."
+  ],
+  "verification_retry": "One earlier final-candidate basic run read stale observer output during startup; prepare_android_qa.ps1 now clears telemetry before launch. Only complete passing final runs are aggregated."
 }
