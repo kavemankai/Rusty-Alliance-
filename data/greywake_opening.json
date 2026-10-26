@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "speaker": "The Stranger",
+  "briefing": [
+    "Greywake Isle. Baron Edric Vane.",
+    "He is to be removed from power.",
+    "How you accomplish that is your concern.",
+    "The island has suffered under his rule for years. There are those who would see its rightful heir restored, others who would see Vane buried, and others still who would tear his government apart.",
+    "You will have two thousand four hundred crowns to assemble your company.",
+    "Your passage is arranged. A vessel departs before dawn.",
+    "Choose your people carefully. You will have little help once you reach Greywake."
+  ],
+  "crossing": "By morning, Greywake rose from the mist.\n\nSomewhere beyond those cliffs, Baron Vane ruled an island that someone had paid you to take from him.",
+  "arrival": "Dock Town\nThe gulls circle the warehouses. Beyond the harbour, the island roads lead inland.",
+  "contract": "Dockside Trouble\n\nBandits are extorting dockworkers near the warehouses. The dockworkers offer 180 crowns to drive them off. Your company chooses when to intervene."
+}

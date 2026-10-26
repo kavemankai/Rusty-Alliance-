@@ -1,3 +1,9 @@
+# Current opening follow-up — 0.15.0
+
+See [Greywake Opening Experience v0.1](GREYWAKE_OPENING_STATUS.md) for the current flow, authored island, tutorial/recovery work, temporary scene art and verification. The prior report below is historical; its package hashes and remaining-work statements describe that earlier build. The new runtime adds one existing CC0 barrel model (36 mappings / 33 models), retaining the 63 icons and original library provenance.
+
+---
+
 # Asset integration verification — 0.12.0
 
 2026-10-26 · standard Godot 4.6.2, Compatibility/OpenGL, Windows/NVIDIA RTX 3050 Laptop GPU.

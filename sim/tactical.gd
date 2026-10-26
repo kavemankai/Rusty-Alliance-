@@ -308,7 +308,7 @@ func los(a: Dictionary,b: Dictionary) -> bool:
   var y=int(round(a.y+dy*f))
   if (x==a.x and y==a.y) or (x==b.x and y==b.y): continue
   var cell=tile(x,y)
-  if cell.block and cell.kind!="window": return false
+  if cell.block and cell.kind not in ["window","water"]: return false
   var eye=lerpf(tile(a.x,a.y).elevation+1.5,tile(b.x,b.y).elevation+1.0,f)
   if cell.elevation>eye: return false
  return true

@@ -32,8 +32,9 @@ func _process(delta: float) -> void:
   if is_instance_valid(app.map_view) and app.map_view.is_inside_tree():
    var map=app.map_view
    state.map={"fingers":map.fingers.size(),"dragged":map.dragged,"zoom":map.zoom,"offset":[map.offset.x,map.offset.y],"rect":rect(map),"sectors":{}}
-   for id in [17,18,34]:
-    var point=map.get_screen_transform()*(map.offset+Vector2(id%16+0.5,int(id/16)+0.5)*32*map.zoom)
+   for id in ([17,18,34,84,100] if c.World.applies(c.s) else [17,18,34]):
+    var local=map.point(id) if c.World.applies(c.s) else map.offset+Vector2(id%16+0.5,int(id/16)+0.5)*32*map.zoom
+    var point=map.get_screen_transform()*local
     state.map.sectors[str(id)]=[point.x,point.y]
   if c.battle!=null and is_instance_valid(app.battle_view) and app.battle_view.is_inside_tree():
    state.phase=c.battle.t.phase;state.round=c.battle.t.round;state.turn=c.battle.t.turn;state.units=[]

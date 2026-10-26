@@ -1,5 +1,7 @@
 extends RefCounted
 const Records=preload("res://sim/records.gd")
+const World=preload("res://sim/greywake_world.gd")
+const Opening=preload("res://sim/greywake_opening.gd")
 const Shipping=preload("res://sim/greywake_shipping.gd")
 const Recruitment=preload("res://sim/recruitment.gd")
 var initial_state_hash=""
@@ -92,6 +94,12 @@ func configure_fall_of_greywake() -> bool:
  Shipping.initialize(self)
  return true
 
+func configure_greywake_opening() -> bool:
+ if not configure_fall_of_greywake(): return false
+ World.install(self)
+ Opening.initialize(self)
+ return true
+
 func embark_greywake() -> bool:
  if not Recruitment.opening(s): return reject("The opening voyage has already departed")
  var q=s.squads.first
@@ -137,6 +145,13 @@ func reject(message: String) -> bool:
 
 func command(kind: String, p: Dictionary = {}) -> bool:
  error = ""
+ if kind=="upgrade_greywake":
+  if not World.can_upgrade(s): return reject("This staging save has history that cannot be safely remapped; its geography is preserved. Start a new opening or continue this save.")
+  World.install(self);Opening.initialize(self,"TAVERN_RECRUITMENT" if Recruitment.opening(s) else "GREYWAKE_ARRIVAL");s.opening_flow.migrated_staging=true
+  return true
+ if not Opening.permits(s,kind): return reject("Complete the current opening step first")
+ if kind in ["opening_next","opening_skip","opening_back","opening_confirm","opening_depart","tutorial_dismiss","tutorial_next","dockside_start"]: return Opening.run(self,kind)
+ if Opening.applies(s) and kind=="embark": return reject("Use the company confirmation before setting sail")
  if Recruitment.opening(s) and kind not in ["hire","recruit_template","cancel_opening_hire","embark","save","load"]: return reject("Choose the opening company before campaign actions")
  match kind:
   "embark": return embark_greywake()
@@ -309,10 +324,11 @@ func remove_member(id: String) -> void:
 
 func neighbors(index: int) -> Array:
  var out = []
+ if not World.passable(s,index): return out
  for d in [Vector2i.LEFT,Vector2i.RIGHT,Vector2i.UP,Vector2i.DOWN]:
   var x = index % 16 + d.x
   var y = int(index / 16) + d.y
-  if x >= 0 and x < 16 and y >= 0 and y < 16: out.append(y*16+x)
+  if x >= 0 and x < 16 and y >= 0 and y < 16 and World.passable(s,y*16+x): out.append(y*16+x)
  return out
 
 func travel_cost(q: Dictionary, sector: int) -> int:
@@ -333,6 +349,7 @@ func travel_cost(q: Dictionary, sector: int) -> int:
  return int(ceil(cost*burden))
 
 func strategic_path(start: int, goal: int, q: Dictionary) -> Array:
+ if not World.passable(s,start) or not World.passable(s,goal): return []
  var open = [start]
  var cost = {start:0}
  var prev = {}
@@ -354,7 +371,7 @@ func strategic_path(start: int, goal: int, q: Dictionary) -> Array:
  return []
 
 func advance(minutes: int) -> bool:
- if Recruitment.opening(s): return reject("Choose the opening company before time advances")
+ if Recruitment.opening(s) or Opening.locked(s): return reject("Complete the opening before time advances")
  if minutes <= 0 or minutes > 43200: return reject("Advance 1 to 43200 minutes")
  if battle != null or not s.encounter.is_empty(): return reject("Time paused by encounter")
  var target = s.time+minutes
@@ -629,6 +646,7 @@ func arrive(id: String,token: int=-1) -> void:
   schedule_arrival(q)
 
 func encounter(q: Dictionary, sector: int) -> void:
+ Opening.prepare_contact(self,sector)
  var contact={"squad":q.get("id",""),"sector":sector,"from":q.get("previous_sector",sector)}
  for other in s.squads.values():
   if other.sector==sector and not other.members.is_empty():
@@ -762,6 +780,7 @@ func resolve_battle(retreat: bool) -> bool:
  for u in battle.t.units:
   if u.team=="company" and u.person.hp>0 and not u.person.get("captured",false): surviving+=1
  s.result={"outcome":"victory" if victory else ("retreat" if retreat else "defeat"),"sector":sector.name,"survivors":surviving}
+ Opening.on_resolved(self,sector.id,s.result.outcome)
  note("Battle "+s.result.outcome+" at "+sector.name)
  battle=null
  s.battle={}
@@ -855,7 +874,7 @@ func load_from(path: String) -> bool:
 func valid_save(data: Variant) -> bool:
  if not SaveGuard.raw(data) or not SaveGuard.records(data): return false
  if not data is Dictionary: return false
- if not Recruitment.valid_state(data) or not Shipping.valid(data): return false
+ if not Recruitment.valid_state(data) or not Shipping.valid(data) or not Opening.valid(data) or not World.valid(data): return false
  for key in ["version","sectors","mercs","squads","events","rng","time","battle","encounter","funds","jobs","ledger","stash","groups","factions","log","next_event","result"]:
   if not data.has(key): return false
  if data.version!=3 or not data.has_all(["next_item","next_levy","stash_sector","pending_encounters"]) or not data.sectors is Array or data.sectors.size()!=256 or not data.mercs is Dictionary or not data.squads is Dictionary: return false

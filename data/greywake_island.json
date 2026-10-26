@@ -1,0 +1,122 @@
+{
+  "version": 1,
+  "width": 10,
+  "height": 10,
+  "mask": [
+    "..........",
+    ".####.....",
+    ".#######..",
+    ".########.",
+    ".########.",
+    ".########.",
+    ".########.",
+    ".########.",
+    "..######..",
+    "...#####.."
+  ],
+  "terrain": [
+    "MMMMMMMMMM",
+    "MRRRRGMMMM",
+    "MRRRRRRGMM",
+    "MGGGRFFFGM",
+    "MGGFRRRRRM",
+    "MFFFRGGGHM",
+    "MFFFRGGHHM",
+    "MGRRGGGHHM",
+    "MMGGGGHHMM",
+    "MMMGHHHHMM"
+  ],
+  "roads": [
+    17,
+    18,
+    34,
+    35,
+    36,
+    37,
+    52,
+    68,
+    69,
+    70,
+    71,
+    72,
+    84,
+    100,
+    67,
+    83,
+    99,
+    115,
+    114
+  ],
+  "locations": [
+    {
+      "id": "dock_town",
+      "name": "Dock Town",
+      "sector": 17,
+      "facility": "market",
+      "owner": "company"
+    },
+    {
+      "id": "harth",
+      "name": "Harth Village",
+      "sector": 84,
+      "facility": "workshop",
+      "owner": "free"
+    },
+    {
+      "id": "old_abbey",
+      "name": "Old Abbey",
+      "sector": 52,
+      "facility": "",
+      "owner": "free"
+    },
+    {
+      "id": "smugglers_cove",
+      "name": "Smuggler\u2019s Cove",
+      "sector": 114,
+      "facility": "",
+      "owner": "free"
+    },
+    {
+      "id": "greyhold",
+      "name": "Greyhold Castle",
+      "sector": 70,
+      "facility": "garrison",
+      "owner": "nobles"
+    },
+    {
+      "id": "east_barracks",
+      "name": "East Barracks",
+      "sector": 72,
+      "facility": "garrison",
+      "owner": "nobles"
+    },
+    {
+      "id": "north_watch",
+      "name": "Northern Watchtower",
+      "sector": 37,
+      "facility": "garrison",
+      "owner": "nobles"
+    },
+    {
+      "id": "pinewood",
+      "name": "Pinewood",
+      "sector": 67,
+      "facility": "",
+      "owner": "free"
+    },
+    {
+      "id": "crossroads",
+      "name": "Crossroads",
+      "sector": 68,
+      "facility": "",
+      "owner": "free"
+    },
+    {
+      "id": "harth_farm",
+      "name": "Harth Farmland",
+      "sector": 100,
+      "facility": "farm",
+      "owner": "free"
+    }
+  ]
+}

@@ -40,7 +40,9 @@ static func accept(c,id: String,squad: String) -> bool:
   if j.id!=id or j.status!="available" or c.s.time>=j.deadline: continue
   var q=c.s.squads.get(squad,{})
   if j.type in ["escort","patrol"]:
-   if q.is_empty() or not capable(c,q) or not q.route.is_empty() or q.sector!=j.origin or c.hostile_at(q.sector): return c.reject("Assign a capable stationary squad at Ashford")
+   if q.is_empty() or not capable(c,q) or not q.route.is_empty() or q.sector!=j.origin or c.hostile_at(q.sector):
+    var work_location=c.s.sectors[j.origin].name if c.s.get("greywake",{}).get("world_mode")=="island_v1" else "Ashford"
+    return c.reject("Assign a capable stationary squad at "+work_location)
    for other in c.s.jobs:
     if other.status=="active" and other.type=="escort" and other.squad==squad and j.type=="escort": return c.reject("This squad already escorts a caravan")
   if j.type in ["eliminate","camp","defend"]:

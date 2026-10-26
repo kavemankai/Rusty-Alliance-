@@ -1,0 +1,36 @@
+{
+  "id": "greywake-dockside-bandits",
+  "reward": 180,
+  "enemies": [
+    {
+      "id": "greywake-dock-thug",
+      "name": "Dockside thug",
+      "weapon": "dagger",
+      "hp": 30,
+      "strength": 38,
+      "agility": 40,
+      "dexterity": 38,
+      "endurance": 40,
+      "perception": 50,
+      "wisdom": 35,
+      "leadership": 10,
+      "melee": 24,
+      "ranged": 10
+    },
+    {
+      "id": "greywake-dock-enforcer",
+      "name": "Dockside enforcer",
+      "weapon": "mace",
+      "hp": 42,
+      "strength": 46,
+      "agility": 44,
+      "dexterity": 45,
+      "endurance": 55,
+      "perception": 55,
+      "wisdom": 40,
+      "leadership": 15,
+      "melee": 34,
+      "ranged": 10
+    }
+  ]
+}

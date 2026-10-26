@@ -1,0 +1,74 @@
+{
+  "passed": 3980,
+  "failed": 0,
+  "source_suites": [
+    {
+      "report": "test-results.json",
+      "failed": 0,
+      "passed": 596
+    },
+    {
+      "report": "extended-results.json",
+      "failed": 0,
+      "passed": 796
+    },
+    {
+      "report": "skills-test-results.json",
+      "failed": 0,
+      "passed": 165
+    },
+    {
+      "report": "greywake-test-results.json",
+      "failed": 0,
+      "passed": 650
+    },
+    {
+      "report": "asset-test-results.json",
+      "failed": 0,
+      "passed": 814
+    },
+    {
+      "report": "greywake-ui-results.json",
+      "failed": 0,
+      "passed": 23
+    },
+    {
+      "report": "opening-flow-results.json",
+      "failed": 0,
+      "passed": 40
+    },
+    {
+      "report": "island-test-results.json",
+      "failed": 0,
+      "passed": 492
+    },
+    {
+      "report": "dockside-test-results.json",
+      "failed": 0,
+      "passed": 183
+    },
+    {
+      "report": "opening-ui-results.json",
+      "failed": 0,
+      "passed": 221
+    },
+    {
+      "report": "ui-test-results.json",
+      "failed": 0
+    },
+    {
+      "report": "skills-ui-results.json",
+      "failed": 0
+    }
+  ],
+  "packaged_windows": {
+    "failed": 0,
+    "actors": 2
+  },
+  "excluded_attempts": [
+    "Initial island run exited with signal 11 despite assertions; only clean repeat runs accepted.",
+    "Headless opening UI invocation lacked a GUI and errored; GUI repeat passed 221/0.",
+    "First player exports omitted SVG plates; explicitly selected and rebuilt; outside-project pack smoke passed.",
+    "Android startup observer initially stale; helper now waits for post-input telemetry before assertions."
+  ]
+}

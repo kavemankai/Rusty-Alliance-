@@ -31,7 +31,7 @@ SELECT={
  'training':('rts','Archery_FirstAge_Level1'), 'workshop':('props','Workbench'),
  'camp':('camp','Tent'),
 }
-RUNTIME=set('tree brush rock ore wall window door roof palisade cart floor barricade stall workbench dummy loot torch crop tent soldier hunter physician smith knight farmer rogue dagger sword axe spear greatsword bow javelin shield helmet'.split())
+RUNTIME=set('barrel tree brush rock ore wall window door roof palisade cart floor barricade stall workbench dummy loot torch crop tent soldier hunter physician smith knight farmer rogue dagger sword axe spear greatsword bow javelin shield helmet'.split())
 def main():
  manifest=json.loads((ROOT/'assets/quaternius/manifest.json').read_text(encoding='utf-8'))
  models={(r['category'],r['name']):r for r in manifest['models']}
@@ -60,6 +60,7 @@ def main():
  # Include the small runtime explicitly; imported scene/material dependencies
  # are then followed by the exporter. Library-only models are not selected.
  files=['res://main.tscn','res://icon.svg']
+ files+=['res://'+p.relative_to(ROOT).as_posix() for p in sorted((ROOT/'assets/greywake').glob('*.svg'))]
  files+=['res://'+p.relative_to(ROOT).as_posix() for folder in ['sim','ui'] for p in sorted((ROOT/folder).glob('*.gd'))]
  files+=sorted(set(active.values()))
  files+=['res://assets/ui/icons/'+key+'.png' for key in selected if (ROOT/'assets/ui/icons'/(key+'.png')).exists()]

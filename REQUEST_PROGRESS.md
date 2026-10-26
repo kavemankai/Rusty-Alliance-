@@ -34,3 +34,8 @@ The 9/10 follow-up adds native Android gestures, touch cancellation/pause cleanu
 ## 0.14.0 Greywake recruitment follow-up
 
 The exact user-supplied twelve-template baseline is implemented as original project data, with a separate production scenario, paid opening company, canonical carried weapons and deterministic scheduled mainland offers. No external source code or weapon statistics were imported. See GREYWAKE_RECRUITMENT_STATUS.md for evidence, strict deadline/ownership/save rules and explicit upstream island/recovery limitations. Original campaign, combat formulas, AI knowledge and renewal accounting are preserved.
+
+
+## Greywake Opening Experience v0.1 — 0.15.0
+
+The user-supplied opening specification is preserved in GREYWAKE_OPENING_EXPERIENCE_SPEC.md. The integrated narrative/tableau/island/dockside work and its verification are documented in GREYWAKE_OPENING_STATUS.md. All new scene plates are temporary original vectors; no unavailable production archive or proprietary art is claimed. Existing authoritative combat, inventory, skills, payroll and shipping are reused. Island boundaries and explicit safe staging migration are simulation rules. The three endings, broader political content and final art/physical acceptance remain deferred.

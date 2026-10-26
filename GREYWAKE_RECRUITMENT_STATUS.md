@@ -1,3 +1,9 @@
+# Current opening follow-up — 0.15.0
+
+See [Greywake Opening Experience v0.1](GREYWAKE_OPENING_STATUS.md) for the current flow, authored island, tutorial/recovery work, temporary scene art and verification. The prior report below is historical; its package hashes and remaining-work statements describe that earlier build. The new runtime adds one existing CC0 barrel model (36 mappings / 33 models), retaining the 63 icons and original library provenance.
+
+---
+
 # Greywake roster, opening company and mainland shipping
 
 Development build: **0.14.0-greywake-recruitment**, based on `8a0a1ec`. Exact roster and initial recruitment are implemented. Scheduled shipping is implemented and tested in a Dock Town staging scenario. **The complete Greywake island campaign is not finished.**

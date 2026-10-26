@@ -1,10 +1,12 @@
-# Current preview: 0.14.0 Greywake recruitment
+# Current preview: Greywake Opening Experience v0.1 (0.15.0)
 
-Choose **New Greywake campaign** to hire two to six paid fighters from the approved roster, then land at Dock Town. Mainland replacement ships arrive on a fixed four-day calendar. The original campaign remains available under **New campaign**. Greywake currently exposes a staging port; its authored island, contracts, recovery economy and endings are later work. See [Greywake status and tests](GREYWAKE_RECRUITMENT_STATUS.md).
+**New Game** opens the anonymous employer's briefing, an interactive illustrated tavern, paid company confirmation, skippable crossing, a gridless 62-sector island and the real Dockside Trouble battle. Outcomes persist; Harth's paid farm-road rounds provide a bounded recovery activity. Original campaign access remains separate under **New campaign**. Temporary vector scene art and role portraits are explicitly provisional.
+
+See [current player flow, files, tests, compatibility, build steps and remaining work](GREYWAKE_OPENING_STATUS.md). The complete Greywake campaign and its three endings remain unfinished.
 
 # The Broken Marches
 
-**0.13.0 skills preview:** Stealth, Fieldcraft and Athletics now join the original four skills, with selected-skill training and compatible saves. The original campaign remains playable. Greywake recruiting infrastructure is tested, but the actual finalized workshop roster is still required; new Greywake creation is disabled until supplied. See [GREYWAKE_SKILLS.md](GREYWAKE_SKILLS.md) and [GREYWAKE_QA.md](GREYWAKE_QA.md). Test-only names/statistics are not shipped as a production roster.
+**Historical 0.13.0 skills preview:** Stealth, Fieldcraft and Athletics now join the original four skills, with selected-skill training and compatible saves. The original campaign remains playable. Greywake recruiting infrastructure is tested, but the actual finalized workshop roster is still required; new Greywake creation is disabled until supplied. See [GREYWAKE_SKILLS.md](GREYWAKE_SKILLS.md) and [GREYWAKE_QA.md](GREYWAKE_QA.md). Test-only names/statistics are not shipped as a production roster.
 
 Original Godot 4.6.2 / GDScript medieval mercenary strategy game. This is a **playable integrated foundation slice**, not the complete production contract. Tile-based 3D tactical board with user-approved Quaternius art, touch-oriented controls, 16×16 campaign, persistent company, six contract types and independent strategic forces. The 0.12.0 art preview still needs fitted appearances, full action animation and the remaining assets listed in ASSET_COVERAGE.md.
 

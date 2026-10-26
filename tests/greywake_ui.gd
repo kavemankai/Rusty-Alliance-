@@ -27,7 +27,10 @@ func click(text: String) -> void:
 func run() -> void:
  app=load("res://main.tscn").instantiate();root.add_child(app);await settle()
  check(not find(app,"New Greywake campaign").disabled,"Production Greywake enabled")
- await click("New Greywake campaign")
+ # Keep this suite as the backward-compatible 0.14 staging UI regression.
+ # The production title/briefing/tableau/island flow is covered by opening_ui.gd.
+ var staging=app.Campaign.new();staging.configure_fall_of_greywake()
+ app.game=staging;app.selected="";app.squad="first";app.tab="company";app.rebuild();await settle()
  app.save_slot="user://greywake-ui-selection.json";app.game.autosave_path="user://greywake-ui-auto.json"
  check(app.game.s.scenario=="fall_of_greywake" and app.game.s.funds==2400,"New screen enters exact scenario and purse")
  check(find(app,"Depart for Dock Town").disabled,"No empty departure")

@@ -171,7 +171,9 @@ static func valid(s: Dictionary) -> bool:
   for e in s.events:
    if e.kind in EVENT_KINDS: return false
   return true
- if s.get("greywake")!=scenario(): return false
+ var scenario_spec=scenario()
+ if s.get("greywake",{}).get("world_mode")=="island_v1": scenario_spec.world_mode="island_v1";scenario_spec.world_version=1
+ if s.get("greywake")!=scenario_spec: return false
  var sh=s.get("shipping")
  if not sh is Dictionary or not sh.has_all(["next_sequence","next_arrival_at","port_blockade","passage_granted","vessels"]): return false
  if not R.integer(sh.next_sequence,2,1000000000) or not R.integer(sh.next_arrival_at,FIRST_ARRIVAL) or int(sh.next_arrival_at-FIRST_ARRIVAL)%ARRIVAL_INTERVAL!=0: return false

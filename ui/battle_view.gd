@@ -9,6 +9,7 @@ var camera: Camera3D
 var selected="mara"
 var preview=[]
 var show_roofs=true
+var middle=false
 var pressed=false
 var dragged=false
 var down=Vector2.ZERO
@@ -108,7 +109,7 @@ func redraw() -> void:
    if level>0 and c.get("light",0)>0: Art.place(geometry,"torch",base,Vector3(0.2,0.9,0.2),true,level==1)
    var key=Art.terrain_key(c)
    if level>0 and key!="":
-    var structure=Art.place(geometry,key,base,Art.terrain_size(key),false,level==1)
+    var structure=Art.place(geometry,key,base,Vector3(.85,1.6,.85) if c.kind=="crate" else Art.terrain_size(key),false,level==1)
     structure.set_meta("terrain_cell",i)
     if key in ["wall","window","door","palisade"]:
      # Fit walls to the persisted blocker chain, without inventing new geometry.
@@ -117,7 +118,7 @@ func redraw() -> void:
      if above.get("block",false) or below.get("block",false): structure.rotation.y=PI/2
      if key=="door" and c.get("open",false):
       structure.rotation.y+=PI/2;structure.position.x+=0.35
-   elif c.block and level>0:
+   elif c.block and level>0 and c.kind!="water":
     var obstacle=Color(obstacles.get(c.kind,"8c8170")) if not c.door else Color("8e663f")
     var structure=box(geometry,Vector3(c.x,0.65+c.elevation*0.5,c.y),Vector3(0.85,1.25 if c.kind!="window" else 0.5,0.85),obstacle.darkened(0.65) if level==1 else obstacle)
     structure.set_meta("terrain_cell",i)
@@ -179,7 +180,7 @@ func tile_color(i: int,chosen) -> Color:
  return paint_cell(c,level,i,chosen)
 
 func paint_cell(c: Dictionary,level: int,i: int,chosen) -> Color:
- var surfaces={"road":"77664b","floor":"777773","crop":"8b8143","quarry":"626971","mud":"55483b"}
+ var surfaces={"road":"77664b","floor":"777773","crop":"8b8143","quarry":"626971","mud":"55483b","stone":"727871","wood":"887353","water":"304b59"}
  var color=Color("485546") if int(c.x+c.y)%2==0 else Color("404d3f")
  if surfaces.has(c.kind): color=Color(surfaces[c.kind])
  if c.cost>2 and not surfaces.has(c.kind): color=Color("62604a")
@@ -211,6 +212,10 @@ func pick(point: Vector2) -> void:
 func input_event(event: InputEvent) -> void:
  if (event is InputEventMouseButton or event is InputEventMouseMotion) and event.device==InputEvent.DEVICE_ID_EMULATION: return
  if battle==null: return
+ if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_MIDDLE:
+  middle=event.pressed;accept_event();return
+ if event is InputEventMouseMotion and middle:
+  camera.position+=Vector3(-event.relative.x-event.relative.y,0,event.relative.x-event.relative.y)*camera.size/900;return
  if event is InputEventMouseButton:
   if event.button_index==MOUSE_BUTTON_WHEEL_UP: camera.size=clampf(camera.size-1,8,32)
   elif event.button_index==MOUSE_BUTTON_WHEEL_DOWN: camera.size=clampf(camera.size+1,8,32)
@@ -252,4 +257,4 @@ func input_event(event: InputEvent) -> void:
 
 func _notification(what: int) -> void:
  if what==NOTIFICATION_APPLICATION_PAUSED:
-  fingers.clear();pressed=false;dragged=true
+  fingers.clear();pressed=false;middle=false;dragged=true

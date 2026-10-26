@@ -30,7 +30,10 @@ class Device:
   raise RuntimeError('Android launch did not reach button '+label)
  def settled(self):
   time.sleep(1.2);return self.state()
- def tap(self,x,y): self.shell('input','tap',str(round(x)),str(round(y)));return self.settled()
+ def tap(self,x,y):
+  self.shell('input','tap',str(round(x)),str(round(y)))
+  # Wait beyond a frame published after input, including slow first-scene imports.
+  first=self.settled();return self.fresh(first['ticks'])
  def swipe(self,x1,y1,x2,y2,duration=400):
   self.shell('input','swipe',*[str(round(n)) for n in [x1,y1,x2,y2,duration]]);return self.settled()
  def click(self,label):

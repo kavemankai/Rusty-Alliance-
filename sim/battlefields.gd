@@ -3,6 +3,7 @@ const META=["layout","layout_version","deployment_zones","enemy_spawns"]
 const KINDS=["farm","settlement","mine","camp","wilderness"]
 
 static func create(sector: Dictionary) -> Dictionary:
+ if sector.get("greywake_location")=="dock_town" and sector.get("greywake_land",false): return dockside()
  var kind="wilderness"
  if sector.facility=="farm": kind="farm"
  elif sector.facility=="mine": kind="mine"
@@ -120,3 +121,16 @@ static func valid_zones(zones: Variant,w: int,h: int) -> bool:
    if not integer(zone[key]): return false
   if zone.x<0 or zone.y<0 or zone.w<1 or zone.h<1 or zone.x+zone.w>w or zone.y+zone.h>h: return false
  return true
+
+# Original dockside geometry. The persisted tile data drives collision, cover and art.
+static func dockside() -> Dictionary:
+ var f={"width":18,"height":14,"tiles":[],"ground":[],"layout":"settlement","layout_version":1,"deployment_zones":[{"x":0,"y":1,"w":5,"h":8}],"enemy_spawns":[{"x":10,"y":6},{"x":12,"y":8}]}
+ for y in range(14):
+  for x in range(18):
+   var sea=y>=10 and not (x>=5 and x<=7 and y<=12)
+   f.tiles.append({"x":x,"y":y,"cost":2,"elevation":0,"block":sea,"cover":0,"conceal":0,"door":false,"open":false,"kind":"water" if sea else ("wood" if y>=10 else "stone")})
+ f.entry_zones={"west":f.deployment_zones.duplicate(true),"east":[{"x":15,"y":5,"w":3,"h":4}],"north":[{"x":1,"y":0,"w":8,"h":2}],"south":[{"x":5,"y":10,"w":3,"h":3}]}
+ house(f,11,0,6,5,12,4)
+ for p in [Vector2i(6,2),Vector2i(7,7),Vector2i(10,9)]: paint(f,p.x,p.y,{"kind":"crate","block":true,"cover":40})
+ for p in [Vector2i(4,8),Vector2i(9,4)]: paint(f,p.x,p.y,{"kind":"barrel","block":true,"cover":30})
+ return f

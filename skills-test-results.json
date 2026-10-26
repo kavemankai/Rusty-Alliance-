@@ -2,5 +2,5 @@
   "failed": 0,
   "failures": [],
   "passed": 165,
-  "roster_source": "synthetic test fixture only; finalized workshop table is not supplied"
+  "roster_source": "legacy infrastructure fixture; production baseline tested in tests/greywake.gd"
 }

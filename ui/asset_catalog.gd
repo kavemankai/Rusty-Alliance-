@@ -18,6 +18,7 @@ const MODELS={
  "dummy":"res://assets/quaternius/props/Exports/glTF/Dummy.gltf",
  "loot":"res://assets/quaternius/props/Exports/glTF/Bag.gltf",
  "torch":"res://assets/quaternius/props/Exports/glTF/Torch_Metal.gltf",
+ "barrel":"res://assets/quaternius/props/Exports/glTF/Barrel.gltf",
  "tent":"res://assets/quaternius/camp/OBJ/Tent.obj",
  "crop":"res://assets/quaternius/crops/OBJ/Wheat_Crop.obj",
  "dagger":"res://assets/quaternius/weapons/OBJ/Dagger.obj",

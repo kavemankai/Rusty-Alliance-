@@ -1,8 +1,10 @@
 extends Node
 const Campaign=preload("res://sim/campaign.gd")
 const Data=preload("res://sim/catalog.gd")
+const GreywakeMap=preload("res://ui/greywake_map.gd")
 const MapView=preload("res://ui/world_map.gd")
 const BattleView=preload("res://ui/battle_view.gd")
+const OpeningView=preload("res://ui/greywake_opening_view.gd")
 const Icons=preload("res://ui/asset_icons.gd")
 var game
 var ui: Control
@@ -25,6 +27,14 @@ var last_message=""
 var save_slot="user://campaign.json"
 var inspected_item=""
 var supply_amount=5
+var opening_transition=false
+var opening_tween: Tween
+var advanced_controls=false
+var tavern_selected="militia_spearman"
+var base_theme: Theme
+var island_theme: Theme
+var opening_view
+var title_visible=false
 var shipping_alert=""
 var port_status: Label
 var confirm: ConfirmationDialog
@@ -37,7 +47,10 @@ func _ready() -> void:
  apply_safe_area()
  var theme=Theme.new()
  theme.default_font_size=18
- ui.theme=theme
+ ui.theme=theme;base_theme=theme
+ island_theme=theme.duplicate();island_theme.default_font_size=16
+ island_theme.set_color("font_color","Label",Color("e2d4b2"))
+ island_theme.set_color("font_color","Button",Color("e2d4b2"))
  confirm=ConfirmationDialog.new()
  ui.add_child(confirm)
  menu()
@@ -61,7 +74,7 @@ func button(parent: Node,title: String,callback: Callable) -> Button:
  b.mouse_filter=Control.MOUSE_FILTER_PASS
  b.clip_text=true
  b.tooltip_text=title
- b.custom_minimum_size=Vector2(0,48)
+ b.custom_minimum_size=Vector2(0,36 if game!=null and Campaign.World.applies(game.s) and not OS.has_feature("android") else 48)
  for resource in ["food","medicine","tools","horse","cart"]:
   if resource in title.to_lower():
    b.icon=Icons.get_icon(resource);b.expand_icon=true;b.add_theme_constant_override("icon_max_width",36)
@@ -79,37 +92,53 @@ func label(parent: Node,text: String) -> Label:
  return l
 
 func menu() -> void:
- clear()
- var box=VBoxContainer.new()
- box.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
- box.position=Vector2(-230,-210)
- box.size=Vector2(460,420)
- ui.add_child(box)
- label(box,"THE BROKEN MARCHES\nMedieval mercenary campaign\nGreywake recruitment preview · 0.14")
- button(box,"New campaign",func():game=Campaign.new();save_slot="user://campaign.json";selected="mara";squad="first";tab="sector";rebuild())
- var greywake=button(box,"New Greywake campaign",func():
+ auto_minutes=0;title_visible=true;ui.theme=base_theme;clear()
+ opening_view=OpeningView.new();opening_view.app=self;opening_view.mode="title";ui.add_child(opening_view)
+
+func start_original() -> void:
+ title_visible=false;game=Campaign.new();save_slot="user://campaign.json";selected="mara";squad="first";tab="sector";rebuild()
+
+func start_greywake() -> void:
+ var candidate=Campaign.new()
+ if not candidate.configure_greywake_opening(): return
+ title_visible=false;tavern_selected="militia_spearman";game=candidate;save_slot="user://greywake.json";selected="";squad="first";tab="sector";rebuild()
+
+func load_original(path: String) -> void:
+ var candidate=Campaign.new()
+ if candidate.command("load",{"path":path}): game=candidate;save_slot="user://campaign.json";title_visible=false;rebuild()
+ else: last_message=candidate.error
+
+func continue_greywake() -> void:
+ var paths=["user://greywake.json","user://greywake-autosave.json"]
+ paths.sort_custom(func(a,b):return FileAccess.get_modified_time(a)>FileAccess.get_modified_time(b))
+ for path in paths:
   var candidate=Campaign.new()
-  if candidate.configure_fall_of_greywake():
-   game=candidate;game.autosave_path="user://greywake-autosave.json";save_slot="user://greywake.json"
-   selected="";squad="first";tab="company";rebuild())
- greywake.disabled=Campaign.Recruitment.workshop_templates().is_empty()
- greywake.tooltip_text="Separate scenario · 2,400 crowns · choose your company" if not greywake.disabled else "The finalized Greywake roster is still required"
- button(box,"Load campaign",func():
-  save_slot="user://campaign.json"
-  game=Campaign.new()
-  if game.command("load",{"path":save_slot}): rebuild()
-  else: label(box,game.error))
- button(box,"Continue autosave",func():
-  save_slot="user://campaign.json"
-  game=Campaign.new()
-  if game.command("load",{"path":"user://autosave.json"}): rebuild()
-  else: label(box,game.error))
- if FileAccess.file_exists("user://greywake.json"):
-  button(box,"Load Greywake campaign",open_greywake.bind("user://greywake.json"))
- if FileAccess.file_exists("user://greywake-autosave.json"):
-  button(box,"Continue Greywake autosave",open_greywake.bind("user://greywake-autosave.json"))
- if greywake.disabled: label(box,"Greywake: awaiting the finalized recruitment roster.")
- label(box,"Tap to inspect. Drag to pan. Pinch or use +/− to zoom.\nRecruit → contract → travel → battle → recover.\nEvery action changes persistent campaign state.")
+  if candidate.command("load",{"path":path}) and Campaign.Recruitment.is_greywake(candidate.s):
+   game=candidate;save_slot="user://greywake.json";selected="";squad="first";tab="sector";title_visible=false;rebuild();return
+
+func title_settings() -> void:
+ clear();var box=VBoxContainer.new();box.set_anchors_and_offsets_preset(Control.PRESET_CENTER);box.position=Vector2(-250,-120);box.size=Vector2(500,240);ui.add_child(box)
+ label(box,"SETTINGS · Desktop and touch")
+ label(box,"Left click: select · Middle drag: pan · Wheel: zoom\nEnter: dialogue · Esc: cancel/skip · Space: end turn")
+ button(box,"Toggle fullscreen",func():DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED if DisplayServer.window_get_mode()==DisplayServer.WINDOW_MODE_FULLSCREEN else DisplayServer.WINDOW_MODE_FULLSCREEN))
+ button(box,"Back",menu)
+
+func opening_execute(kind: String,p: Dictionary={}) -> void:
+ if opening_transition: return
+ var before=Campaign.Opening.stage(game.s)
+ if game.command(kind,p):
+  last_message="Saved" if kind=="save" else ""
+  if before!=Campaign.Opening.stage(game.s):
+   opening_transition=true
+   var curtain=ColorRect.new();curtain.color=Color.BLACK;curtain.modulate.a=0;curtain.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);ui.add_child(curtain)
+   opening_tween=create_tween();opening_tween.tween_property(curtain,"modulate:a",1.0,.10)
+   opening_tween.tween_callback(func():rebuild();fade_in())
+  else: rebuild()
+ else: last_message=game.error;rebuild()
+
+func fade_in() -> void:
+ var curtain=ColorRect.new();curtain.color=Color.BLACK;curtain.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);curtain.mouse_filter=Control.MOUSE_FILTER_IGNORE;ui.add_child(curtain)
+ opening_tween=create_tween();opening_tween.tween_property(curtain,"modulate:a",0.0,.15);opening_tween.tween_callback(curtain.queue_free)
 
 func open_greywake(path: String) -> void:
  var candidate=Campaign.new()
@@ -120,6 +149,13 @@ func open_greywake(path: String) -> void:
  selected="";squad="first";tab="company";rebuild()
 
 func rebuild() -> void:
+ if opening_tween!=null and opening_tween.is_valid(): opening_tween.kill()
+ opening_transition=false
+ title_visible=false
+ ui.theme=island_theme if Campaign.World.applies(game.s) else base_theme
+ if Campaign.Opening.locked(game.s):
+  auto_minutes=0;clear();map_view=null;battle_view=null
+  opening_view=OpeningView.new();opening_view.app=self;ui.add_child(opening_view);return
  if Campaign.Recruitment.opening(game.s):
   opening_screen();return
  target=""
@@ -135,7 +171,8 @@ func rebuild() -> void:
  var nav=HBoxContainer.new()
  root.add_child(nav)
  var navigation=[["Map","sector"],["Operations","operations"],["Company","company"],["Contracts","contracts"],["Inventory","inventory"],["Supplies","supplies"],["Ledger","ledger"],["Inspector","debug"],["Settings","settings"]]
- if Campaign.Shipping.applies(game.s): navigation=[["Dock Town","harbour"],["Company","company"],["Inventory","inventory"],["Supplies","supplies"],["Ledger","ledger"],["Settings","settings"]]
+ if Campaign.World.applies(game.s): navigation=[["Map","sector"],["Harbour","harbour"],["Company","company"],["Contracts","contracts"],["Inventory","inventory"],["Supplies","supplies"],["Settings","settings"]]
+ elif Campaign.Shipping.applies(game.s): navigation=[["Dock Town","harbour"],["Company","company"],["Inventory","inventory"],["Supplies","supplies"],["Ledger","ledger"],["Settings","settings"]]
  if Campaign.Shipping.applies(game.s) and game.battle!=null:
   navigation.push_front(["Battle","sector"])
   if tab=="harbour": tab="sector"
@@ -146,17 +183,19 @@ func rebuild() -> void:
  root.add_child(content)
  map_view=null
  battle_view=null
- if game.battle==null and Campaign.Shipping.applies(game.s):
+ if game.battle==null and Campaign.Shipping.applies(game.s) and not Campaign.World.applies(game.s):
   var port=VBoxContainer.new();port.size_flags_horizontal=Control.SIZE_EXPAND_FILL
   content.add_child(port)
   label(port,"DOCK TOWN · Recruitment port\nThe Fall of Greywake")
   port_status=label(port,"")
   label(port,"The 10×10 island map and its routes are a later milestone. Company, inventory and scheduled mainland recruitment are available here.")
+  if Campaign.World.can_upgrade(game.s): button(port,"Upgrade staging save to island opening",run_command.bind("upgrade_greywake",{}))
+  label(port,"Existing staging geography is preserved unless an eligible save is explicitly upgraded.")
   button(port,"Recruitment harbour",func():change_tab("harbour"))
   button(port,"Visit Dock Town",run_command.bind("visit",{"squad":squad}))
   if tab in ["sector","contracts","operations"]: tab="harbour"
  elif game.battle==null:
-  map_view=MapView.new()
+  map_view=GreywakeMap.new() if Campaign.World.applies(game.s) else MapView.new()
   map_view.campaign=game
   map_view.selected=sector
   map_view.squad=squad
@@ -206,7 +245,7 @@ func rebuild() -> void:
   else:
    button(bar,"End turn",func():
     if not game.battle.end_turn(): status(game.battle.error)
-    else: status("Enemy turn resolved")
+    else: status("Enemy turn resolved");game.Opening.mark(game.s,"turn")
     refresh())
    button(bar,"Resolve",func():run_command("resolve"))
   if game.battle.t.get("peaceful",false): button(bar,"Leave sector",func():run_command("leave"))
@@ -273,7 +312,7 @@ func run_command(kind: String,p: Dictionary={}) -> void:
   if not game.s.log.is_empty() and str(game.s.log.back())!=previous_log: update+=". "+str(game.s.log.back())
   status(update)
   if kind=="deploy": destination={}
-  if kind in ["resolve","retreat","enter","load","confirm_deployment","exploration_running"] or had_battle!=(game.battle!=null) or (game.battle!=null and previous_phase!=game.battle.t.phase): rebuild()
+  if kind in ["resolve","retreat","enter","load","confirm_deployment","exploration_running","upgrade_greywake","dockside_start"] or had_battle!=(game.battle!=null) or (game.battle!=null and previous_phase!=game.battle.t.phase): rebuild()
   else: refresh()
  else: status(game.error)
 
@@ -316,6 +355,8 @@ func show_panel() -> void:
   _: sector_panel()
 
 func sector_panel() -> void:
+ if Campaign.World.applies(game.s):
+  island_panel();return
  var cell=game.s.sectors[sector]
  label(side,"%s · %d:%d\n%s · %s\nFacility: %s\nLoyalty %d · Order %d · Levy %d" % [cell.name,cell.x+1,cell.y+1,cell.terrain,cell.owner,cell.facility if cell.facility!="" else "none",cell.loyalty,cell.order,game.Garrison.strength(cell)])
  if cell.owner=="company":
@@ -431,6 +472,7 @@ func inventory_panel() -> void:
   button(side,"Buy %s · %d crowns" % [item,price],run_command.bind("buy",{"item":item,"squad":squad}))
 
 func tactical_cell(x: int,y: int) -> void:
+ get_viewport().gui_release_focus()
  tab="sector"
  var b=game.battle
  var u=b.at(x,y)
@@ -446,9 +488,10 @@ func tactical_cell(x: int,y: int) -> void:
   show_panel()
   return
  if u!=null and u.team=="company":
+  game.Opening.mark(game.s,"select")
   selected=u.id
   destination={}
- elif u!=null and b.known("company",u.id): target=u.id
+ elif u!=null and b.known("company",u.id): target=u.id;game.Opening.mark(game.s,"chance")
  else:
   var actor=b.unit(selected)
   if actor!=null:
@@ -460,7 +503,10 @@ func tactical_cell(x: int,y: int) -> void:
 
 func battle_action(kind: String,p: Dictionary={}) -> void:
  var previous_phase=game.battle.t.phase
- if game.battle.action(selected,kind,p): status("Done: "+kind)
+ if game.battle.action(selected,kind,p):
+  status("Done: "+kind)
+  if kind in ["move","attack"]: game.Opening.mark(game.s,kind)
+  if kind in ["guard","defence_mode"]: game.Opening.mark(game.s,"defence")
  else: status(game.battle.error)
  destination={}
  if battle_view!=null: battle_view.preview=[]
@@ -471,6 +517,8 @@ func battle_action(kind: String,p: Dictionary={}) -> void:
 
 func tactical_panel() -> void:
  var b=game.battle
+ var beginner=game.Opening.stage(game.s)=="FIRST_TACTICAL_ENCOUNTER" and not advanced_controls
+ tutorial_panel()
  if b.t.phase=="deployment":
   deployment_panel()
   return
@@ -485,7 +533,7 @@ func tactical_panel() -> void:
   label(side,"Quiet rounds: %d/3 before exploration may resume" % b.t.quiet_rounds)
   if b.t.quiet_rounds>=3: button(side,"Resume exploration",run_command.bind("explore",{}))
  for u in b.t.units:
-  if u.team=="company" and u.person.hp>0: button(side,("● " if selected==u.id else "")+u.person.name+" · %d AP / %d HP" % [u.ap,u.person.hp],func():selected=u.id;target="";destination={};battle_view.selected=selected;refresh())
+  if u.team=="company" and u.person.hp>0: button(side,("● " if selected==u.id else "")+u.person.name+" · %d AP / %d HP" % [u.ap,u.person.hp],func():selected=u.id;target="";destination={};battle_view.selected=selected;game.Opening.mark(game.s,"select");refresh())
  var u=b.unit(selected)
  if u==null: return
  if u.role=="cart":
@@ -498,14 +546,14 @@ func tactical_panel() -> void:
   label(side,"Target %s · HP %d\nRange %d · Hit %d%% · aim %d\nAttack cost %d AP · defence may negate hit" % [enemy.person.name,enemy.person.hp,b.distance(u,enemy),b.hit_chance(u,enemy,aim),aim,b.Combat.cost(u,aim)])
   label(side,"Directional cover against this attack: %d" % b.directional_cover(u,enemy))
   button(side,"Aim + (max 3)",func():aim=(aim+1)%4;show_panel())
-  if Data.WEAPONS[Data.weapon(u.person)].reach>0: button(side,"Attack style: "+u.get("attack_style","normal"),func():var values=b.Combat.ATTACKS.keys();battle_action("attack_style",{"value":values[(values.find(u.get("attack_style","normal"))+1)%values.size()]}))
-  button(side,"Aim at: "+u.get("aim_location","auto"),func():var values=b.Combat.LOCATIONS;battle_action("aim_location",{"value":values[(values.find(u.get("aim_location","auto"))+1)%values.size()]}))
-  if Data.WEAPONS[Data.weapon(u.person)].reach>0:
+  if not beginner and Data.WEAPONS[Data.weapon(u.person)].reach>0: button(side,"Attack style: "+u.get("attack_style","normal"),func():var values=b.Combat.ATTACKS.keys();battle_action("attack_style",{"value":values[(values.find(u.get("attack_style","normal"))+1)%values.size()]}))
+  if not beginner: button(side,"Aim at: "+u.get("aim_location","auto"),func():var values=b.Combat.LOCATIONS;battle_action("aim_location",{"value":values[(values.find(u.get("aim_location","auto"))+1)%values.size()]}))
+  if not beginner and Data.WEAPONS[Data.weapon(u.person)].reach>0:
    var charge=b.Combat.charge_preview(b,u,enemy)
    label(side,"Charge: %d movement + %d strike AP · %d%% contact chance · %d visible reaction threats" % [charge.movement,charge.strike,charge.hit,charge.reactions])
    var charge_button=button(side,"Charge target · movement + power strike",battle_action.bind("charge",{"target":target}))
    charge_button.disabled=b.distance(u,enemy)<2 or b.distance(u,enemy)>6 or charge.movement<=0 or charge.movement+charge.strike>u.ap
-  if Data.shield(u.person): button(side,"Shield bash · 5 AP",battle_action.bind("bash",{"target":target}))
+  if not beginner and Data.shield(u.person): button(side,"Shield bash · 5 AP",battle_action.bind("bash",{"target":target}))
   button(side,"Confirm attack",battle_action.bind("attack",{"target":target,"aim":aim}))
  elif not destination.is_empty():
   var route=b.path(u,destination.x,destination.y,true)
@@ -519,12 +567,21 @@ func tactical_panel() -> void:
   button(side,"Confirm movement",battle_action.bind("move",destination.duplicate()))
   if b.t.get("peaceful",false):
    for build_kind in ["barricade","palisade","gate","torch"]: button(side,"Build "+build_kind+" · 8 AP",battle_action.bind("build",{"x":destination.x,"y":destination.y,"kind":build_kind}))
-  for formation_style in ["line","column","wedge"]: button(side,"Order "+formation_style+" formation",battle_action.bind("formation",{"x":destination.x,"y":destination.y,"style":formation_style}))
+  for formation_style in ([] if beginner else ["line","column","wedge"]): button(side,"Order "+formation_style+" formation",battle_action.bind("formation",{"x":destination.x,"y":destination.y,"style":formation_style}))
   var withdrawal=b.Combat.risk(b,u,destination.x,destination.y)
   label(side,"Visible melee reactions: %d · deliberate disengage %d AP. Unseen or ranged threats may still react." % [withdrawal.threats.size(),withdrawal.disengage_ap])
   if b.t.phase=="combat": button(side,"Disengage to tile",battle_action.bind("disengage",destination.duplicate()))
   if cell.door and b.Visibility.level(b,destination.x,destination.y)==2: button(side,"Open / close door · 3 AP",battle_action.bind("door",destination.duplicate()))
  button(side,"Cancel selection",func():target="";destination={};battle_view.preview=[];refresh())
+ if beginner:
+  if game.battle.t.phase=="combat":
+   button(side,"Prepare defence · 2 AP",battle_action.bind("defence_mode",{"value":"shield" if Data.shield(u.person) else "brace"}))
+   button(side,"Guard / disengagement reaction",battle_action.bind("guard",{}))
+  if Data.WEAPONS[Data.weapon(u.person)].reach==0: button(side,"Reload",battle_action.bind("reload",{}))
+  if u.person.bleeding>0: button(side,"First aid self · 5 AP",battle_action.bind("aid",{}))
+  button(side,"Show advanced combat controls",func():advanced_controls=true;show_panel())
+  for line in b.t.log.slice(maxi(0,b.t.log.size()-3)): label(side,line)
+  return
  if u.get("protecting","")!="": label(side,"Protecting an adjacent ally: each frontal interception needs another 3 AP and shield condition.")
  label(side,"Defence: %s · shield condition %d%%\nInjuries: %s" % [u.get("defence_mode","balanced"),Data.equipped(u.person,"shield").get("condition",0),Data.injury_summary(u.person)])
  for defence in b.Combat.DEFENCES: button(side,"Defence "+defence+" · 2 AP",battle_action.bind("defence_mode",{"value":defence}))
@@ -553,6 +610,7 @@ func ask(text: String,callback: Callable) -> void:
  confirm.popup_centered(Vector2i(500,200))
 
 func _process(delta: float) -> void:
+ if title_visible: return
  if game!=null and game.battle!=null and game.battle.t.phase=="exploration" and game.battle.t.exploration.get("running",false):
   timer+=delta
   if timer>=0.4:
@@ -581,11 +639,17 @@ func _notification(what: int) -> void:
 
 func contracts_panel() -> void:
  label(side,"CONTRACT BOARD · selected squad: "+squad)
- button(side,"Request new postings",run_command.bind("post_jobs",{}))
+ if not Campaign.World.applies(game.s): button(side,"Request new postings",run_command.bind("post_jobs",{}))
+ else: label(side,"After a withdrawal, paid farm-road rounds at Harth can support provisions and wages. No free recovery is provided.")
  label(side,"Finish before the listed deadline. Road work reposts one day after closing.")
  for j in game.s.jobs:
-  label(side,"%s · %s · %s\n%d crowns · sector %d:%d\nDeadline day %d, %02d:%02d" % [j.name,j.type,j.status,j.reward,int(j.sector)%16+1,int(j.sector/16)+1,int(j.deadline/1440)+1,int(j.deadline%1440/60),int(j.deadline%60)])
-  label(side,game.Contracts.describe(j))
+  if Campaign.World.applies(game.s):
+   label(side,"%s · %s\n%d crowns · %s" % [j.name,j.status,j.reward,game.s.sectors[j.sector].name])
+   if j.get("opening_contract",false): label(side,"The opening contract imposes no campaign deadline. Drive off the dockside bandits in a real encounter.")
+   elif j.get("recovery_work",false): label(side,"Accept at Harth, check the farmland, then return. Progress %d/2. Paid once on completion; the existing one-day repost delay applies." % j.step)
+  else:
+   label(side,"%s · %s · %s\n%d crowns · sector %d:%d\nDeadline day %d, %02d:%02d" % [j.name,j.type,j.status,j.reward,int(j.sector)%16+1,int(j.sector/16)+1,int(j.deadline/1440)+1,int(j.deadline%1440/60),int(j.deadline%60)])
+   label(side,game.Contracts.describe(j))
   if j.squad!="": label(side,"Assigned: "+j.squad)
   if j.reason!="": label(side,j.reason)
   if j.status=="available": button(side,"Accept "+j.name,run_command.bind("accept",{"id":j.id,"squad":squad}))
@@ -687,3 +751,81 @@ func harbour_panel() -> void:
    hire.disabled=o.status!="available" or not shipping.accessible(game.s) or game.s.time>=v.recruitment_deadline or game.s.funds<o.fee or game.battle!=null or not game.s.encounter.is_empty() or q.sector!=shipping.dock(game.s) or not q.route.is_empty()
  for line in game.s.log:
   if "OFFSHORE" in line or "HARBOUR REOPENED" in line or "REINFORCEMENTS LOST" in line or "MAINLAND VESSEL ARRIVED" in line: label(side,line)
+
+func _unhandled_key_input(event: InputEvent) -> void:
+ if not event is InputEventKey or not event.pressed or event.echo: return
+ if title_visible:
+  if event.keycode==KEY_ESCAPE: menu();get_viewport().set_input_as_handled()
+  return
+ if game==null: return
+ var stage=Campaign.Opening.stage(game.s)
+ if Campaign.Opening.locked(game.s):
+  if event.keycode==KEY_ENTER and stage=="EMPLOYER_BRIEFING": opening_execute("opening_next",{})
+  elif event.keycode in [KEY_ESCAPE,KEY_SPACE] and stage in ["BOAT_CROSSING","EMPLOYER_BRIEFING"]: opening_execute("opening_skip",{})
+  elif event.keycode==KEY_ESCAPE and stage=="TAVERN_RECRUITMENT": tavern_selected="";rebuild()
+  elif event.keycode==KEY_ESCAPE and stage=="COMPANY_CONFIRMATION": opening_execute("opening_back",{})
+  else: return
+  get_viewport().set_input_as_handled();return
+ if event.keycode==KEY_ESCAPE:
+  target="";destination={};get_viewport().gui_release_focus()
+  if battle_view!=null: battle_view.preview=[]
+  refresh();get_viewport().set_input_as_handled()
+ elif event.keycode==KEY_SPACE and game.battle!=null and game.battle.t.phase=="combat":
+  var focus=get_viewport().gui_get_focus_owner()
+  if focus!=null and (focus is Button or focus is LineEdit or focus is TextEdit): return
+  if game.battle.end_turn(): game.Opening.mark(game.s,"turn");refresh()
+  else: status(game.battle.error)
+  get_viewport().set_input_as_handled()
+
+func island_panel() -> void:
+ var cell=game.s.sectors[sector];var q=game.s.squads[squad]
+ label(side,cell.name.to_upper())
+ label(side,cell.terrain.capitalize()+" · "+(cell.owner if cell.known else "Not yet observed"))
+ label(side,"Company: "+game.s.sectors[q.sector].name+" · "+str(q.members.size())+" fighters")
+ if not game.s.encounter.is_empty():
+  label(side,"Hostile contact · campaign time paused")
+  button(side,"Deploy company",run_command.bind("enter",{}))
+ elif not q.members.is_empty():
+  var route=game.strategic_path(q.sector,sector,q);var eta=0
+  for id in route: eta+=game.travel_cost(q,id)
+  if q.sector!=sector:
+   label(side,"Journey estimate: %d min across %d sectors" % [eta,route.size()])
+   var go=button(side,"Travel to "+cell.name,run_command.bind("route",{"squad":squad,"sector":sector}));go.disabled=route.is_empty() or not q.route.is_empty()
+  else:
+   if not game.hostile_at(sector):
+    if cell.facility=="garrison" and cell.owner=="nobles": label(side,"Fortress approach · entry is unavailable in this opening.")
+    else: button(side,"Visit "+cell.name,run_command.bind("visit",{"squad":squad}))
+ if sector==game.Shipping.dock(game.s):
+  var intro=game.s.jobs.filter(func(j):return j.id==game.Opening.INTRO_JOB)
+  if not intro.is_empty() and intro[0].status in ["available","active"]:
+   label(side,"DOCKSIDE TROUBLE · %d crowns\nBandits are extorting workers near the warehouses. Prepare, deploy or return later." % intro[0].reward)
+   var fight=button(side,"Deal with Dockside Trouble",run_command.bind("dockside_start",{}))
+   fight.disabled=q.sector!=sector or not q.route.is_empty() or not game.Contracts.capable(game,q)
+  elif game.hostile_at(sector) and q.sector==sector and not q.route.is_empty(): label(side,"Return here to recover the occupied harbour.")
+  button(side,"Recruitment harbour",func():change_tab("harbour"))
+  label(side,"Mainland vessels: "+game.Shipping.timestamp(game.s.shipping.next_arrival_at)+" · harbour "+("open" if game.Shipping.accessible(game.s) else "blockaded"))
+ if not game.s.result.is_empty(): label(side,"Last encounter: "+game.s.result.outcome+" · survivors "+str(game.s.result.survivors))
+
+func tutorial_panel() -> void:
+ var key=game.Opening.lesson(game.s,game.battle)
+ if key=="": return
+ label(side,"FIRST ENCOUNTER · "+game.Opening.LESSONS[key])
+ button(side,"Next tip",run_command.bind("tutorial_next",{}))
+ button(side,"Hide tutorial",run_command.bind("tutorial_dismiss",{}))
+
+func _input(event: InputEvent) -> void:
+ if opening_transition:
+  get_viewport().set_input_as_handled();return
+ if title_visible or game==null or confirm.visible: return
+ var stage=Campaign.Opening.stage(game.s)
+ if event is InputEventKey and event.pressed and not event.echo:
+  if (stage=="EMPLOYER_BRIEFING" and event.keycode in [KEY_ENTER,KEY_SPACE,KEY_ESCAPE]) or (stage=="BOAT_CROSSING" and event.keycode in [KEY_SPACE,KEY_ESCAPE]) or (stage in ["TAVERN_RECRUITMENT","COMPANY_CONFIRMATION"] and event.keycode==KEY_ESCAPE):
+   _unhandled_key_input(event)
+ if event is InputEventMouseButton and event.pressed and event.button_index==MOUSE_BUTTON_RIGHT:
+  if stage=="TAVERN_RECRUITMENT": tavern_selected="";rebuild()
+  elif stage=="COMPANY_CONFIRMATION": opening_execute("opening_back",{})
+  elif not Campaign.Opening.locked(game.s):
+   target="";destination={}
+   if battle_view!=null: battle_view.preview=[]
+   refresh()
+  get_viewport().set_input_as_handled()

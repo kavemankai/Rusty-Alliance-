@@ -123,11 +123,14 @@ static func actor(parent: Node3D,u: Dictionary,pos: Vector3) -> Node3D:
 
 static func terrain_key(cell: Dictionary) -> String:
  if cell.get("door",false): return "door"
+ if cell.kind=="crate": return "barricade"
+ if cell.kind=="barrel": return "barrel"
  if cell.kind in ["tree","brush","rock","ore","wall","window","palisade","barricade","stall","workbench","dummy","crop","tent"]: return cell.kind
  return ""
 
 static func terrain_size(key: String) -> Vector3:
  match key:
+  "barrel": return Vector3(0.85,1.3,0.85)
   "tree": return Vector3(0.95,1.9,0.95)
   "wall","window": return Vector3(0.94,1.3,0.28)
   "door","palisade": return Vector3(0.9,1.25,0.25)
