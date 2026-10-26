@@ -1,10 +1,12 @@
 # Provenance
 
+2026-10-26 asset update: the user explicitly supplied and authorized `All in One - Quaternius[Patreon].zip`. Its included root/per-pack notices identify the imported art as CC0 1.0 Universal. These third-party models/textures and their rendered thumbnails are not project-authored art and do not come from JA2. Source entries/hashes and preserved notices are in `assets/quaternius/`; ASSET_COVERAGE.md distinguishes runtime use from library availability and unfinished fitting/animation work. Quaternius attribution and the supplied CC0 notice are included in THIRD_PARTY_NOTICES.txt.
+
 Reference: kavemankai/jaggedalliance2 at 9bec381bcaec845361e13f95098faaf294435acd. The checkout includes `SFI Source Code license agreement.txt`; the inspected agreement restricts commercial use and distribution of that software and derivative works. The reference is retained outside the new project for research.
 
 New sim/ and ui/ scripts, names, world layout, formulas, equipment values, tests and primitive icon were independently authored for this project. No JA2 source, copied tables, protected characters, maps, binaries or assets are shipped. This is a development provenance statement, not a rights opinion. Any eventual commercial release requires appropriate rights review, as required by the production contract.
 
-Runtime: Godot Engine 4.6.2 standard, official release 71f334935, MIT licence; engine and export-template third-party notices remain applicable to the exported APK. See https://godotengine.org/license/ and engine-distributed notices. No external art, music or paid services are used.
+Runtime: Godot Engine 4.6.2 standard, official release 71f334935, MIT licence; engine and export-template third-party notices remain applicable to the exported APK. See https://godotengine.org/license/ and engine-distributed notices. External art is the user-authorized Quaternius CC0 library described above; no music or paid services are introduced.
 
 Build troubleshooting consulted the official Godot Android exporter implementation:
 https://github.com/godotengine/godot/blob/4.6.2-stable/platform/android/export/export_plugin.cpp

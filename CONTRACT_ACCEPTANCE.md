@@ -4,7 +4,7 @@ This is a traceable acceptance inventory, not a claim that every bullet of the p
 
 | Contract area | Evidence / implementation | Acceptance limit |
 |---|---|---|
-| 3-4 Platform and primitive scope | Standard Godot 4.6.2 Compatibility, landscape debug APK, primitive geometry | Android measurements depend on recorded emulator/device evidence; no phone thermal claim |
+| 3-4 Platform and visual scope | Standard Godot 4.6.2 Compatibility, landscape debug APK; user authorized Quaternius art on 2026-10-26, superseding the original primitive-only art restriction | Art coverage is partial as recorded in ASSET_COVERAGE.md; old Android measurements precede the art update; no phone thermal claim |
 | 5-6 Source study / independence | Expanded SOURCE_AUDIT.md, original implementation mapping, release-content audit and engine notices | Technical source study is covered; legal clean-room/commercial clearance is not certified |
 | 9-10 Central loop / authority | Canonical Campaign.s and profile/item ownership; normal-control UI contract loop | Broader unrestricted player decision space is not exhaustively tested |
 | 11-13 Strategic map / events | 256 sectors, weighted routes/contact, stable event queue, time controls | Five strategic terrain categories plus tactical archetypes; not every listed terrain has its own behaviour |

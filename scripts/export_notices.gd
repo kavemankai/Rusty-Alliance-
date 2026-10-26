@@ -10,5 +10,10 @@ func _init() -> void:
  for name in licences:
   text+="\n--- "+name+" ---\n"+licences[name]+"\n"
  text+="\n\n"+FileAccess.get_file_as_string("res://scripts/android/runtime-notice.txt")
+ if FileAccess.file_exists("res://assets/quaternius/LICENSE.txt"):
+  text+="\n\n--- Quaternius art assets ---\nSource: user-supplied All in One - Quaternius[Patreon].zip\nFiles: assets/quaternius/*; thumbnails rendered from those models in assets/ui/icons/*\n"+FileAccess.get_file_as_string("res://assets/quaternius/LICENSE.txt")
+ var lines=text.split("\n")
+ for i in range(lines.size()): lines[i]=lines[i].strip_edges(false,true)
+ text="\n".join(lines)
  var f=FileAccess.open("res://THIRD_PARTY_NOTICES.txt",FileAccess.WRITE);f.store_string(text);f.close()
  print("NOTICES: exported ",licences.size()," bundled licence texts");quit()

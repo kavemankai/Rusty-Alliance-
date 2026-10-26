@@ -1,5 +1,7 @@
 # Handover
 
+Current visual pass: 0.12.0 uses the authorized Quaternius CC0 archive. Read ASSET_COVERAGE.md and ASSET_QA.md before further asset work. `ui/asset_visuals.gd` fits imported models to persisted tiles/actors, `ui/asset_catalog.gd` records explicit dependencies, and `ui/asset_icons.gd` supplies thumbnails. Regenerate mappings/export selections with `python scripts/map_quaternius.py`; regenerate icons with `scripts/render_asset_icons.gd`, then rerun mapping/import. Keep library-only models out of player exports. Prior Android 0.11.0 performance evidence must not be attributed to this art build.
+
 Open project.godot with standard Godot 4.6.2, or install the debug APK. README.md contains the exact first-contract walkthrough. Screenshots show the actual strategic, inventory and tactical runtime.
 
 Simulation entry: sim/campaign.gd command(). Campaign.s is the single state store. Tactical rules: sim/tactical.gd, with weak campaign ownership and shared mercenary references. Original equipment/character/AP data: sim/catalog.gd. Main UI: ui/main.gd. Strategic drawing/gestures: ui/world_map.gd. Instanced 3D board and ray selection: ui/battle_view.gd.

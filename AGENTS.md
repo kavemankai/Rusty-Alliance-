@@ -15,7 +15,7 @@ Godot 4.6.2 standard, GDScript, Compatibility renderer, Android landscape. Read 
 - New mechanics need deterministic behavioural checks. Run tests/run.gd and tests/ui_smoke.gd. An exit code alone is insufficient: reject SCRIPT ERROR and ERROR output.
 - Movement preview and execution must use the same step_cost. Displayed accuracy uses hit_chance before condition/fatigue mutations.
 - Preserve RNG state, ordered events, injuries, inventory and active encounters. Keep backups when saving.
-- Use primitive geometry only. Do not add finished assets or spend time on visual polish.
+- The user authorized importing the supplied Quaternius archive on 2026-10-26, superseding the earlier primitives-only art restriction. Use its documented CC0 assets; keep selection/fog/AP overlays readable and preserve logical geometry. Do not add unrelated packs or claim fitted equipment/complete animation coverage without testing it.
 - Do not call foundation complete while required contract systems or Android device verification remain outstanding.
 - Keep changes recoverable with local commits. Never delete unrelated work, force push, spend money, expose credentials or publish commercially.
 - Update source audit, test evidence, parity and continuation instructions when behaviour changes.

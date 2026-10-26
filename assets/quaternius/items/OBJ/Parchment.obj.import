@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://krdfru3dot7j"
+path="res://.godot/imported/Parchment.obj-bad48e3703906850f5c2a4e171aaa84e.mesh"
+
+[deps]
+
+files=["res://.godot/imported/Parchment.obj-bad48e3703906850f5c2a4e171aaa84e.mesh"]
+
+source_file="res://assets/quaternius/items/OBJ/Parchment.obj"
+dest_files=["res://.godot/imported/Parchment.obj-bad48e3703906850f5c2a4e171aaa84e.mesh", "res://.godot/imported/Parchment.obj-bad48e3703906850f5c2a4e171aaa84e.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

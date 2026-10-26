@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://detkxuj3spjxa"
+path="res://.godot/imported/Book1_Closed.obj-b624a389114d4ac108ce9e6aa7922678.mesh"
+
+[deps]
+
+files=["res://.godot/imported/Book1_Closed.obj-b624a389114d4ac108ce9e6aa7922678.mesh"]
+
+source_file="res://assets/quaternius/items/OBJ/Book1_Closed.obj"
+dest_files=["res://.godot/imported/Book1_Closed.obj-b624a389114d4ac108ce9e6aa7922678.mesh", "res://.godot/imported/Book1_Closed.obj-b624a389114d4ac108ce9e6aa7922678.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

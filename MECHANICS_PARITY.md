@@ -1,5 +1,7 @@
 # Verified fidelity and differences
 
+The 0.12.0 Quaternius presentation update changes models/thumbnails, not simulation fidelity. Saved logical geometry, cover, AP, equipment ownership and fog remain authoritative; available animation clips do not establish completed action animation coverage. See ASSET_COVERAGE.md and ASSET_QA.md.
+
 This is an independent implementation inspired by JA2 system relationships. **Exact numeric parity is not established for any subsystem.** PRESERVED classifications refer to the purpose/architecture, not copied formulae or tables.
 
 Verified: ability/condition-dependent AP; paid legal path execution; weighted sector routes; timestamped arrival/contact; chronological world events; distinct current knowledge and remembered enemy coordinates; company state persisting across battle and save/load; real economic consequences; unique equipment ownership and condition; persistent hostile casualties/injuries; sector doors and ground loot; adjacent retreat and queued contacts.

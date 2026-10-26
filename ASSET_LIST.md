@@ -2,7 +2,7 @@
 
 Production planning inventory • 2026-10-26
 
-This list describes assets for a cohesive finished release of the original medieval mercenary game. It does not authorize generating/importing final art or replace the current primitives-only foundation milestone. No production assets have been created by this list.
+This list describes assets for a cohesive finished release of the original medieval mercenary game. The user subsequently authorized the supplied Quaternius ZIP: see [ASSET_COVERAGE.md](ASSET_COVERAGE.md) for imported models, actual in-game use and remaining production work. The tables below remain the full planning inventory, not a claim that every row is finished.
 
 The baseline is the implemented game: orthographic 3D tactical combat, a 16x16 strategic world, six named mercenaries, four faction identities, local levies, protected caravans, persistent equipment, exploration, buildings, construction and six contract types. Quantities below are planning estimates, not an approved content budget. They should be refined after one representative scene and character are approved.
 
@@ -15,7 +15,7 @@ The baseline is the implemented game: orthographic 3D tactical combat, a 16x16 s
 
 One mesh is not one scene placement. One shared animation can serve many characters. An icon's selected/disabled states normally reuse the same icon. Do not multiply models by eight facing directions, manufacture art for all 256 sectors separately, or add category totals together when they count different kinds of deliverables.
 
-Unless stated otherwise, listed assets are **planned / not commissioned**. Existing greybox primitives and QA screenshots are not counted as finished production art.
+Unless coverage is recorded in ASSET_COVERAGE.md, listed assets remain **planned / not commissioned**. Existing greybox primitives and QA screenshots are not counted as finished production art.
 
 ## 1. Art direction and reference package
 

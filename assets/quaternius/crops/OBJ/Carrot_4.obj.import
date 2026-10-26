@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://71bf5oiiu0hn"
+path="res://.godot/imported/Carrot_4.obj-0f61aa926abd40b90f77ebb9ec022dfc.mesh"
+
+[deps]
+
+files=["res://.godot/imported/Carrot_4.obj-0f61aa926abd40b90f77ebb9ec022dfc.mesh"]
+
+source_file="res://assets/quaternius/crops/OBJ/Carrot_4.obj"
+dest_files=["res://.godot/imported/Carrot_4.obj-0f61aa926abd40b90f77ebb9ec022dfc.mesh", "res://.godot/imported/Carrot_4.obj-0f61aa926abd40b90f77ebb9ec022dfc.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

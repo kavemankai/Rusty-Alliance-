@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://5k8h6e65aqdu"
+path="res://.godot/imported/Crystal2_Damaged.obj-d18bb81edb5f7659ce2dbcbcd23f5747.mesh"
+
+[deps]
+
+files=["res://.godot/imported/Crystal2_Damaged.obj-d18bb81edb5f7659ce2dbcbcd23f5747.mesh"]
+
+source_file="res://assets/quaternius/items/OBJ/Crystal2_Damaged.obj"
+dest_files=["res://.godot/imported/Crystal2_Damaged.obj-d18bb81edb5f7659ce2dbcbcd23f5747.mesh", "res://.godot/imported/Crystal2_Damaged.obj-d18bb81edb5f7659ce2dbcbcd23f5747.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

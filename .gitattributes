@@ -1,4 +1,10 @@
 * text=auto eol=lf
+
+# Keep supplied art/mesh buffers and licence notices byte-identical to the archive.
+assets/quaternius/** binary
+assets/quaternius/manifest.json text eol=lf diff
+assets/quaternius/runtime-map.json text eol=lf diff
+assets/ui/icons/*.png binary
 *.png binary
 *.apk binary
 *.zip binary

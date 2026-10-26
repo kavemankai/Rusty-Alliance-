@@ -4,7 +4,7 @@
 
 Target repository was empty when cloned. Godot source, tests, documentation and the asset inventory are tracked in this directory; origin is https://github.com/kavemankai/Rusty-Alliance-.git. Generated builds and local development tools are stored separately from the source repository.
 
-Engine: standard Godot 4.6.2 stable, official 71f334935. GDScript, Compatibility/OpenGL renderer, landscape, Android min SDK 24 / target SDK 35. arm64-v8a, armeabi-v7a and x86_64 debug architectures. No paid services or final-art assets.
+Engine: standard Godot 4.6.2 stable, official 71f334935. GDScript, Compatibility/OpenGL renderer, landscape, Android min SDK 24 / target SDK 35. arm64-v8a, armeabi-v7a and x86_64 debug architectures. No paid services. Version 0.12.0 introduces the user-approved Quaternius CC0 asset library; ASSET_COVERAGE.md records actual coverage and unfinished art/animation work. Earlier Android emulator measurements describe 0.11.0, before these art changes.
 
 Verified on Windows with NVIDIA RTX 3050 Laptop GPU:
 

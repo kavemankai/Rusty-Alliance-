@@ -1,4 +1,5 @@
 extends Control
+const Icons=preload("res://ui/asset_icons.gd")
 signal sector_selected(index: int)
 var campaign
 var selected=17
@@ -29,6 +30,8 @@ func _draw() -> void:
   draw_rect(r,color)
   if sector.id==selected: draw_rect(r,Color("ffd27d"),false,3)
   if sector.known and sector.facility!="":
+   var icon=Icons.get_icon(sector.facility)
+   if icon!=null: draw_texture_rect(icon,Rect2(r.position+Vector2.ONE*2,r.size-Vector2.ONE*4),false)
    draw_string(ThemeDB.fallback_font,r.position+Vector2(4,cell*0.7),sector.facility.substr(0,1).to_upper(),HORIZONTAL_ALIGNMENT_LEFT,-1,int(16*zoom),Color.WHITE)
  for q in campaign.s.squads.values():
   if q.members.is_empty(): continue

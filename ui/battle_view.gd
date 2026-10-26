@@ -1,4 +1,5 @@
 extends SubViewportContainer
+const Art=preload("res://ui/asset_visuals.gd")
 signal cell_selected(x: int,y: int)
 var battle
 var viewport: SubViewport
@@ -101,15 +102,28 @@ func redraw() -> void:
    var color=paint_cell(c,level,i,chosen)
    multi.set_instance_transform(i,Transform3D(Basis.IDENTITY,Vector3(c.x,c.elevation*0.5,c.y)))
    multi.set_instance_color(i,color)
+   var base=Vector3(c.x,0.07+c.elevation*0.5,c.y)
    if show_roofs and level>0 and c.get("roof",false) and not cutaways.has(c.get("room","")):
-    box(geometry,Vector3(c.x,2.0+c.elevation*0.5,c.y),Vector3(0.96,0.15,0.96),Color("594c3d").darkened(0.4 if level==1 else 0.0))
-   if level>0 and c.get("light",0)>0: box(geometry,Vector3(c.x,0.6,c.y),Vector3(0.15,1.0,0.15),Color("ffd16d"))
-   if c.block and level>0:
+    Art.place(geometry,"roof",base+Vector3.UP*1.55,Vector3(0.98,0.3,0.98),false,level==1)
+   if level>0 and c.get("light",0)>0: Art.place(geometry,"torch",base,Vector3(0.2,0.9,0.2),true,level==1)
+   var key=Art.terrain_key(c)
+   if level>0 and key!="":
+    var structure=Art.place(geometry,key,base,Art.terrain_size(key),false,level==1)
+    structure.set_meta("terrain_cell",i)
+    if key in ["wall","window","door","palisade"]:
+     # Fit walls to the persisted blocker chain, without inventing new geometry.
+     var above=battle.Visibility.cell(battle,c.x,c.y-1)
+     var below=battle.Visibility.cell(battle,c.x,c.y+1)
+     if above.get("block",false) or below.get("block",false): structure.rotation.y=PI/2
+     if key=="door" and c.get("open",false):
+      structure.rotation.y+=PI/2;structure.position.x+=0.35
+   elif c.block and level>0:
     var obstacle=Color(obstacles.get(c.kind,"8c8170")) if not c.door else Color("8e663f")
     var structure=box(geometry,Vector3(c.x,0.65+c.elevation*0.5,c.y),Vector3(0.85,1.25 if c.kind!="window" else 0.5,0.85),obstacle.darkened(0.65) if level==1 else obstacle)
     structure.set_meta("terrain_cell",i)
    elif c.cover>0 and level>0:
     box(geometry,Vector3(c.x,0.3+c.elevation*0.5,c.y),Vector3(0.9,0.5,1.1 if c.kind=="tent" else 0.4),Color("8a7356").darkened(0.65) if level==1 else Color("8a7356"))
+   if c.kind=="floor" and level>0: Art.place(geometry,"floor",base,Vector3(0.94,0.04,0.94),false,level==1)
   instance.multimesh=multi
   geometry.add_child(instance)
  else:
@@ -132,20 +146,20 @@ func redraw() -> void:
   piles[key].count+=1
  for pile in piles.values():
   var height=battle.tile(pile.x,pile.y).elevation*0.5
-  var loot=box(geometry,Vector3(pile.x,height+0.2,pile.y),Vector3(0.35,0.25,0.35),Color("e7c969"))
+  var loot=Art.place(geometry,"loot",Vector3(pile.x,height+0.07,pile.y),Vector3(0.35,0.3,0.35))
   loot.set_meta("ground_pile",true)
  for u in battle.t.units:
   if u.person.hp<=0: continue
   if u.team!="company" and not battle.known("company",u.id): continue
   var elevation=battle.tile(u.x,u.y).elevation*0.5
-  var mesh=MeshInstance3D.new()
-  if u.role=="cart":
-   var cart=BoxMesh.new();cart.size=Vector3(1.1,0.7,0.8);mesh.mesh=cart
-  else:
-   var capsule=CapsuleMesh.new();capsule.radius=0.24;capsule.height=1.2;mesh.mesh=capsule
-  mesh.material_override=material(Color("74cbe3") if u.team=="company" else Color("e77b62"))
-  mesh.position=Vector3(u.x,elevation+0.7,u.y)
-  geometry.add_child(mesh)
+  Art.actor(geometry,u,Vector3(u.x,elevation+0.07,u.y))
+  # Team and selection use an independent marker, preserving readable allegiance.
+  var marker=MeshInstance3D.new()
+  var disk=CylinderMesh.new();disk.top_radius=0.34;disk.bottom_radius=0.34;disk.height=0.025
+  marker.mesh=disk
+  marker.material_override=material(Color("74cbe3") if u.team=="company" else Color("e77b62"))
+  marker.position=Vector3(u.x,elevation+0.075,u.y)
+  geometry.add_child(marker)
   var label=Label3D.new()
   label.text="%s\n%d HP · %d AP" % [u.person.name,u.person.hp,u.ap]
   label.font_size=32

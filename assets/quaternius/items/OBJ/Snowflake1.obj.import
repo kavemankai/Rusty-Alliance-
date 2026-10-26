@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://b58lga8qu58uu"
+path="res://.godot/imported/Snowflake1.obj-98a3119055ff9aa955265d2ef061a2fd.mesh"
+
+[deps]
+
+files=["res://.godot/imported/Snowflake1.obj-98a3119055ff9aa955265d2ef061a2fd.mesh"]
+
+source_file="res://assets/quaternius/items/OBJ/Snowflake1.obj"
+dest_files=["res://.godot/imported/Snowflake1.obj-98a3119055ff9aa955265d2ef061a2fd.mesh", "res://.godot/imported/Snowflake1.obj-98a3119055ff9aa955265d2ef061a2fd.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

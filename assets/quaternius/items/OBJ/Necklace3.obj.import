@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://davuirrr53jsa"
+path="res://.godot/imported/Necklace3.obj-2938213469f1cea407c6e01e5cd2c7af.mesh"
+
+[deps]
+
+files=["res://.godot/imported/Necklace3.obj-2938213469f1cea407c6e01e5cd2c7af.mesh"]
+
+source_file="res://assets/quaternius/items/OBJ/Necklace3.obj"
+dest_files=["res://.godot/imported/Necklace3.obj-2938213469f1cea407c6e01e5cd2c7af.mesh", "res://.godot/imported/Necklace3.obj-2938213469f1cea407c6e01e5cd2c7af.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

@@ -1,5 +1,7 @@
 # Reference source audit
 
+2026-10-26 art update: the visual presentation uses the separately supplied Quaternius CC0 archive, not research-repository assets. `assets/quaternius/manifest.json` records source entries, hashes and repaired dependency aliases. ASSET_COVERAGE.md records library versus runtime coverage. Simulation rules and the source relationships audited below are unchanged by the art pass.
+
 Repository: https://github.com/kavemankai/jaggedalliance2.git
 Inspected revision: 9bec381bcaec845361e13f95098faaf294435acd
 Inspection date: 2026-10-25. The reference checkout lives outside this deliverable under work/ja2-reference.

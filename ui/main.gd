@@ -3,6 +3,7 @@ const Campaign=preload("res://sim/campaign.gd")
 const Data=preload("res://sim/catalog.gd")
 const MapView=preload("res://ui/world_map.gd")
 const BattleView=preload("res://ui/battle_view.gd")
+const Icons=preload("res://ui/asset_icons.gd")
 var game
 var ui: Control
 var header: Label
@@ -59,6 +60,10 @@ func button(parent: Node,title: String,callback: Callable) -> Button:
  b.clip_text=true
  b.tooltip_text=title
  b.custom_minimum_size=Vector2(0,48)
+ for resource in ["food","medicine","tools","horse","cart"]:
+  if resource in title.to_lower():
+   b.icon=Icons.get_icon(resource);b.expand_icon=true;b.add_theme_constant_override("icon_max_width",36)
+   break
  b.size_flags_horizontal=Control.SIZE_EXPAND_FILL
  parent.add_child(b)
  b.pressed.connect(callback,CONNECT_DEFERRED)
@@ -78,7 +83,7 @@ func menu() -> void:
  box.position=Vector2(-230,-210)
  box.size=Vector2(460,420)
  ui.add_child(box)
- label(box,"THE BROKEN MARCHES\nMedieval mercenary campaign\nGodot 4.6 · mechanical greybox")
+ label(box,"THE BROKEN MARCHES\nMedieval mercenary campaign\nQuaternius asset preview · 0.12")
  button(box,"New campaign",func():game=Campaign.new(); tab="sector"; rebuild())
  button(box,"Load campaign",func():
   game=Campaign.new()
@@ -312,7 +317,8 @@ func company_panel() -> void:
   if m.get("captured",false):
    label(side,m.name+" · captured")
    continue
-  button(side,("● " if selected==m.id else "")+m.name+" · "+m.background,func():selected=m.id;show_panel())
+  var recruit=button(side,("● " if selected==m.id else "")+m.name+" · "+m.background,func():selected=m.id;show_panel())
+  recruit.icon=Icons.get_icon(m.background);recruit.expand_icon=true;recruit.add_theme_constant_override("icon_max_width",44)
   if selected!=m.id: continue
   label(side,"HP %d/%d · AP %d · Morale %d\nFatigue %d · Wounds %d · Bleed %d\nSTR %d AGI %d DEX %d END %d\nPER %d WIS %d LEAD %d EXP %d\nMelee %d Ranged %d Medical %d Smith %d\n%s / %s · weight %d\n%d crowns/day" % [m.hp,m.max_hp,Data.ap(m),m.morale,m.fatigue,m.wounds,m.bleeding,m.strength,m.agility,m.dexterity,m.endurance,m.perception,m.wisdom,m.leadership,m.experience,m.melee,m.ranged,m.medical,m.smithing,Data.weapon(m),Data.armour(m),Data.weight(m),m.wage])
   if not m.hired: button(side,"Hire · %d crowns / 7 days" % m.fee,run_command.bind("hire",{"id":m.id,"squad":squad}))
@@ -338,7 +344,8 @@ func inventory_panel() -> void:
    var slot=""
    for key in m.equipment:
     if m.equipment[key]==entry.id: slot=key
-   button(side,Data.item_label(entry)+(" · "+slot if slot!="" else ""),func():inspected_item=entry.id;show_panel())
+   var item_button=button(side,Data.item_label(entry)+(" · "+slot if slot!="" else ""),func():inspected_item=entry.id;show_panel())
+   item_button.icon=Icons.item(entry);item_button.expand_icon=true;item_button.add_theme_constant_override("icon_max_width",40)
    if inspected_item!=entry.id: continue
    if slot!="": button(side,"Unequip to backpack",run_command.bind("unequip",{"id":selected,"slot":slot}))
    elif entry.kind!="ammo": button(side,"Equip carried item",run_command.bind("equip",{"id":selected,"item":entry.id}))
@@ -350,8 +357,10 @@ func inventory_panel() -> void:
       button(side,"Give to "+other.name,run_command.bind("transfer",{"from":selected,"to":other.id,"item":entry.id}))
  label(side,"ASHFORD STOCKPILE · visit to collect")
  for item in game.s.stash:
-  button(side,"Take "+Data.item_label(item),run_command.bind("transfer",{"from":"stash","to":selected,"item":item.id}))
-  button(side,"Equip "+Data.item_label(item),run_command.bind("equip",{"id":selected,"item":item.id}))
+  var take=button(side,"Take "+Data.item_label(item),run_command.bind("transfer",{"from":"stash","to":selected,"item":item.id}))
+  take.icon=Icons.item(item);take.expand_icon=true;take.add_theme_constant_override("icon_max_width",40)
+  var equip=button(side,"Equip "+Data.item_label(item),run_command.bind("equip",{"id":selected,"item":item.id}))
+  equip.icon=Icons.item(item);equip.expand_icon=true;equip.add_theme_constant_override("icon_max_width",40)
  label(side,"MARKET · visit Ashford")
  for item in ["food","medicine","tools","ammo","arrows","bolts","javelins","stone","shield","helmet","sword","spear","axe","mace","bow","crossbow","mail","plate"]:
   var price=Data.WEAPONS[item].price if Data.WEAPONS.has(item) else (Data.ARMOUR[item].price if Data.ARMOUR.has(item) else {"food":20,"medicine":30,"tools":25,"ammo":15,"shield":65,"helmet":45,"arrows":15,"bolts":15,"javelins":15,"stone":5}[item])

@@ -2261,3 +2261,25 @@ https://dl.google.com/dl/android/maven2/androidx/documentfile/documentfile/1.1.0
 https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-stdlib/2.1.20/kotlin-stdlib-2.1.20.pom
 
 No project-authored game licence is granted by these notices. A commercial distribution still requires the project's independent rights and complete dependency-notice review.
+
+
+--- Quaternius art assets ---
+Source: user-supplied All in One - Quaternius[Patreon].zip
+Files: assets/quaternius/*; thumbnails rendered from those models in assets/ui/icons/*
+------------------------------------------------------
+Models by @Quaternius
+Consider supporting me on Patreon!
+
+https://www.patreon.com/quaternius
+-------------------------------------------------------
+
+License:
+CC0 1.0 Universal (CC0 1.0)
+Public Domain Dedication
+https://creativecommons.org/publicdomain/zero/1.0/
+
+-------------------------------------------------------
+Join the Discord Server:
+https://discord.gg/vJqnRUYRfT
+
+https://quaternius.com
