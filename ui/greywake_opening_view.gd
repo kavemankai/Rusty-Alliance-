@@ -19,7 +19,7 @@ func panel_style() -> StyleBoxFlat:
  style.border_color=Color("a48a5b");style.set_border_width_all(1);style.set_content_margin_all(14)
  return style
 func frame(parent: Node) -> VBoxContainer:
- var shell=PanelContainer.new();shell.add_theme_stylebox_override("panel",panel_style());parent.add_child(shell)
+ var shell=PanelContainer.new();shell.mouse_filter=MOUSE_FILTER_PASS;shell.add_theme_stylebox_override("panel",panel_style());parent.add_child(shell)
  shell.size_flags_horizontal=SIZE_EXPAND_FILL
  var box=VBoxContainer.new();box.add_theme_constant_override("separation",7);shell.add_child(box);return box
 func text(parent: Node,value: String,font_size: int=18) -> Label:
@@ -136,6 +136,7 @@ func populate_profile(profile: VBoxContainer,rows: Array) -> void:
   if candidate.id==app.tavern_selected: row=candidate
  text(profile,row.name,24);text(profile,row.background.capitalize()+" · "+row.tier.capitalize(),18)
  var portrait=TextureRect.new();portrait.texture=ICONS.get_icon(row.background);portrait.custom_minimum_size=Vector2(72,72);portrait.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;portrait.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+ portrait.mouse_filter=MOUSE_FILTER_IGNORE
  portrait.tooltip_text="Temporary role illustration; an identity-matched portrait is not supplied.";profile.add_child(portrait)
  text(profile,"Role portrait",13)
  if row.has("biography"): text(profile,row.biography,16)

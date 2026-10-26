@@ -16,7 +16,7 @@ class Device:
    except (ValueError,RuntimeError): time.sleep(1)
   raise RuntimeError('No Android QA telemetry; enable the read-only debug observer first')
  def fresh(self,after_ticks):
-  for retry in range(30):
+  for retry in range(300):
    state=self.state()
    if state['ticks']!=after_ticks: return state
    time.sleep(0.1)

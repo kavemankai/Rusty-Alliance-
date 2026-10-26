@@ -69,6 +69,9 @@
     "Initial island run exited with signal 11 despite assertions; only clean repeat runs accepted.",
     "Headless opening UI invocation lacked a GUI and errored; GUI repeat passed 221/0.",
     "First player exports omitted SVG plates; explicitly selected and rebuilt; outside-project pack smoke passed.",
-    "Android startup observer initially stale; helper now waits for post-input telemetry before assertions."
-  ]
+    "Android startup observer initially stale; helper now waits for post-input telemetry before assertions.",
+    "First Android lifecycle retry exceeded the short telemetry timeout during 3D reload; only the later complete scenario is accepted.",
+    "Android tavern swipe could not reveal Hire because PanelContainer consumed drag events; event propagation fixed and a new final APK exported. Pre-fix native results are excluded from final artifact acceptance."
+  ],
+  "engine": "Godot 4.6.2 stable standard"
 }
