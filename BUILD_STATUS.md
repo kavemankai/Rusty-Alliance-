@@ -2,7 +2,7 @@
 
 **Playable integrated slice delivered; full production foundation incomplete.**
 
-Current development build: **0.13.0-skills-preview**. Seven functional skills, selected-skill training, compatible save normalization and validated repeatable recruiting infrastructure are implemented. **Full Greywake acceptance remains open because the finalized twelve-template workshop statistics were not supplied.** New Greywake creation is disabled rather than populated with invented data. See GREYWAKE_SKILLS.md and GREYWAKE_QA.md; original campaign identities and starting company remain intact.
+Current development build: **0.14.0-greywake-recruitment**. The approved twelve-profile roster, paid two-to-six-person opening selection, canonical loadouts and deterministic mainland shipping are implemented. New Greywake creation is enabled as a Dock Town staging scenario. Shipping uses Day 4 06:00, four-day intervals, exclusive 24-hour offshore deadlines and actual-docking 48-hour offers. See GREYWAKE_RECRUITMENT_STATUS.md for test counts and remaining acceptance: the 10×10 island map, authored recovery work/travel, broader Greywake content and physical Android testing remain unfinished. Original campaign identities, starting company and renewal accounting remain intact.
 
 Target repository was empty when cloned. Godot source, tests, documentation and the asset inventory are tracked in this directory; origin is https://github.com/kavemankai/Rusty-Alliance-.git. Generated builds and local development tools are stored separately from the source repository.
 

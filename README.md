@@ -1,3 +1,7 @@
+# Current preview: 0.14.0 Greywake recruitment
+
+Choose **New Greywake campaign** to hire two to six paid fighters from the approved roster, then land at Dock Town. Mainland replacement ships arrive on a fixed four-day calendar. The original campaign remains available under **New campaign**. Greywake currently exposes a staging port; its authored island, contracts, recovery economy and endings are later work. See [Greywake status and tests](GREYWAKE_RECRUITMENT_STATUS.md).
+
 # The Broken Marches
 
 **0.13.0 skills preview:** Stealth, Fieldcraft and Athletics now join the original four skills, with selected-skill training and compatible saves. The original campaign remains playable. Greywake recruiting infrastructure is tested, but the actual finalized workshop roster is still required; new Greywake creation is disabled until supplied. See [GREYWAKE_SKILLS.md](GREYWAKE_SKILLS.md) and [GREYWAKE_QA.md](GREYWAKE_QA.md). Test-only names/statistics are not shipped as a production roster.

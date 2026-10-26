@@ -68,3 +68,8 @@ Reference remains revision 9bec381bcaec845361e13f95098faaf294435acd. The followi
 The technical audit covers the requested principal system relationships, with explicit independent replacements and test pointers. It does not establish exact numeric parity or a legally certified clean-room process. Engine/runtime notices are generated from the installed standard engine using scripts/export_notices.gd. scripts/audit_release.py checks release contents, a tracked-source hash manifest, byte-identical reference files and signing-material exclusion. Its limits are part of the resulting report.
 
 Commercial rights review, final release signing/distribution approval and physical hardware acceptance remain separate gates. Contract acceptance gaps found during this audit are recorded in CONTRACT_ACCEPTANCE.md; these are not silently relabelled optional.
+
+
+## 0.14.0 Greywake recruitment follow-up
+
+The exact user-supplied twelve-template baseline is implemented as original project data, with a separate production scenario, paid opening company, canonical carried weapons and deterministic scheduled mainland offers. No external source code or weapon statistics were imported. See GREYWAKE_RECRUITMENT_STATUS.md for evidence, strict deadline/ownership/save rules and explicit upstream island/recovery limitations. Original campaign, combat formulas, AI knowledge and renewal accounting are preserved.

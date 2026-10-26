@@ -1,3 +1,11 @@
+# Current Greywake milestone — 0.14.0
+
+The exact roster has now been supplied and implemented. New Greywake creation, paid pre-voyage selection and scheduled mainland recruitment are enabled. See [current implementation and verification](GREYWAKE_RECRUITMENT_STATUS.md) and [approved shipping specification](GREYWAKE_RECRUITMENT_SHIPPING_SPEC.md). The island map and recovery economy remain upstream acceptance work.
+
+---
+
+## Historical 0.13 record (superseded status)
+
 # Greywake skill system — implementation and open acceptance
 
 2026-10-26 · 0.13.0-skills-preview

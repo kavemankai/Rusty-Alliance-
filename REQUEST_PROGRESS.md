@@ -29,3 +29,8 @@ Phases 7 and 8 add typed event/financial/assignment records, structural prefligh
 
 
 The 9/10 follow-up adds native Android gestures, touch cancellation/pause cleanup, safe-area handling, scroll propagation fixes, repeatable OS-input testing and explicit acceptance gaps. See ANDROID_QA.md and CONTRACT_ACCEPTANCE.md. Emulator acceptance is scoped separately from physical-phone acceptance.
+
+
+## 0.14.0 Greywake recruitment follow-up
+
+The exact user-supplied twelve-template baseline is implemented as original project data, with a separate production scenario, paid opening company, canonical carried weapons and deterministic scheduled mainland offers. No external source code or weapon statistics were imported. See GREYWAKE_RECRUITMENT_STATUS.md for evidence, strict deadline/ownership/save rules and explicit upstream island/recovery limitations. Original campaign, combat formulas, AI knowledge and renewal accounting are preserved.

@@ -24,6 +24,7 @@ $jar=Join-Path $qaRoot ('marches-gesture-'+[guid]::NewGuid().ToString('N')+'.jar
 [IO.Compression.ZipFile]::CreateFromDirectory($dexRoot,$jar)
 & $adb -s $Serial wait-for-device
 Assert-Native 'Emulator availability'
+& $adb -s $Serial shell am force-stop org.brokenmarches.foundation
 & $adb -s $Serial install -r $Apk
 Assert-Native 'APK installation'
 & $adb -s $Serial shell run-as org.brokenmarches.foundation mkdir -p files
@@ -32,6 +33,8 @@ Assert-Native 'QA directory creation'
 Assert-Native 'Read-only observer opt-in'
 & $adb -s $Serial push $jar /data/local/tmp/marches-gesture.jar
 Assert-Native 'OS gesture helper deployment'
+& $adb -s $Serial shell run-as org.brokenmarches.foundation rm -f files/mobile-qa.json
+Assert-Native 'Stale observer cleanup'
 & $adb -s $Serial shell am start -a android.intent.action.MAIN -c android.intent.category.LAUNCHER -p org.brokenmarches.foundation
 Assert-Native 'Android launcher'
 Write-Output 'Dedicated emulator ready. Dismiss the Android full-screen first-launch hint if present, then run android_smoke.py basic, gestures, android_tactical_smoke.py, and android_smoke.py lifecycle.'

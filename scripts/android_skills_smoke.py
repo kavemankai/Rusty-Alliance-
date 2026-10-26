@@ -25,7 +25,7 @@ try:
  d.shell('am','start','-a','android.intent.action.MAIN','-c','android.intent.category.LAUNCHER','-p',d.package)
  d.wait_button('New campaign')
  s=d.state()
- d.check(any(b['text']=='New Greywake campaign' and b['disabled'] for b in s['buttons']),'Unsupplied workshop roster cannot start a fabricated production scenario')
+ d.check(any(b['text']=='New Greywake campaign' and not b['disabled'] for b in s['buttons']),'Approved workshop roster enables a separate production Greywake scenario')
  d.click('New campaign');d.click('Company');d.click('● Mara');d.click('Train Stealth')
  m=d.state()['game']['mercs']['mara']
  d.check(len(m['skills'])==7 and m['training_skill']=='stealth','Native touch selects Stealth and the character has seven skills')
@@ -79,7 +79,7 @@ finally:
  except Exception as report_error:
   d.check(False,'Emulator report: '+str(report_error))
   report={'scenario':'skills','passed':sum(c['passed'] for c in d.checks),'failed':sum(not c['passed'] for c in d.checks),'checks':d.checks,'limits':['Emulator connection failed; this run is not accepted.']}
- report['greywake_roster']='Synthetic test fixture only; finalized workshop roster is not available.'
+ report['greywake_roster']='Legacy infrastructure test uses an isolated synthetic fixture; production roster is tested separately.'
  (Path(a.output)/'skills-results.json').write_text(json.dumps(report,indent=2),encoding='utf-8')
  print(json.dumps(report),flush=True)
 raise SystemExit(1 if report['failed'] else 0)

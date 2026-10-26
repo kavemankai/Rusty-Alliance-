@@ -179,6 +179,6 @@ func run() -> void:
  check(estimate==6,"Withdrawal preview uses provisional unknown terrain rather than hidden Fieldcraft cost")
  hidden_board.tile(1,2).block=true
  check(hidden_board.Combat.risk(hidden_board,explorer,1,2).disengage_ap==estimate,"Hidden blocker changes cannot leak through the withdrawal AP preview")
- var report={"passed":passed,"failed":failures.size(),"failures":failures,"roster_source":"synthetic test fixture only; finalized workshop table is not supplied"}
+ var report={"passed":passed,"failed":failures.size(),"failures":failures,"roster_source":"legacy infrastructure fixture; production baseline tested in tests/greywake.gd"}
  var file=FileAccess.open("res://skills-test-results.json",FileAccess.WRITE);file.store_string(JSON.stringify(report,"  "));file.close()
  print("SKILLS: "+JSON.stringify(report));quit(0 if failures.is_empty() else 1)

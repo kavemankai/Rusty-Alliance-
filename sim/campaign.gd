@@ -1,5 +1,6 @@
 extends RefCounted
 const Records=preload("res://sim/records.gd")
+const Shipping=preload("res://sim/greywake_shipping.gd")
 const Recruitment=preload("res://sim/recruitment.gd")
 var initial_state_hash=""
 const SaveGuard=preload("res://sim/save_guard.gd")
@@ -78,6 +79,41 @@ func configure_new_greywake(templates: Array) -> bool:
  if autosave_path=="user://autosave.json": autosave_path="user://greywake-autosave.json"
  return true
 
+# Production Greywake entry is distinct from the legacy synthetic-infrastructure API.
+func configure_fall_of_greywake() -> bool:
+ if not configure_new_greywake(Recruitment.workshop_templates()): return false
+ s.scenario="fall_of_greywake"
+ s.opening_voyage={"phase":"hiring","capacity":6,"paid":{},"company":[],"landed_at":0}
+ s.jobs=[];s.groups=[];s.stash=[]
+ s.events=s.events.filter(func(e):return e.kind=="hour")
+ for cell in s.sectors:
+  cell.owner="free";cell.facility="";cell.known=false;cell.name="Island terrain pending"
+ s.sectors[17].merge({"name":"Dock Town","owner":"company","facility":"market","known":true},true)
+ Shipping.initialize(self)
+ return true
+
+func embark_greywake() -> bool:
+ if not Recruitment.opening(s): return reject("The opening voyage has already departed")
+ var q=s.squads.first
+ if q.members.size()<2 or q.members.size()>6: return reject("Choose two to six hired mercenaries before departure")
+ for id in q.members:
+  if not s.mercs[id].hired or s.mercs[id].dead or not s.opening_voyage.paid.has(id): return reject("Invalid opening company")
+ s.opening_voyage.phase="arrived";s.opening_voyage.company=q.members.duplicate();s.opening_voyage.landed_at=s.time
+ q.sector=Shipping.dock(s)
+ for id in q.members: s.mercs[id].mainland_hired=true
+ note("The selected company arrived together at Dock Town. Mainland reinforcements first arrive Day 4 at 06:00.")
+ return true
+
+func cancel_opening_hire(id: String) -> bool:
+ if not Recruitment.opening(s) or not s.opening_voyage.paid.has(id): return reject("No refundable opening reservation")
+ var fee=s.opening_voyage.paid[id]
+ remove_member(id);s.events=s.events.filter(func(e):return not (e.kind=="employment" and e.payload.id==id))
+ s.opening_voyage.paid.erase(id)
+ record(fee,"Cancel opening reservation "+s.mercs[id].name)
+ s.mercs[id].expires=0
+ if s.mercs[id].tier=="cheap": s.mercs.erase(id)
+ return true
+
 func note(message: String) -> void:
  s.log.append(message)
  if s.log.size() > 60: s.log.pop_front()
@@ -101,17 +137,26 @@ func reject(message: String) -> bool:
 
 func command(kind: String, p: Dictionary = {}) -> bool:
  error = ""
+ if Recruitment.opening(s) and kind not in ["hire","recruit_template","cancel_opening_hire","embark","save","load"]: return reject("Choose the opening company before campaign actions")
  match kind:
+  "embark": return embark_greywake()
+  "cancel_opening_hire": return cancel_opening_hire(p.get("id",""))
+  "hire_offer":
+   if not p.get("offer","") is String or not p.get("squad","first") is String: return reject("Choose a vessel offer and squad")
+   return Shipping.hire(self,p.get("offer",""),p.get("squad","first"))
   "recruit_template":
    if not p.get("template","") is String or not p.get("squad","first") is String: return reject("Choose a recruit template and squad")
    return Recruitment.recruit(self,p.get("template",""),p.get("squad","first"))
   "visit", "leave", "transport", "prisoner": return Operations.run(self,kind,p)
   "hire":
+   if Shipping.applies(s) and not Recruitment.opening(s): return reject("Hire through a docked mainland vessel offer")
+   if Recruitment.opening(s) and s.squads.first.members.size()>=6: return reject("Opening transport holds six mercenaries")
    if battle != null: return reject("Resolve battle first")
    if not s.mercs.has(p.get("id","")): return reject("Unknown recruit")
    var m = s.mercs[p.id]
    var q = s.squads.get(p.get("squad","first"),{})
    if m.hired or m.dead or m.get("captured",false) or s.funds < m.fee or q.is_empty() or q.sector != 17 or not q.route.is_empty(): return reject("Recruit an available fighter at Ashford with sufficient funds")
+   if Recruitment.opening(s): s.opening_voyage.paid[m.id]=m.fee
    record(-m.fee,"Hire " + m.name)
    m.hired = true
    m.expires = s.time + 7*1440
@@ -253,7 +298,7 @@ func command(kind: String, p: Dictionary = {}) -> bool:
  return true
 
 func default_save_path() -> String:
- return "user://greywake.json" if s.get("scenario","")=="greywake" else "user://campaign.json"
+ return "user://greywake.json" if Recruitment.is_greywake(s) else "user://campaign.json"
 
 func remove_member(id: String) -> void:
  s.mercs[id].hired = false
@@ -309,6 +354,7 @@ func strategic_path(start: int, goal: int, q: Dictionary) -> Array:
  return []
 
 func advance(minutes: int) -> bool:
+ if Recruitment.opening(s): return reject("Choose the opening company before time advances")
  if minutes <= 0 or minutes > 43200: return reject("Advance 1 to 43200 minutes")
  if battle != null or not s.encounter.is_empty(): return reject("Time paused by encounter")
  var target = s.time+minutes
@@ -318,6 +364,7 @@ func advance(minutes: int) -> bool:
   if event.kind == "hour":
    hourly()
    schedule(s.time+60,"hour",{})
+  elif event.kind in Shipping.EVENT_KINDS: Shipping.process(self,event)
   elif event.kind == "arrival": arrive(event.payload.squad,event.payload.get("token",-1))
   elif event.kind == "employment":
    var m=s.mercs.get(event.payload.id,{})
@@ -325,6 +372,7 @@ func advance(minutes: int) -> bool:
     remove_member(m.id)
     note(m.name+" contract expired")
   elif event.kind == "deadline": Contracts.tick(self)
+  Shipping.access_changed(self)
   Contracts.tick(self)
   if not s.encounter.is_empty(): return true
  s.time = target
@@ -549,6 +597,7 @@ func faction_tick() -> void:
     for p in sector.levies:
      if p.hp>0: p.captured=true
     sector.owner=g.faction
+    Shipping.access_changed(self)
     note(g.faction+" captured "+sector.name)
    else:
     var casualties=int(ceil(force_strength(g)/2.0))
@@ -658,6 +707,7 @@ func resolve_battle(retreat: bool) -> bool:
   u.person.morale=clampi(u.person.morale+(8 if victory else -15),0,100)
  if victory:
   sector.owner="company"
+  Shipping.access_changed(self)
   sector.cleared=true
   Operations.rescue(self,sector.id)
   for g in s.groups:
@@ -703,6 +753,7 @@ func resolve_battle(retreat: bool) -> bool:
    for g in s.groups:
     if g.sector==sector.id and g.faction!="company" and force_strength(g)>0:
      sector.owner=g.faction
+     Shipping.access_changed(self)
      break
  for g in s.groups:
   if g.sector==sector.id and g.faction!="company": record_group_losses(g)
@@ -776,7 +827,7 @@ func load_from(path: String) -> bool:
  s=normalize_numbers(data)
  initial_state_hash=""
  if autosave_path in ["user://autosave.json","user://greywake-autosave.json"]:
-  autosave_path="user://greywake-autosave.json" if s.get("scenario","")=="greywake" else "user://autosave.json"
+  autosave_path="user://greywake-autosave.json" if Recruitment.is_greywake(s) else "user://autosave.json"
  Contracts.normalize(s)
  battle=null
  if not s.battle.is_empty():
@@ -804,7 +855,7 @@ func load_from(path: String) -> bool:
 func valid_save(data: Variant) -> bool:
  if not SaveGuard.raw(data) or not SaveGuard.records(data): return false
  if not data is Dictionary: return false
- if not Recruitment.valid_state(data): return false
+ if not Recruitment.valid_state(data) or not Shipping.valid(data): return false
  for key in ["version","sectors","mercs","squads","events","rng","time","battle","encounter","funds","jobs","ledger","stash","groups","factions","log","next_event","result"]:
   if not data.has(key): return false
  if data.version!=3 or not data.has_all(["next_item","next_levy","stash_sector","pending_encounters"]) or not data.sectors is Array or data.sectors.size()!=256 or not data.mercs is Dictionary or not data.squads is Dictionary: return false

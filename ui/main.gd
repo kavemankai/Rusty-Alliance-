@@ -25,6 +25,8 @@ var last_message=""
 var save_slot="user://campaign.json"
 var inspected_item=""
 var supply_amount=5
+var shipping_alert=""
+var port_status: Label
 var confirm: ConfirmationDialog
 
 func _ready() -> void:
@@ -83,11 +85,11 @@ func menu() -> void:
  box.position=Vector2(-230,-210)
  box.size=Vector2(460,420)
  ui.add_child(box)
- label(box,"THE BROKEN MARCHES\nMedieval mercenary campaign\nSeven-skill preview · 0.13")
+ label(box,"THE BROKEN MARCHES\nMedieval mercenary campaign\nGreywake recruitment preview · 0.14")
  button(box,"New campaign",func():game=Campaign.new();save_slot="user://campaign.json";selected="mara";squad="first";tab="sector";rebuild())
  var greywake=button(box,"New Greywake campaign",func():
   var candidate=Campaign.new()
-  if candidate.configure_new_greywake(Campaign.Recruitment.workshop_templates()):
+  if candidate.configure_fall_of_greywake():
    game=candidate;game.autosave_path="user://greywake-autosave.json";save_slot="user://greywake.json"
    selected="";squad="first";tab="company";rebuild())
  greywake.disabled=Campaign.Recruitment.workshop_templates().is_empty()
@@ -111,13 +113,15 @@ func menu() -> void:
 
 func open_greywake(path: String) -> void:
  var candidate=Campaign.new()
- if not candidate.command("load",{"path":path}) or candidate.s.get("scenario","")!="greywake":
+ if not candidate.command("load",{"path":path}) or not Campaign.Recruitment.is_greywake(candidate.s):
   var dialog=AcceptDialog.new();dialog.dialog_text="Unable to load the Greywake save. "+candidate.error
   ui.add_child(dialog);dialog.popup_centered();return
  game=candidate;game.autosave_path="user://greywake-autosave.json";save_slot="user://greywake.json"
  selected="";squad="first";tab="company";rebuild()
 
 func rebuild() -> void:
+ if Campaign.Recruitment.opening(game.s):
+  opening_screen();return
  target=""
  destination={}
  aim=0
@@ -130,14 +134,28 @@ func rebuild() -> void:
  header=label(root,"")
  var nav=HBoxContainer.new()
  root.add_child(nav)
- for item in [["Map","sector"],["Operations","operations"],["Company","company"],["Contracts","contracts"],["Inventory","inventory"],["Supplies","supplies"],["Ledger","ledger"],["Inspector","debug"],["Settings","settings"]]:
+ var navigation=[["Map","sector"],["Operations","operations"],["Company","company"],["Contracts","contracts"],["Inventory","inventory"],["Supplies","supplies"],["Ledger","ledger"],["Inspector","debug"],["Settings","settings"]]
+ if Campaign.Shipping.applies(game.s): navigation=[["Dock Town","harbour"],["Company","company"],["Inventory","inventory"],["Supplies","supplies"],["Ledger","ledger"],["Settings","settings"]]
+ if Campaign.Shipping.applies(game.s) and game.battle!=null:
+  navigation.push_front(["Battle","sector"])
+  if tab=="harbour": tab="sector"
+ for item in navigation:
   button(nav,item[0],change_tab.bind(item[1]))
  content=HBoxContainer.new()
  content.size_flags_vertical=Control.SIZE_EXPAND_FILL
  root.add_child(content)
  map_view=null
  battle_view=null
- if game.battle==null:
+ if game.battle==null and Campaign.Shipping.applies(game.s):
+  var port=VBoxContainer.new();port.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+  content.add_child(port)
+  label(port,"DOCK TOWN · Recruitment port\nThe Fall of Greywake")
+  port_status=label(port,"")
+  label(port,"The 10×10 island map and its routes are a later milestone. Company, inventory and scheduled mainland recruitment are available here.")
+  button(port,"Recruitment harbour",func():change_tab("harbour"))
+  button(port,"Visit Dock Town",run_command.bind("visit",{"squad":squad}))
+  if tab in ["sector","contracts","operations"]: tab="harbour"
+ elif game.battle==null:
   map_view=MapView.new()
   map_view.campaign=game
   map_view.selected=sector
@@ -174,8 +192,8 @@ func rebuild() -> void:
   button(bar,"Pause",func():auto_minutes=0; status("Time paused"))
   button(bar,"Run ×1",func():auto_minutes=10)
   button(bar,"Run ×6",func():auto_minutes=60)
-  button(bar,"−",func():map_view.zoom=clampf(map_view.zoom/1.15,0.65,2.8);map_view.queue_redraw())
-  button(bar,"+",func():map_view.zoom=clampf(map_view.zoom*1.15,0.65,2.8);map_view.queue_redraw())
+  if map_view!=null: button(bar,"−",func():map_view.zoom=clampf(map_view.zoom/1.15,0.65,2.8);map_view.queue_redraw())
+  if map_view!=null: button(bar,"+",func():map_view.zoom=clampf(map_view.zoom*1.15,0.65,2.8);map_view.queue_redraw())
  else:
   if game.battle.t.phase=="deployment":
    button(bar,"Begin combat",func():run_command("confirm_deployment"))
@@ -213,6 +231,17 @@ func status(text: String) -> void:
 
 func refresh() -> void:
  var s=game.s
+ if Campaign.Shipping.applies(s):
+  if is_instance_valid(port_status):
+   var active="scheduled"
+   for vessel in s.shipping.vessels:
+    if vessel.arrival_at<=s.time: active=vessel.status
+   port_status.text="⚓ Harbour "+("open" if Campaign.Shipping.accessible(s) else "blockaded")+" · Vessel "+active+" · Next "+Campaign.Shipping.timestamp(s.shipping.next_arrival_at)
+  for i in range(s.log.size()-1,-1,-1):
+   var line=s.log[i]
+   if "OFFSHORE" in line or "HARBOUR REOPENED" in line or "REINFORCEMENTS LOST" in line or "MAINLAND VESSEL ARRIVED" in line:
+    if shipping_alert!=line: shipping_alert=line;status(line)
+    break
  var pack=game.s.squads[squad].supplies
  var caption=game.s.squads[squad].name
  if game.battle!=null:
@@ -257,6 +286,7 @@ func show_panel() -> void:
   tactical_panel()
   return
  match tab:
+  "harbour": harbour_panel()
   "operations": operations_panel()
   "company": company_panel()
   "contracts": contracts_panel()
@@ -350,7 +380,9 @@ func company_panel() -> void:
   if selected!=m.id: continue
   label(side,"HP %d/%d · AP %d · Morale %d\nFatigue %d · Wounds %d · Bleed %d\nSTR %d AGI %d DEX %d END %d\nPER %d WIS %d LEAD %d EXP %d\nMelee %d Ranged %d Medical %d Smith %d\n%s / %s · weight %d\n%d crowns/day" % [m.hp,m.max_hp,Data.ap(m),m.morale,m.fatigue,m.wounds,m.bleeding,m.strength,m.agility,m.dexterity,m.endurance,m.perception,m.wisdom,m.leadership,m.experience,m.melee,m.ranged,m.medical,m.smithing,Data.weapon(m),Data.armour(m),Data.weight(m),m.wage])
   label(side,"Stealth %d · Fieldcraft %d · Athletics %d\nHiring fee %d crowns · daily wage %d crowns" % [m.stealth,m.fieldcraft,m.athletics,m.fee,m.wage])
-  if not m.hired: button(side,"Hire · %d crowns / 7 days" % m.fee,run_command.bind("hire",{"id":m.id,"squad":squad}))
+  if not m.hired:
+   if Campaign.Shipping.applies(game.s): label(side,"Mainland professional · requires a current vessel offer")
+   else: button(side,"Hire · %d crowns / 7 days" % m.fee,run_command.bind("hire",{"id":m.id,"squad":squad}))
   else:
    label(side,"Assignment: "+m.assignment)
    for value in ["rest","medical","training","repair","guard","scout","garrison"]: button(side,value.capitalize(),run_command.bind("assignment",{"id":m.id,"value":value}))
@@ -382,18 +414,18 @@ func inventory_panel() -> void:
    if slot!="": button(side,"Unequip to backpack",run_command.bind("unequip",{"id":selected,"slot":slot}))
    elif entry.kind!="ammo": button(side,"Equip carried item",run_command.bind("equip",{"id":selected,"item":entry.id}))
    if slot=="":
-    button(side,"Deposit at Ashford",run_command.bind("transfer",{"from":selected,"to":"stash","item":entry.id}))
+    button(side,"Deposit at Dock Town" if Campaign.Shipping.applies(game.s) else "Deposit at Ashford",run_command.bind("transfer",{"from":selected,"to":"stash","item":entry.id}))
     for other in game.s.mercs.values()+game.s.sectors[sector].levies:
      if other.get("hired",false) or other in game.s.sectors[sector].levies:
       if other.id==selected: continue
       button(side,"Give to "+other.name,run_command.bind("transfer",{"from":selected,"to":other.id,"item":entry.id}))
- label(side,"ASHFORD STOCKPILE · visit to collect")
+ label(side,"DOCK TOWN STOCKPILE · visit to collect" if Campaign.Shipping.applies(game.s) else "ASHFORD STOCKPILE · visit to collect")
  for item in game.s.stash:
   var take=button(side,"Take "+Data.item_label(item),run_command.bind("transfer",{"from":"stash","to":selected,"item":item.id}))
   take.icon=Icons.item(item);take.expand_icon=true;take.add_theme_constant_override("icon_max_width",40)
   var equip=button(side,"Equip "+Data.item_label(item),run_command.bind("equip",{"id":selected,"item":item.id}))
   equip.icon=Icons.item(item);equip.expand_icon=true;equip.add_theme_constant_override("icon_max_width",40)
- label(side,"MARKET · visit Ashford")
+ label(side,"MARKET · visit Dock Town" if Campaign.Shipping.applies(game.s) else "MARKET · visit Ashford")
  for item in ["food","medicine","tools","ammo","arrows","bolts","javelins","stone","shield","helmet","sword","spear","axe","mace","bow","crossbow","mail","plate"]:
   var price=Data.WEAPONS[item].price if Data.WEAPONS.has(item) else (Data.ARMOUR[item].price if Data.ARMOUR.has(item) else {"food":20,"medicine":30,"tools":25,"ammo":15,"shield":65,"helmet":45,"arrows":15,"bolts":15,"javelins":15,"stone":5}[item])
   button(side,"Buy %s · %d crowns" % [item,price],run_command.bind("buy",{"item":item,"squad":squad}))
@@ -598,3 +630,60 @@ func operations_panel() -> void:
    if prisoner.get("captured",false) and prisoner.hp>0 and not prisoner.get("released",false) and prisoner.get("captured_sector",g.sector)==q.sector:
     label(side,prisoner.name+" · detained")
     for choice in ["release","ransom","recruit"]: button(side,choice.capitalize()+" "+prisoner.name,run_command.bind("prisoner",{"id":prisoner.id,"choice":choice,"squad":squad}))
+
+func opening_action(kind: String,p: Dictionary={}) -> void:
+ if game.command(kind,p): last_message="Selection updated";rebuild()
+ else: last_message=game.error;opening_screen()
+
+func opening_screen() -> void:
+ auto_minutes=0;clear();map_view=null;battle_view=null
+ var root=VBoxContainer.new();root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);ui.add_child(root)
+ label(root,"THE FALL OF GREYWAKE · Mainland tavern · Pre-voyage company")
+ label(root,"%d crowns remaining · %d / 6 aboard · Choose at least TWO mercenaries. Hiring fees are charged now; wages are daily." % [game.s.funds,game.s.squads.first.members.size()])
+ var scroll=ScrollContainer.new();scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL;root.add_child(scroll)
+ var rows=VBoxContainer.new();rows.size_flags_horizontal=Control.SIZE_EXPAND_FILL;scroll.add_child(rows)
+ label(rows,"SELECTED COMPANY · refundable before departure")
+ for id in game.s.squads.first.members:
+  var m=game.s.mercs[id]
+  button(rows,"Remove "+m.name+" · refund "+str(m.fee),opening_action.bind("cancel_opening_hire",{"id":id}))
+ for row in game.s.recruitment.templates:
+  var box=VBoxContainer.new();rows.add_child(box)
+  label(box,"%s · %s · Fee %d · Wage %d/day%s" % [row.name,row.tier.capitalize(),row.fee,row.wage," · repeatable" if row.repeatable else " · unique"])
+  var details=[]
+  for key in Data.Skills.ATTRIBUTES+Data.Skills.ALL: details.append(key.capitalize()+" "+str(row.attributes.get(key,row.skills.get(key,0))))
+  label(box," · ".join(details))
+  label(box,"Equipment: "+row.weapon+", "+row.armour+(", shield" if row.get("shield",false) else "")+("; carried "+", ".join(row.get("secondary_weapons",[])) if not row.get("secondary_weapons",[]).is_empty() else "")+("; "+Data.ammo_kind_for(row.weapon) if row.get("ammo_quantity",0)>0 else ""))
+  var taken=not row.repeatable and game.s.mercs["greywake-named-"+row.id].hired
+  var hire=button(box,"Hire "+row.name,opening_action.bind("recruit_template" if row.repeatable else "hire",{"template":row.id,"id":"greywake-named-"+row.id,"squad":"first"}))
+  hire.disabled=taken or game.s.funds<row.fee or game.s.squads.first.members.size()>=6
+ var controls=HBoxContainer.new();root.add_child(controls)
+ button(controls,"Save selection",opening_action.bind("save",{"path":save_slot}))
+ button(controls,"Load selection",opening_action.bind("load",{"path":save_slot}))
+ var depart=button(controls,"Depart for Dock Town",opening_action.bind("embark",{}))
+ depart.disabled=game.s.squads.first.members.size()<2
+ message=label(root,last_message)
+
+func harbour_panel() -> void:
+ var shipping=Campaign.Shipping;var sh=game.s.shipping
+ label(side,"DOCK TOWN · MAINLAND RECRUITMENT")
+ label(side,"Harbour access: "+("open" if shipping.accessible(game.s) else "blockaded"))
+ label(side,"Next scheduled ship: "+shipping.timestamp(sh.next_arrival_at)+"\nHiring requires a stationary squad at Dock Town. Resolve any tactical encounter first.")
+ for v in sh.vessels:
+  if v.status=="scheduled": continue
+  label(side,v.id+" · "+v.status)
+  if v.status in ["departed","turned_back","cancelled"]: continue
+  if v.status=="offshore":
+   label(side,"MAINLAND VESSEL WAITING OFFSHORE\nDock Town · waiting until "+shipping.timestamp(v.offshore_deadline)+"\nPassenger identities are unavailable while the harbour is sealed.")
+   continue
+  label(side,"Recruitment closes: "+shipping.timestamp(v.recruitment_deadline))
+  for o in v.offers:
+   label(side,"%s · fee %d · wage %d/day · %s" % [o.name,o.fee,o.wage,o.status])
+   var stats=[]
+   for key in Data.Skills.ATTRIBUTES+Data.Skills.ALL: stats.append(key.capitalize()+" "+str(o.preview.attributes.get(key,o.preview.skills.get(key,0))))
+   label(side," · ".join(stats))
+   label(side,"Equipment: "+o.preview.weapon+", "+o.preview.armour+(", shield" if o.preview.get("shield",false) else "")+("; "+str(o.preview.ammo_quantity)+" "+Data.ammo_kind_for(o.preview.weapon) if o.preview.get("ammo_quantity",0)>0 else "")+("; carried "+", ".join(o.preview.get("secondary_weapons",[])) if not o.preview.get("secondary_weapons",[]).is_empty() else ""))
+   var hire=button(side,"Hire passenger "+o.name,run_command.bind("hire_offer",{"offer":o.id,"squad":squad}))
+   var q=game.s.squads[squad]
+   hire.disabled=o.status!="available" or not shipping.accessible(game.s) or game.s.time>=v.recruitment_deadline or game.s.funds<o.fee or game.battle!=null or not game.s.encounter.is_empty() or q.sector!=shipping.dock(game.s) or not q.route.is_empty()
+ for line in game.s.log:
+  if "OFFSHORE" in line or "HARBOUR REOPENED" in line or "REINFORCEMENTS LOST" in line or "MAINLAND VESSEL ARRIVED" in line: label(side,line)

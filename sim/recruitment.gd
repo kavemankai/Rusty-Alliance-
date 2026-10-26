@@ -8,7 +8,16 @@ static func workshop_templates() -> Array:
  if not FileAccess.file_exists(ROSTER_FILE): return []
  var doc=JSON.parse_string(FileAccess.get_file_as_string(ROSTER_FILE))
  if not doc is Dictionary or not doc.get("templates") is Array: return []
- return doc.templates if valid_templates(doc.templates) else []
+ var rows=[]
+ for source in doc.templates:
+  if not source is Dictionary: return []
+  var row=source.duplicate(true);row.attributes={};row.skills={}
+  for key in row:
+   if row[key] is float and row[key]==floor(row[key]): row[key]=int(row[key])
+  for key in Data.Skills.ATTRIBUTES: row.attributes[key]=row.get(key)
+  for key in Data.Skills.ALL: row.skills[key]=row.get(key)
+  rows.append(row)
+ return rows if valid_templates(rows) else []
 
 static func valid_templates(rows: Variant) -> bool:
  if not rows is Array or rows.size()!=12: return false
@@ -29,6 +38,11 @@ static func valid_templates(rows: Variant) -> bool:
    if row.has(flag) and not row[flag] is bool: return false
   for stat in ["max_hp","experience"]:
    if row.has(stat) and not R.integer(row[stat],1,1000): return false
+  if row.has("ammo_quantity") and not R.integer(row.ammo_quantity,0,1000): return false
+  if row.has("secondary_weapons"):
+   if not row.secondary_weapons is Array or row.secondary_weapons.size()>2: return false
+   for weapon in row.secondary_weapons:
+    if weapon not in Data.WEAPONS: return false
   ids[row.id]=true;names[row.name]=true;counts[row.tier]+=1
  return counts=={"cheap":2,"mid":4,"high":4,"elite":2}
 
@@ -42,6 +56,13 @@ static func make_person(row: Dictionary,id: String,title: String) -> Dictionary:
  for kind in ["shield","helmet"]:
   if row.get(kind,false):
    var entry=Data.item(id+":"+kind,kind);person.inventory.append(entry);person.equipment[kind]=entry.id
+ if row.has("ammo_quantity"):
+  if row.ammo_quantity==0: person.inventory=person.inventory.filter(func(i):return i.kind!="ammo")
+  else:
+   for entry in person.inventory:
+    if entry.kind=="ammo": entry.quantity=int(row.ammo_quantity)
+ for i in range(row.get("secondary_weapons",[]).size()):
+  person.inventory.append(Data.item(id+":secondary-"+str(i),row.secondary_weapons[i]))
  return person
 
 static func configure(state: Dictionary,rows: Array) -> Dictionary:
@@ -57,8 +78,16 @@ static func configure(state: Dictionary,rows: Array) -> Dictionary:
    var person=make_person(row,"greywake-named-"+row.id,row.name);fresh.mercs[person.id]=person
  return fresh
 
+static func is_greywake(state: Dictionary) -> bool:
+ return state.get("scenario","") in ["greywake","fall_of_greywake"]
+
+static func opening(state: Dictionary) -> bool:
+ return state.get("opening_voyage",{}).get("phase","")=="hiring"
+
 static func recruit(c,template_id: String,squad_id: String) -> bool:
- if c.s.get("scenario","")!="greywake" or not c.s.has("recruitment"): return c.reject("Repeatable recruitment belongs to Greywake")
+ if not is_greywake(c.s) or not c.s.has("recruitment"): return c.reject("Repeatable recruitment belongs to Greywake")
+ if c.s.get("scenario")=="fall_of_greywake" and not opening(c.s): return c.reject("Hire through a docked mainland vessel offer")
+ if opening(c.s) and c.s.squads.first.members.size()>=6: return c.reject("Opening transport holds six mercenaries")
  if c.battle!=null: return c.reject("Resolve battle first")
  var row={}
  for entry in c.s.recruitment.templates:
@@ -80,12 +109,13 @@ static func recruit(c,template_id: String,squad_id: String) -> bool:
  person.hired=true;person.expires=c.s.time+7*1440
  c.s.mercs[id]=person;c.s.recruitment.next_id=counter+1;squad.members.append(id)
  if squad.leader=="": squad.leader=id
+ if opening(c.s): c.s.opening_voyage.paid[id]=person.fee
  c.schedule(person.expires,"employment",{"id":id});c.note(person.name+" recruited as an individual")
  return true
 
 static func valid_state(state: Dictionary) -> bool:
  if state.get("scenario","original")=="original": return not state.has("recruitment")
- if state.get("scenario")!="greywake" or not state.get("recruitment") is Dictionary: return false
+ if not is_greywake(state) or not state.get("recruitment") is Dictionary: return false
  var registry=state.recruitment
  if not valid_templates(registry.get("templates")) or not R.integer(registry.get("next_id"),1,1000000000): return false
  var names={};var named={};var types={}
@@ -94,6 +124,7 @@ static func valid_state(state: Dictionary) -> bool:
   if names.has(person.name) or not types.has(person.get("template_id","")): return false
   names[person.name]=true
   var row=types[person.template_id]
+  if person.has("mainland_hired") and not person.mainland_hired is bool: return false
   if person.get("tier")!=row.tier: return false
   if person.fee!=row.fee or person.wage!=row.wage: return false
   if not row.repeatable:
@@ -103,4 +134,25 @@ static func valid_state(state: Dictionary) -> bool:
    if not person.id.begins_with("greywake-recruit-"): return false
    var serial=person.id.trim_prefix("greywake-recruit-")
    if not serial.is_valid_int() or int(serial)<1 or int(serial)>=registry.next_id: return false
- return named.size()==10
+ if named.size()!=10: return false
+ if state.get("scenario")=="fall_of_greywake":
+  if registry.templates!=workshop_templates(): return false
+  var v=state.get("opening_voyage")
+  if not v is Dictionary or v.get("phase") not in ["hiring","arrived"] or v.get("capacity")!=6 or not v.get("paid") is Dictionary: return false
+  var total=0
+  for id in v.paid:
+   if not state.mercs.has(id) or v.paid[id]!=state.mercs[id].fee: return false
+   total+=v.paid[id]
+  if v.phase=="hiring":
+   for person in state.mercs.values():
+    if person.hired!=v.paid.has(person.id): return false
+   if state.time!=480 or state.funds!=PURSE-total or v.paid.size()!=state.squads.first.members.size() or v.paid.size()>6: return false
+   for id in v.paid:
+    if id not in state.squads.first.members or not state.mercs[id].hired: return false
+  else:
+   if not v.get("company") is Array or v.company.size()!=v.paid.size() or v.company.size()<2 or v.company.size()>6 or v.get("landed_at")!=480: return false
+   var ids={}
+   for id in v.company:
+    if not v.paid.has(id) or ids.has(id) or not state.mercs[id].get("mainland_hired",false): return false
+    ids[id]=true
+ return true

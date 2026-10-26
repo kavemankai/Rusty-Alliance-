@@ -1,0 +1,13 @@
+id,name,tier,repeatable,fee,wage,strength,agility,dexterity,endurance,perception,wisdom,leadership,melee,ranged,medical,smithing,stealth,fieldcraft,athletics
+militia_spearman,Militia Spearman,cheap,true,120,12,55,49,45,58,47,42,22,40,25,8,12,22,38,40
+militia_crossbowman,Militia Crossbowman,cheap,true,140,14,45,52,53,46,51,41,18,29,43,7,10,28,32,38
+mara,Mara,mid,false,350,28,70,68,71,70,61,57,68,72,48,20,20,36,48,68
+oswin,Oswin,mid,false,330,26,57,69,76,63,83,64,35,43,78,12,20,68,82,70
+ada,Ada,mid,false,410,34,58,60,69,61,68,79,53,56,35,85,16,35,58,50
+bram,Bram,mid,false,390,30,82,50,69,78,50,65,39,70,22,18,82,22,45,52
+elin,Elin,high,false,900,65,79,60,73,84,66,62,79,87,40,14,20,18,30,56
+nessa,Nessa,high,false,780,52,55,88,82,75,88,72,45,50,80,23,20,84,90,86
+garran,Garran,high,false,850,60,83,60,75,90,77,68,76,83,32,26,24,26,58,66
+sabine,Sabine,high,false,820,55,62,90,90,65,80,77,41,78,67,14,27,92,68,85
+roderic,Roderic,elite,false,3200,120,89,77,86,90,85,82,96,96,61,40,34,52,76,75
+ysra,Ysra,elite,false,3800,135,68,91,97,78,97,84,65,62,97,25,30,90,94,89

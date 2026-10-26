@@ -1,6 +1,6 @@
 extends RefCounted
 const ASSIGNMENTS=["rest","medical","training","repair","guard","scout","garrison"]
-const EVENTS=["hour","arrival","employment","deadline"]
+const EVENTS=["hour","arrival","employment","deadline","greywake_ship_arrival","greywake_offshore_deadline","greywake_recruitment_departure"]
 
 class Scalar:
  static func integer(value: Variant,low: int=-1000000000000,high: int=1000000000000) -> bool:
@@ -23,6 +23,7 @@ class Event extends Scalar:
   var p=value.payload
   if value.kind in ["employment","deadline"] and (not p.get("id") is String or p.id==""): return null
   if value.kind=="arrival" and (not p.get("squad") is String or p.squad=="" or (p.has("token") and not integer(p.token,0))): return null
+  if value.kind.begins_with("greywake_") and (not p.get("vessel") is String or p.vessel==""): return null
   return Event.new(int(value.id),int(value.at),value.kind,p)
 
 class Transaction extends Scalar:

@@ -1,0 +1,10 @@
+{
+  "id": "fall_of_greywake",
+  "dock_sector": 17,
+  "friendly_harbour_owners": [
+    "company"
+  ],
+  "world_mode": "dock_town_staging",
+  "planned_width": 10,
+  "planned_height": 10
+}
