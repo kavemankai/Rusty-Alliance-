@@ -45,6 +45,7 @@ func run() -> void:
   for key in app.Data.Skills.ATTRIBUTES+app.Data.Skills.ALL:
    check(has_label(app,key.capitalize()+"  "+str(row.attributes.get(key,row.skills.get(key,0)))),"Native profile value "+row.id+"/"+key)
   check(has_label(app,"Hiring fee %d crowns · Daily wage %d" % [row.fee,row.wage]),"Native fee and wage "+row.id)
+ check(find(app,"Set Sail").get_theme_stylebox("normal") is StyleBoxTexture,"Supplied UI artwork is bound to the real hiring/departure controls")
  check(find(app,"Set Sail").disabled,"Empty tableau company cannot depart")
  await click("Roderic")
  check(find(app,"Recruit Roderic").disabled,"Elite profile visible but unaffordable")

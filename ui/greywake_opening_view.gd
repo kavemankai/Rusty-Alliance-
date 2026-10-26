@@ -1,4 +1,5 @@
 extends Control
+const Art=preload("res://ui/greywake_art.gd")
 const ArrivalMap=preload("res://ui/greywake_map.gd")
 const ICONS=preload("res://ui/asset_icons.gd")
 const TAVERN=preload("res://assets/greywake/tavern.svg")
@@ -14,18 +15,19 @@ func _ready() -> void:
  set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
  if mode=="title": title()
  else: opening()
-func panel_style() -> StyleBoxFlat:
+func panel_style(decorated: bool=false) -> StyleBox:
+ if decorated: return Art.panel()
  var style=StyleBoxFlat.new();style.bg_color=Color("202523");style.bg_color.a=.97
  style.border_color=Color("a48a5b");style.set_border_width_all(1);style.set_content_margin_all(14)
  return style
-func frame(parent: Node) -> VBoxContainer:
- var shell=PanelContainer.new();shell.mouse_filter=MOUSE_FILTER_PASS;shell.add_theme_stylebox_override("panel",panel_style());parent.add_child(shell)
+func frame(parent: Node,decorated: bool=false) -> VBoxContainer:
+ var shell=PanelContainer.new();shell.mouse_filter=MOUSE_FILTER_PASS;shell.add_theme_stylebox_override("panel",panel_style(decorated));parent.add_child(shell)
  shell.size_flags_horizontal=SIZE_EXPAND_FILL
  var box=VBoxContainer.new();box.add_theme_constant_override("separation",7);shell.add_child(box);return box
 func text(parent: Node,value: String,font_size: int=18) -> Label:
  var l=app.label(parent,value);l.add_theme_font_size_override("font_size",font_size);l.add_theme_color_override("font_color",Color("e2d4b2"));return l
 func action(parent: Node,value: String,callback: Callable) -> Button:
- var b=app.button(parent,value,callback);b.custom_minimum_size.y=44 if OS.has_feature("android") else 36
+ var b=app.button(parent,value,callback);Art.apply_button(b);b.custom_minimum_size.y=44 if OS.has_feature("android") else 36
  b.add_theme_color_override("font_hover_color",Color("ffe9ad"));return b
 func plate(texture: Texture2D) -> void:
  var bg=TextureRect.new();bg.texture=texture;bg.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;bg.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_COVERED
@@ -119,8 +121,8 @@ func tavern() -> void:
   canvas.add_child(hotspot);hotspot.set_meta("point",POSITIONS[row.id]);hot.append(hotspot)
   hotspot.pressed.connect(func():app.tavern_selected=row.id;app.rebuild(),CONNECT_DEFERRED)
  call_deferred("place_hotspots")
- var profile_scroll=ScrollContainer.new();profile_scroll.custom_minimum_size.x=340;body.add_child(profile_scroll)
- var profile=frame(profile_scroll);profile.custom_minimum_size.x=280
+ var profile_scroll=ScrollContainer.new();profile_scroll.custom_minimum_size.x=370;body.add_child(profile_scroll)
+ var profile=frame(profile_scroll,true);profile.custom_minimum_size.x=280
  populate_profile(profile,rows)
  var manifest_box=frame(root);manifest(manifest_box)
  var bar=HBoxContainer.new();root.add_child(bar)

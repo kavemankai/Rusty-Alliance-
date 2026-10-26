@@ -39,3 +39,7 @@ The exact user-supplied twelve-template baseline is implemented as original proj
 ## Greywake Opening Experience v0.1 — 0.15.0
 
 The user-supplied opening specification is preserved in GREYWAKE_OPENING_EXPERIENCE_SPEC.md. The integrated narrative/tableau/island/dockside work and its verification are documented in GREYWAKE_OPENING_STATUS.md. All new scene plates are temporary original vectors; no unavailable production archive or proprietary art is claimed. Existing authoritative combat, inventory, skills, payroll and shipping are reused. Island boundaries and explicit safe staging migration are simulation rules. The three endings, broader political content and final art/physical acceptance remain deferred.
+
+## 2026-10-27 — partial v0.2 art
+
+Eight supplied UI textures are integrated into real Greywake controls; duplicate ZIP deduplicated. Canonical roster and existing gameplay are preserved. Unmapped provisional portraits/boards are reference-only; the standalone scenes/map are absent. See GREYWAKE_ART_V02_STATUS.md and ui-art-results.json for current evidence and remaining assets.

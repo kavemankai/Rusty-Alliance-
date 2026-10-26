@@ -1,3 +1,7 @@
+# Current UI art preview — 0.15.1
+
+Supplied v0.2 panel/button/icon art now skins the real Greywake controls. The roster, existing scenes, live battle and layered island are preserved. [Import audit, missing assets and current checks](GREYWAKE_ART_V02_STATUS.md). Portrait identities remain unmapped; standalone scene/map files were not included in the supplied parts.
+
 # Current preview: Greywake Opening Experience v0.1 (0.15.0)
 
 **New Game** opens the anonymous employer's briefing, an interactive illustrated tavern, paid company confirmation, skippable crossing, a gridless 62-sector island and the real Dockside Trouble battle. Outcomes persist; Harth's paid farm-road rounds provide a bounded recovery activity. Original campaign access remains separate under **New campaign**. Temporary vector scene art and role portraits are explicitly provisional.

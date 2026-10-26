@@ -1,0 +1,69 @@
+{
+  "reference_background": "assets/backgrounds/03_tavern_recruitment_1920x1080.png",
+  "note": "Placeholders for the intended tavern grouping only; validate against final separate character art.",
+  "coordinate_system": "normalized_0_1",
+  "vignettes": [
+    {
+      "id": "cheap_table",
+      "label": "Peasants drinking",
+      "bounds": [
+        0.02,
+        0.24,
+        0.29,
+        0.76
+      ],
+      "candidate_ids": [
+        "cheap_farmhand",
+        "cheap_dock_labourer"
+      ]
+    },
+    {
+      "id": "knight_table",
+      "label": "Lone knight",
+      "bounds": [
+        0.3,
+        0.22,
+        0.53,
+        0.82
+      ],
+      "candidate_ids": [
+        "sir_garran_thorne"
+      ]
+    },
+    {
+      "id": "mid_table",
+      "label": "Mid-tier company",
+      "bounds": [
+        0.5,
+        0.22,
+        0.75,
+        0.85
+      ],
+      "candidate_ids": [
+        "ivo_pike",
+        "toman_reed",
+        "bess_ash"
+      ]
+    },
+    {
+      "id": "tavern_brawl",
+      "label": "Tavern fistfight",
+      "bounds": [
+        0.73,
+        0.14,
+        0.99,
+        0.91
+      ],
+      "candidate_ids": [
+        "jory_hale",
+        "hester_blackthorn"
+      ]
+    }
+  ],
+  "unplaced_candidates": [
+    "corvin_mire",
+    "sera_tallow",
+    "caldus_wren",
+    "dame_ysabet_crowe"
+  ]
+}

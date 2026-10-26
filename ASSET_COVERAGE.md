@@ -81,3 +81,7 @@ An isolated 15-model calibration preview is provided as `asset-calibration-previ
 3. Finish the missing medieval crossbow/mace/polearm/bolts and the UI/action/status icon gaps.
 4. Dress the five encounter families without altering saved collision/cover/visibility rules.
 5. Supply audio/music and original faction/UI/release artwork, then repeat mobile acceptance checks.
+
+## 2026-10-27 — partial v0.2 art
+
+Eight supplied UI textures are integrated into real Greywake controls; duplicate ZIP deduplicated. Canonical roster and existing gameplay are preserved. Unmapped provisional portraits/boards are reference-only; the standalone scenes/map are absent. See GREYWAKE_ART_V02_STATUS.md and ui-art-results.json for current evidence and remaining assets.

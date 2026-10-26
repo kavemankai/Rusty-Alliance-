@@ -81,6 +81,7 @@ func button(parent: Node,title: String,callback: Callable) -> Button:
    break
  b.size_flags_horizontal=Control.SIZE_EXPAND_FILL
  parent.add_child(b)
+ if game!=null and Campaign.World.applies(game.s): preload("res://ui/greywake_art.gd").apply_button(b)
  b.pressed.connect(callback,CONNECT_DEFERRED)
  return b
 

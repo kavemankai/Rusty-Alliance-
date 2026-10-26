@@ -1,0 +1,140 @@
+{
+  "archives": [
+    {
+      "file": "1-Greywake_v02_07_Concept_Boards_B.zip",
+      "sha256": "43fa46bd82d7ff79a4ecfe084b4d82dddc3dd3dd0bd177df3269ede062e92972"
+    },
+    {
+      "file": "2-Greywake_v02_06_Concept_Boards_A.zip",
+      "sha256": "2364aec2448b40b57bfc2a3b0f76fd43b3808767671e2258c076494abc920cc5"
+    },
+    {
+      "file": "3-Greywake_v02_05_UI_And_Previews.zip",
+      "sha256": "a4b883faf4ee93a4361b3d581c1e02b994a6d237816f8c32848ec884aaa66ade"
+    },
+    {
+      "file": "4-Greywake_v02_05_UI_And_Previews.zip",
+      "sha256": "a4b883faf4ee93a4361b3d581c1e02b994a6d237816f8c32848ec884aaa66ade"
+    },
+    {
+      "file": "5-Greywake_v02_04_Mercenary_Portraits.zip",
+      "sha256": "6862b1a5f449489e5ccf6204d95fa565ea7f3911d331b06b964e4b07104472f6"
+    }
+  ],
+  "duplicate_archive": "4-Greywake_v02_05_UI_And_Previews.zip duplicates 3 byte-for-byte",
+  "supplied_ui_pngs": 24,
+  "supplied_portrait_pngs": 24,
+  "supplied_reference_boards": 5,
+  "standalone_scene_plates_supplied": 0,
+  "standalone_map_supplied": false,
+  "canonical_portrait_mapping": {},
+  "files": [
+    {
+      "path": "assets/greywake/production_ui/anchor_256.png",
+      "sha256": "d7298fb5e400eaff08d591474b1b6317dc499df0e720fbe921be4cca86a2b8f3"
+    },
+    {
+      "path": "assets/greywake/production_ui/bell_256.png",
+      "sha256": "e132e50009adbbc884db5f47dc4174a6cb25de024483c9f69464ea6f69753a82"
+    },
+    {
+      "path": "assets/greywake/production_ui/blockade_256.png",
+      "sha256": "bf7fae0791bee8a3372bee526249d3ca5b09b0b1a8abf8d591dfa4ff0eeddc78"
+    },
+    {
+      "path": "assets/greywake/production_ui/button_disabled.png",
+      "sha256": "3ec48179408b31cd9bc2bb0ddd46b93f439818e56b56562a69f1e12af09c3184"
+    },
+    {
+      "path": "assets/greywake/production_ui/button_hover.png",
+      "sha256": "580bebc54c108baf95668f616337d677423d4fa7235074104878e05ac94a9d60"
+    },
+    {
+      "path": "assets/greywake/production_ui/button_normal.png",
+      "sha256": "1d11211beac82d1f440f8cf3b82f40f7eca9531bfecdab7c4c2a234db358859f"
+    },
+    {
+      "path": "assets/greywake/production_ui/button_selected.png",
+      "sha256": "4301c407e1a9165b38d343392e64eb23cd5597566c9ce2ba67a654d9f3d2bd07"
+    },
+    {
+      "path": "assets/greywake/production_ui/coin_256.png",
+      "sha256": "f38dfd9e53deb0417cb847ef99837629d174500bfa887ede322a2d045ae473fb"
+    },
+    {
+      "path": "assets/greywake/production_ui/crate_256.png",
+      "sha256": "b5e29304f268e343b6378be6edadae149f7d3d2e82155ae9a41c7481245e24f4"
+    },
+    {
+      "path": "assets/greywake/production_ui/dark_recruitment_panel_700x900.png",
+      "sha256": "bdbae12cbddb4a658129b9c896a7c07696368c724ae932feee17b18672f85020"
+    },
+    {
+      "path": "assets/greywake/production_ui/full_black_fade_1920x1080.png",
+      "sha256": "d5c17545e80f6b9185d2290c399ed87cdfe0f867a2ae49a94714aa6db9424ac8"
+    },
+    {
+      "path": "assets/greywake/production_ui/harbour_alert_panel_880x420.png",
+      "sha256": "eaa3325ea8a18b65b22bd883b5d771194a66ae8cfa4c9e763c56a49cf4d9be02"
+    },
+    {
+      "path": "assets/greywake/production_ui/map_pin_256.png",
+      "sha256": "0366ef2d4c145edff90e11be9009b045134e6e017aebdd181d8e36796c219b43"
+    },
+    {
+      "path": "assets/greywake/production_ui/modal_dimmer_1920x1080.png",
+      "sha256": "9ebd401a39c4522f5f49eda178264a256cf1ae400c4b9ae3befea6ded2d1f58a"
+    },
+    {
+      "path": "assets/greywake/production_ui/notification_panel_720x260.png",
+      "sha256": "f6f314e2e837df679a222d3d1568a873330f861400b1e646b01739d3adbe5470"
+    },
+    {
+      "path": "assets/greywake/production_ui/parchment_dialogue_panel_1280x320.png",
+      "sha256": "f3b6c596ac50777e01e5f4ad652fb9982bd297c27103b8047e65bda167933334"
+    },
+    {
+      "path": "assets/greywake/production_ui/portrait_frame_transparent_430x535.png",
+      "sha256": "ee3b559dcb5382c8cc2f845757c66df48ec5bcf2fbfd6f3a331a7d59c6176d04"
+    },
+    {
+      "path": "assets/greywake/production_ui/recruit_256.png",
+      "sha256": "9ad6c6d5ff8b4fc0b5605b111972cfb755300a038f755fd4c59d1bb39831dce3"
+    },
+    {
+      "path": "assets/greywake/production_ui/shield_256.png",
+      "sha256": "8d937b9504901dd0be97d3a195a3215deceef06e039d5cf485eea8c254c7f40c"
+    },
+    {
+      "path": "assets/greywake/production_ui/ship_256.png",
+      "sha256": "62ee0afd5fe937f5fcb291fa87ab33a621bce0c9d092f116d5a5ef45ae01de50"
+    },
+    {
+      "path": "assets/greywake/production_ui/skull_256.png",
+      "sha256": "3a5f6f94f72f673bf80e4aee1e4156282c2b4426cffe9b802eca0aa14b678912"
+    },
+    {
+      "path": "assets/greywake/production_ui/sword_256.png",
+      "sha256": "bf297e94dce9ff63eedda0c96e8795f14fab76c26a89d1c3eb3feb7808d9442c"
+    },
+    {
+      "path": "assets/greywake/production_ui/tavern_profile_panel_550x700.png",
+      "sha256": "cd3f2c23850f084c49dcfb3e44332624800e69cdcc028ccb9c0f6385a68af8a9"
+    },
+    {
+      "path": "assets/greywake/production_ui/warning_256.png",
+      "sha256": "45a2c495dd6958e61178be83e7e05ce0244a0b673a985e0e46b26d5c8a23c7ca"
+    }
+  ],
+  "runtime_ui_pngs": [
+    "button_normal.png",
+    "button_hover.png",
+    "button_selected.png",
+    "button_disabled.png",
+    "tavern_profile_panel_550x700.png",
+    "anchor_256.png",
+    "ship_256.png",
+    "recruit_256.png"
+  ],
+  "spare_ui_pngs": 16
+}

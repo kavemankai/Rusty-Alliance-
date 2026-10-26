@@ -45,7 +45,7 @@ for y in range(620,900,35):
  for x in range(0,1600,220):p.append(path(f'M{x} {y} Q{x+80} {y-12} {x+160} {y+2}','none','#67746b'))
 p.extend([path('M410 730 Q750 870 1150 728 L1050 830 Q780 935 500 826 Z','#211e1c','#997f58'),path('M785 726 L790 227','none','#8f7956'),path('M800 250 Q1120 430 1050 654 L800 635 Z','#acaa92','#544d3c'),path('M782 300 L572 663 H776 Z','#777f76','#544d3c')])
 save('voyage.svg',p)
-(out/'PROVENANCE.txt').write_text('''# Temporary Greywake opening art
+if not (out/'PROVENANCE.txt').exists(): (out/'PROVENANCE.txt').write_text('''# Temporary Greywake opening art
 
 The requested Greywake_Opening_Art_ProductionPack_v02.zip was not found in the task workspace or Downloads during the initial audit. No files from that package are claimed as imported or approved.
 

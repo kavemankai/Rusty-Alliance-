@@ -1,3 +1,7 @@
+# Current art update — 0.15.1-greywake-ui-art
+
+Partial v0.2 archives have now been received. Eight supplied UI textures are integrated; the concept boards and mismatched provisional portraits remain reference-only. Standalone scene plates/map are missing from these attachments. See GREYWAKE_ART_V02_STATUS.md. The 0.15 opening evidence below remains historical for its exact binaries.
+
 # Build status — 2026-10-26
 
 **Playable integrated slice delivered; full production foundation incomplete.**

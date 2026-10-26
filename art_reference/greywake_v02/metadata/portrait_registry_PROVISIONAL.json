@@ -1,0 +1,137 @@
+{
+  "notice": "Visual placeholders only. Do not replace required canonical data/greywake_roster.json with this file.",
+  "candidates": [
+    {
+      "id": "cheap_farmhand",
+      "display_name_provisional": "Farmhand",
+      "tier": "cheap",
+      "recruit_repeatable": true,
+      "portrait": "assets/portraits/full/cheap_farmhand_768x960.png",
+      "thumbnail": "assets/portraits/thumbs/cheap_farmhand_512x512.png",
+      "approved_roster": false,
+      "reference_number": 8,
+      "notes": "Repeatable archetype; individual names assigned by simulation"
+    },
+    {
+      "id": "cheap_dock_labourer",
+      "display_name_provisional": "Dock Labourer",
+      "tier": "cheap",
+      "recruit_repeatable": true,
+      "portrait": "assets/portraits/full/cheap_dock_labourer_768x960.png",
+      "thumbnail": "assets/portraits/thumbs/cheap_dock_labourer_512x512.png",
+      "approved_roster": false,
+      "reference_number": 3,
+      "notes": "Repeatable archetype; individual names assigned by simulation"
+    },
+    {
+      "id": "ivo_pike",
+      "display_name_provisional": "Ivo Pike",
+      "tier": "mid",
+      "recruit_repeatable": false,
+      "portrait": "assets/portraits/full/ivo_pike_768x960.png",
+      "thumbnail": "assets/portraits/thumbs/ivo_pike_512x512.png",
+      "approved_roster": false,
+      "reference_number": 12,
+      "notes": "Working name; unapproved"
+    },
+    {
+      "id": "toman_reed",
+      "display_name_provisional": "Toman Reed",
+      "tier": "mid",
+      "recruit_repeatable": false,
+      "portrait": "assets/portraits/full/toman_reed_768x960.png",
+      "thumbnail": "assets/portraits/thumbs/toman_reed_512x512.png",
+      "approved_roster": false,
+      "reference_number": 7,
+      "notes": "Working name; unapproved"
+    },
+    {
+      "id": "jory_hale",
+      "display_name_provisional": "Jory Hale",
+      "tier": "mid",
+      "recruit_repeatable": false,
+      "portrait": "assets/portraits/full/jory_hale_768x960.png",
+      "thumbnail": "assets/portraits/thumbs/jory_hale_512x512.png",
+      "approved_roster": false,
+      "reference_number": 1,
+      "notes": "Working name; unapproved"
+    },
+    {
+      "id": "bess_ash",
+      "display_name_provisional": "Bess Ash",
+      "tier": "mid",
+      "recruit_repeatable": false,
+      "portrait": "assets/portraits/full/bess_ash_768x960.png",
+      "thumbnail": "assets/portraits/thumbs/bess_ash_512x512.png",
+      "approved_roster": false,
+      "reference_number": 6,
+      "notes": "Working name; unapproved"
+    },
+    {
+      "id": "hester_blackthorn",
+      "display_name_provisional": "Hester Blackthorn",
+      "tier": "high",
+      "recruit_repeatable": false,
+      "portrait": "assets/portraits/full/hester_blackthorn_768x960.png",
+      "thumbnail": "assets/portraits/thumbs/hester_blackthorn_512x512.png",
+      "approved_roster": false,
+      "reference_number": 11,
+      "notes": "Working name; unapproved"
+    },
+    {
+      "id": "corvin_mire",
+      "display_name_provisional": "Corvin Mire",
+      "tier": "high",
+      "recruit_repeatable": false,
+      "portrait": "assets/portraits/full/corvin_mire_768x960.png",
+      "thumbnail": "assets/portraits/thumbs/corvin_mire_512x512.png",
+      "approved_roster": false,
+      "reference_number": 4,
+      "notes": "Working name; unapproved"
+    },
+    {
+      "id": "sera_tallow",
+      "display_name_provisional": "Sera Tallow",
+      "tier": "high",
+      "recruit_repeatable": false,
+      "portrait": "assets/portraits/full/sera_tallow_768x960.png",
+      "thumbnail": "assets/portraits/thumbs/sera_tallow_512x512.png",
+      "approved_roster": false,
+      "reference_number": 2,
+      "notes": "Working name; unapproved"
+    },
+    {
+      "id": "caldus_wren",
+      "display_name_provisional": "Caldus Wren",
+      "tier": "high",
+      "recruit_repeatable": false,
+      "portrait": "assets/portraits/full/caldus_wren_768x960.png",
+      "thumbnail": "assets/portraits/thumbs/caldus_wren_512x512.png",
+      "approved_roster": false,
+      "reference_number": 10,
+      "notes": "Working name; unapproved"
+    },
+    {
+      "id": "sir_garran_thorne",
+      "display_name_provisional": "Sir Garran Thorne",
+      "tier": "elite",
+      "recruit_repeatable": false,
+      "portrait": "assets/portraits/full/sir_garran_thorne_768x960.png",
+      "thumbnail": "assets/portraits/thumbs/sir_garran_thorne_512x512.png",
+      "approved_roster": false,
+      "reference_number": 9,
+      "notes": "Working name; unapproved"
+    },
+    {
+      "id": "dame_ysabet_crowe",
+      "display_name_provisional": "Dame Ysabet Crowe",
+      "tier": "elite",
+      "recruit_repeatable": false,
+      "portrait": "assets/portraits/full/dame_ysabet_crowe_768x960.png",
+      "thumbnail": "assets/portraits/thumbs/dame_ysabet_crowe_512x512.png",
+      "approved_roster": false,
+      "reference_number": 5,
+      "notes": "Working name; fully helmeted reference"
+    }
+  ]
+}
