@@ -61,4 +61,5 @@ static func run(test) -> void:
  test.check(board.camera.size<zoom,"Tactical camera handles Android native magnify gestures")
  camera_position=board.camera.position;board.input_event(pan)
  test.check(board.camera.position!=camera_position,"Tactical camera handles Android native pan gestures")
- board.free()
+ # Skinned presentation nodes must finish their deferred teardown before exit.
+ board.queue_free()

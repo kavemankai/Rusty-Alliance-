@@ -40,7 +40,7 @@ def main():
  selected={}
  for key, source in SELECT.items():
   row=models[source]
-  entry=' '+json.dumps(key)+':preload('+json.dumps(row['path'])+'),'
+  entry=' '+json.dumps(key)+':'+json.dumps(row['path'])+','
   thumbnail_lines.append(entry)
   if key in RUNTIME:lines.append(entry)
   selected[key]=row['path']

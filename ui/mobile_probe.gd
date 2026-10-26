@@ -26,7 +26,9 @@ func _process(delta: float) -> void:
   var c=app.game
   var state={"time":c.s.time,"funds":c.s.funds,"rng":c.s.rng,"selected_sector":app.sector,"squad_sector":c.s.squads.get(app.squad,{}).get("sector",-1),"route":c.s.squads.get(app.squad,{}).get("route",[]),"selected":app.selected,"tab":app.tab,"message":app.last_message,"phase":"strategic","hash":JSON.stringify(c.s).sha256_text(),"jobs":c.s.jobs,"mercs":{}}
   for id in c.s.mercs:
-   var m=c.s.mercs[id];state.mercs[id]={"hired":m.hired,"hp":m.hp,"weapon":app.Data.weapon(m)}
+   var m=c.s.mercs[id];state.mercs[id]={"hired":m.hired,"hp":m.hp,"weapon":app.Data.weapon(m),"skills":{},"training_skill":m.training_skill,"training":m.training,"experience":m.experience}
+   for key in app.Data.Skills.ALL: state.mercs[id].skills[key]=m[key]
+  state.scenario=c.s.get("scenario","original")
   if is_instance_valid(app.map_view) and app.map_view.is_inside_tree():
    var map=app.map_view
    state.map={"fingers":map.fingers.size(),"dragged":map.dragged,"zoom":map.zoom,"offset":[map.offset.x,map.offset.y],"rect":rect(map),"sectors":{}}

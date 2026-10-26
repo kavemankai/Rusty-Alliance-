@@ -15,6 +15,7 @@ static func item(value: Variant,legacy: bool=false) -> bool:
 
 static func person(value: Variant,legacy: bool=false) -> bool:
  if not value is Dictionary or not text(value.get("id")) or value.id=="" or not text(value.get("name")): return false
+ if not Data.Skills.valid(value): return false
  if not value.get("inventory") is Array or value.inventory.size()>4096: return false
  for entry in value.inventory:
   if not item(entry,legacy): return false

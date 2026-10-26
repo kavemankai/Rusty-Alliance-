@@ -21,7 +21,7 @@ func run() -> void:
  stage.add_child(environment)
  var count=0
  for key in Thumbnails.MODELS:
-  var model=Art.model(key,Vector3(1.5,1.6,1.5),true,Thumbnails.MODELS[key])
+  var model=Art.model(key,Vector3(1.5,1.6,1.5),true,load(Thumbnails.MODELS[key]))
   stage.add_child(model)
   await process_frame;await process_frame
   await RenderingServer.frame_post_draw

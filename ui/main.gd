@@ -83,17 +83,39 @@ func menu() -> void:
  box.position=Vector2(-230,-210)
  box.size=Vector2(460,420)
  ui.add_child(box)
- label(box,"THE BROKEN MARCHES\nMedieval mercenary campaign\nQuaternius asset preview · 0.12")
- button(box,"New campaign",func():game=Campaign.new(); tab="sector"; rebuild())
+ label(box,"THE BROKEN MARCHES\nMedieval mercenary campaign\nSeven-skill preview · 0.13")
+ button(box,"New campaign",func():game=Campaign.new();save_slot="user://campaign.json";selected="mara";squad="first";tab="sector";rebuild())
+ var greywake=button(box,"New Greywake campaign",func():
+  var candidate=Campaign.new()
+  if candidate.configure_new_greywake(Campaign.Recruitment.workshop_templates()):
+   game=candidate;game.autosave_path="user://greywake-autosave.json";save_slot="user://greywake.json"
+   selected="";squad="first";tab="company";rebuild())
+ greywake.disabled=Campaign.Recruitment.workshop_templates().is_empty()
+ greywake.tooltip_text="Separate scenario · 2,400 crowns · choose your company" if not greywake.disabled else "The finalized Greywake roster is still required"
  button(box,"Load campaign",func():
+  save_slot="user://campaign.json"
   game=Campaign.new()
   if game.command("load",{"path":save_slot}): rebuild()
   else: label(box,game.error))
  button(box,"Continue autosave",func():
+  save_slot="user://campaign.json"
   game=Campaign.new()
   if game.command("load",{"path":"user://autosave.json"}): rebuild()
   else: label(box,game.error))
+ if FileAccess.file_exists("user://greywake.json"):
+  button(box,"Load Greywake campaign",open_greywake.bind("user://greywake.json"))
+ if FileAccess.file_exists("user://greywake-autosave.json"):
+  button(box,"Continue Greywake autosave",open_greywake.bind("user://greywake-autosave.json"))
+ if greywake.disabled: label(box,"Greywake: awaiting the finalized recruitment roster.")
  label(box,"Tap to inspect. Drag to pan. Pinch or use +/− to zoom.\nRecruit → contract → travel → battle → recover.\nEvery action changes persistent campaign state.")
+
+func open_greywake(path: String) -> void:
+ var candidate=Campaign.new()
+ if not candidate.command("load",{"path":path}) or candidate.s.get("scenario","")!="greywake":
+  var dialog=AcceptDialog.new();dialog.dialog_text="Unable to load the Greywake save. "+candidate.error
+  ui.add_child(dialog);dialog.popup_centered();return
+ game=candidate;game.autosave_path="user://greywake-autosave.json";save_slot="user://greywake.json"
+ selected="";squad="first";tab="company";rebuild()
 
 func rebuild() -> void:
  target=""
@@ -310,6 +332,12 @@ func supplies_panel() -> void:
 
 func company_panel() -> void:
  label(side,"COMPANY & RECRUITMENT")
+ if game.s.get("scenario","")=="greywake":
+  label(side,"GREYWAKE · repeatable cheap recruits")
+  for row in game.s.recruitment.templates:
+   if row.repeatable:
+    button(side,"Recruit %s · %d crowns" % [row.name,row.fee],run_command.bind("recruit_template",{"template":row.id,"squad":squad}))
+    label(side,"Daily wage: %d crowns · each recruit keeps individual equipment and progression" % row.wage)
  for m in game.s.mercs.values():
   if m.dead:
    label(side,m.name+" · deceased")
@@ -321,10 +349,14 @@ func company_panel() -> void:
   recruit.icon=Icons.get_icon(m.background);recruit.expand_icon=true;recruit.add_theme_constant_override("icon_max_width",44)
   if selected!=m.id: continue
   label(side,"HP %d/%d · AP %d · Morale %d\nFatigue %d · Wounds %d · Bleed %d\nSTR %d AGI %d DEX %d END %d\nPER %d WIS %d LEAD %d EXP %d\nMelee %d Ranged %d Medical %d Smith %d\n%s / %s · weight %d\n%d crowns/day" % [m.hp,m.max_hp,Data.ap(m),m.morale,m.fatigue,m.wounds,m.bleeding,m.strength,m.agility,m.dexterity,m.endurance,m.perception,m.wisdom,m.leadership,m.experience,m.melee,m.ranged,m.medical,m.smithing,Data.weapon(m),Data.armour(m),Data.weight(m),m.wage])
+  label(side,"Stealth %d · Fieldcraft %d · Athletics %d\nHiring fee %d crowns · daily wage %d crowns" % [m.stealth,m.fieldcraft,m.athletics,m.fee,m.wage])
   if not m.hired: button(side,"Hire · %d crowns / 7 days" % m.fee,run_command.bind("hire",{"id":m.id,"squad":squad}))
   else:
    label(side,"Assignment: "+m.assignment)
    for value in ["rest","medical","training","repair","guard","scout","garrison"]: button(side,value.capitalize(),run_command.bind("assignment",{"id":m.id,"value":value}))
+   label(side,"Training: %s · %d/12 progress" % [m.training_skill.capitalize(),m.training])
+   for skill in Data.Skills.ALL:
+    button(side,"Train "+skill.capitalize(),run_command.bind("assignment",{"id":m.id,"value":"training","skill":skill}))
    button(side,"Renew 7 days · %d crowns" % (m.wage*7),run_command.bind("renew",{"id":m.id}))
    button(side,"Split into new squad",run_command.bind("split",{"id":m.id,"squad":squad}))
    if squad!="first": button(side,"Merge this squad into First company",run_command.bind("merge",{"from":squad,"to":"first"}))

@@ -1,5 +1,7 @@
 # Reference source audit
 
+2026-10-26 skills update: `sim/skills.gd` supplies independently authored Stealth/concealment, wilderness AP, scouting, running-fatigue and controlled-withdrawal rules. `sim/recruitment.gd` handles separate-scenario templates, individual IDs and validated recruitment transactions. No reference code, skill trees or numeric tables were copied. The exact Greywake workshop statistics remain an unresolved input; test fixtures are explicitly synthetic. Legacy character normalization preserves owned equipment/history and a neutral baseline for added skills. See GREYWAKE_SKILLS.md for formulas and bounded acceptance.
+
 2026-10-26 art update: the visual presentation uses the separately supplied Quaternius CC0 archive, not research-repository assets. `assets/quaternius/manifest.json` records source entries, hashes and repaired dependency aliases. ASSET_COVERAGE.md records library versus runtime coverage. Simulation rules and the source relationships audited below are unchanged by the art pass.
 
 Repository: https://github.com/kavemankai/jaggedalliance2.git

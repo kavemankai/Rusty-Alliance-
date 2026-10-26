@@ -1,5 +1,7 @@
 # Handover
 
+Latest feature work: 0.13.0-skills-preview. Read GREYWAKE_SKILLS.md and GREYWAKE_QA.md. The missing input is the finalized twelve-row Greywake roster (names, all fourteen attribute/skill statistics, fees, wages and any starting gear). `data/greywake_roster.json` is intentionally empty; do not promote the synthetic test roster into production. Once the authoritative table arrives, integrate it, validate starting-company choices/Elite affordability, rerun the skill/UI/Android suites and update acceptance. Do not replace the original campaign or alter renewal accounting without a clear intended billing model.
+
 Current visual pass: 0.12.0 uses the authorized Quaternius CC0 archive. Read ASSET_COVERAGE.md and ASSET_QA.md before further asset work. `ui/asset_visuals.gd` fits imported models to persisted tiles/actors, `ui/asset_catalog.gd` records explicit dependencies, and `ui/asset_icons.gd` supplies thumbnails. Regenerate mappings/export selections with `python scripts/map_quaternius.py`; regenerate icons with `scripts/render_asset_icons.gd`, then rerun mapping/import. Keep library-only models out of player exports. Prior Android 0.11.0 performance evidence must not be attributed to this art build.
 
 Open project.godot with standard Godot 4.6.2, or install the debug APK. README.md contains the exact first-contract walkthrough. Screenshots show the actual strategic, inventory and tactical runtime.

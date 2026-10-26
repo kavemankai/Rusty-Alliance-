@@ -34,7 +34,11 @@ $env:Path = (Join-Path $JavaHome 'bin') + [IO.Path]::PathSeparator + $env:Path
 Invoke-GodotChecked @('--headless','--path',$projectRoot,'--editor','--import','--quit')
 Invoke-GodotChecked @('--headless','--path',$projectRoot,'--script','tests/run.gd')
 Invoke-GodotChecked @('--headless','--path',$projectRoot,'--script','tests/extended.gd')
-if (-not $SkipUi) { Invoke-GodotChecked @('--path',$projectRoot,'--script','tests/ui_smoke.gd') }
+Invoke-GodotChecked @('--headless','--path',$projectRoot,'--script','tests/skills.gd')
+if (-not $SkipUi) {
+ Invoke-GodotChecked @('--path',$projectRoot,'--script','tests/ui_smoke.gd')
+ Invoke-GodotChecked @('--path',$projectRoot,'--script','tests/skills_ui.gd')
+}
 Invoke-GodotChecked @('--headless','--path',$projectRoot,'--export-debug','Android','builds/broken-marches-debug.apk')
 $signer = Join-Path $AndroidSdk 'build-tools/35.0.1/apksigner.bat'
 & $signer verify --verbose (Join-Path $buildRoot 'broken-marches-debug.apk')

@@ -24,9 +24,13 @@ static func bounds(node: Node3D) -> AABB:
 
 static func model(key: String,dimensions: Vector3,uniform: bool=true,source_override: Resource=null) -> Node3D:
  var source=source_override if source_override!=null else Catalog.MODELS.get(key)
+ if source is String: source=load(source)
  if source==null: return null
  var root=Node3D.new()
  root.set_meta("asset_key",key)
+ # Keep only live models resident; the engine cache reuses this resource during
+ # redraw while previous nodes await deferred deletion. No static cache cycle.
+ root.set_meta("asset_resource",source)
  var content: Node3D
  if source is PackedScene: content=source.instantiate()
  elif source is Mesh:

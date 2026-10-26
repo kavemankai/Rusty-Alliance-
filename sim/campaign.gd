@@ -1,5 +1,7 @@
 extends RefCounted
 const Records=preload("res://sim/records.gd")
+const Recruitment=preload("res://sim/recruitment.gd")
+var initial_state_hash=""
 const SaveGuard=preload("res://sim/save_guard.gd")
 var save_fault="" # Per-instance fault injection for recovery verification.
 var recovery_source=""
@@ -66,6 +68,15 @@ func _init(seed_value: int = 731) -> void:
  for j in s.jobs: schedule(j.deadline,"deadline",{"id":j.id})
  record(0,"Company charter")
  note("Hire, equip and accept Redbank. Select sector 3:3, plot route, then advance time.")
+ initial_state_hash=JSON.stringify(s).sha256_text()
+
+func configure_new_greywake(templates: Array) -> bool:
+ if battle!=null or initial_state_hash=="" or JSON.stringify(s).sha256_text()!=initial_state_hash: return reject("Choose Greywake as a separate new campaign")
+ var configured=Recruitment.configure(s,templates)
+ if configured.is_empty(): return reject("The finalized Greywake roster table is required")
+ s=configured;initial_state_hash=""
+ if autosave_path=="user://autosave.json": autosave_path="user://greywake-autosave.json"
+ return true
 
 func note(message: String) -> void:
  s.log.append(message)
@@ -91,6 +102,9 @@ func reject(message: String) -> bool:
 func command(kind: String, p: Dictionary = {}) -> bool:
  error = ""
  match kind:
+  "recruit_template":
+   if not p.get("template","") is String or not p.get("squad","first") is String: return reject("Choose a recruit template and squad")
+   return Recruitment.recruit(self,p.get("template",""),p.get("squad","first"))
   "visit", "leave", "transport", "prisoner": return Operations.run(self,kind,p)
   "hire":
    if battle != null: return reject("Resolve battle first")
@@ -148,13 +162,16 @@ func command(kind: String, p: Dictionary = {}) -> bool:
    if invalid!="": return reject(invalid)
   "assignment":
    if battle != null: return reject("Resolve battle first")
-   if not p.value in ["rest","medical","training","repair","guard","scout","garrison"]: return reject("Unknown assignment")
-   if not s.mercs.has(p.id) or not s.mercs[p.id].hired: return reject("Not employed")
-   s.mercs[p.id].assignment = p.value
+   var task=p.get("value","");var person_id=p.get("id","")
+   if task not in ["rest","medical","training","repair","guard","scout","garrison"]: return reject("Unknown assignment")
+   if not person_id is String or not s.mercs.has(person_id) or not s.mercs[person_id].hired: return reject("Not employed")
+   if p.has("skill") and (task!="training" or p.skill not in Data.Skills.ALL): return reject("Choose one of the seven skills for training")
+   if task=="training": Data.Skills.select_training(s.mercs[person_id],p.get("skill",s.mercs[person_id].training_skill))
+   s.mercs[person_id].assignment = task
    var location=-1
    for squad in s.squads.values():
-    if p.id in squad.members: location=squad.sector
-   s.mercs[p.id].assignment_record=Records.Assignment.new(p.id,p.value,location,s.time).pack()
+    if person_id in squad.members: location=squad.sector
+   s.mercs[person_id].assignment_record=Records.Assignment.new(person_id,task,location,s.time).pack()
   "renew":
    if battle != null: return reject("Resolve battle first")
    var m=s.mercs.get(p.get("id",""),{})
@@ -229,11 +246,14 @@ func command(kind: String, p: Dictionary = {}) -> bool:
    if sector.owner != "company" or s.funds < 80 or Garrison.living(sector)>=12 or not s.encounter.is_empty(): return reject("Need a peaceful owned sector, fewer than 12 levies and 80 crowns")
    record(-80,"Recruit levy")
    Garrison.create(s,sector)
-  "save": return save_to(p.get("path","user://campaign.json"))
-  "load": return load_from(p.get("path","user://campaign.json"))
+  "save": return save_to(p.get("path",default_save_path()))
+  "load": return load_from(p.get("path",default_save_path()))
   _: return reject("Unknown command: " + kind)
  Contracts.tick(self)
  return true
+
+func default_save_path() -> String:
+ return "user://greywake.json" if s.get("scenario","")=="greywake" else "user://campaign.json"
 
 func remove_member(id: String) -> void:
  s.mercs[id].hired = false
@@ -360,10 +380,7 @@ func hourly() -> void:
        m.wounds = maxi(0,m.wounds-1)
        Data.treat(m,medic)
     "training":
-     m.training += 1+int(m.wisdom/40)+(2 if local_sector.facility=="training" else 0)
-     if m.training >= 12:
-      m.training -= 12
-      m.melee = mini(95,m.melee+1)
+     if not shortage: Data.Skills.train(m,int(s.time/60),local_sector.facility=="training")
     "repair":
      for entry in m.inventory:
       if entry.kind!="ammo" and entry.condition<100 and provisions.get("tools",0)>0:
@@ -378,7 +395,7 @@ func hourly() -> void:
      local_sector.known=true
      for n in neighbors(local_sector.id):
       s.sectors[n].known=true
-      if m.perception>=75:
+      if m.perception>=75 or m.fieldcraft>=70:
        for far in neighbors(n): s.sectors[far].known=true
     "garrison":
      if local_sector.owner=="company" and Garrison.strength(local_sector)>0:
@@ -673,7 +690,7 @@ func resolve_battle(retreat: bool) -> bool:
    if retreat and not q.members.is_empty():
     var preferred=q.get("previous_sector",-1)
     q.sector=preferred if preferred in exits else exits[0]
-    for member in q.members: s.mercs[member].fatigue=mini(100,s.mercs[member].fatigue+10)
+    for member in q.members: s.mercs[member].fatigue=mini(100,s.mercs[member].fatigue+Data.Skills.withdrawal_fatigue(s.mercs[member]))
    elif q.members.is_empty(): Supplies.combine(q.supplies,sector.supplies)
    q.route=[]
    q.due=0
@@ -757,6 +774,9 @@ func load_from(path: String) -> bool:
     break
  if data.is_empty(): return reject("Save invalid or unsupported version")
  s=normalize_numbers(data)
+ initial_state_hash=""
+ if autosave_path in ["user://autosave.json","user://greywake-autosave.json"]:
+  autosave_path="user://greywake-autosave.json" if s.get("scenario","")=="greywake" else "user://autosave.json"
  Contracts.normalize(s)
  battle=null
  if not s.battle.is_empty():
@@ -784,6 +804,7 @@ func load_from(path: String) -> bool:
 func valid_save(data: Variant) -> bool:
  if not SaveGuard.raw(data) or not SaveGuard.records(data): return false
  if not data is Dictionary: return false
+ if not Recruitment.valid_state(data): return false
  for key in ["version","sectors","mercs","squads","events","rng","time","battle","encounter","funds","jobs","ledger","stash","groups","factions","log","next_event","result"]:
   if not data.has(key): return false
  if data.version!=3 or not data.has_all(["next_item","next_levy","stash_sector","pending_encounters"]) or not data.sectors is Array or data.sectors.size()!=256 or not data.mercs is Dictionary or not data.squads is Dictionary: return false
@@ -836,6 +857,8 @@ func valid_save(data: Variant) -> bool:
   for stat in ["hp","max_hp","fatigue","morale","strength","agility","dexterity","endurance","perception","wisdom","leadership","melee","ranged","medical","smithing","experience","bleeding","wounds"]:
    if not (m[stat] is int or m[stat] is float): return false
   if not Battle.Combat.valid_person(m): return false
+  if not Data.Skills.valid(m,true): return false
+  if m.trained_hour>int(data.time/60): return false
   if m.max_hp<=0 or m.hp<0 or m.hp>m.max_hp: return false
  var assigned={}
  for q in data.squads.values():

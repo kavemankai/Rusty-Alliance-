@@ -55,7 +55,7 @@ static func step(b,u: Dictionary,cell: Dictionary) -> bool:
  u.ap-=cost
  u.facing=b.heading(cell.x-u.x,cell.y-u.y)
  u.x=cell.x;u.y=cell.y
- u.person.fatigue=mini(100,u.person.fatigue+(maxi(1,5-int(u.person.endurance/20)) if u.mode=="run" else 1))
+ u.person.fatigue=mini(100,u.person.fatigue+(b.Data.Skills.running_fatigue(u.person) if u.mode=="run" else 1))
  b.refresh_knowledge()
  return true
 

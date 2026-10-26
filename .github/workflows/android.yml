@@ -54,11 +54,18 @@ jobs:
           godot --headless --script tests/extended.gd 2>&1 | tee /tmp/extended.log
           ! grep -E 'SCRIPT ERROR:|^ERROR:|FAIL:' /tmp/extended.log
       - name: Verify normal UI campaign loop
+        # The finalized Greywake workshop table is not substituted by test data.
         env:
           LIBGL_ALWAYS_SOFTWARE: '1'
         run: |
           xvfb-run -a godot --audio-driver Dummy --script tests/ui_smoke.gd 2>&1 | tee /tmp/ui.log
           ! grep -E 'SCRIPT ERROR:|^ERROR:|"failed":[1-9]' /tmp/ui.log
+          xvfb-run -a godot --audio-driver Dummy --script tests/skills_ui.gd 2>&1 | tee /tmp/skills-ui.log
+          ! grep -E 'SCRIPT ERROR:|^ERROR:|"failed":[1-9]' /tmp/skills-ui.log
+      - name: Verify skills and scenario recruitment safeguards
+        run: |
+          godot --headless --script tests/skills.gd 2>&1 | tee /tmp/skills.log
+          ! grep -E 'SCRIPT ERROR:|^ERROR:|FAIL:|"failed":[1-9]' /tmp/skills.log
       - name: Export and inspect APK
         run: |
           mkdir -p builds

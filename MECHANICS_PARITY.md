@@ -1,5 +1,7 @@
 # Verified fidelity and differences
 
+The 0.13.0 skill update preserves the original seven attributes/four skills and adds Stealth, Fieldcraft and Athletics. New original rules affect concealed-unit detection, eligible wilderness AP/scouting, running fatigue and withdrawal; all are neutral for normalized legacy values of 40. Training selects among seven skills, with separate saved partial credit and a once-per-hour guard. This is not a weapon-specific skill tree or a new JA2 parity claim. Greywake's actual workshop roster is still unavailable; recruiting tests use synthetic data and do not establish finalized scenario balance.
+
 The 0.12.0 Quaternius presentation update changes models/thumbnails, not simulation fidelity. Saved logical geometry, cover, AP, equipment ownership and fog remain authoritative; available animation clips do not establish completed action animation coverage. See ASSET_COVERAGE.md and ASSET_QA.md.
 
 This is an independent implementation inspired by JA2 system relationships. **Exact numeric parity is not established for any subsystem.** PRESERVED classifications refer to the purpose/architecture, not copied formulae or tables.

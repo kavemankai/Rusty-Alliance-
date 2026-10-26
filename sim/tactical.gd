@@ -171,7 +171,8 @@ func step_cost(u: Dictionary, from: Dictionary, dest: Dictionary,charted: bool=f
   var b=Visibility.cell(self,from.x,from.y+dy,u.team) if charted else tile(from.x,from.y+dy)
   if a.is_empty() or b.is_empty() or a.block or b.block or planned_occupant(u,a.x,a.y,charted)!=null or planned_occupant(u,b.x,b.y,charted)!=null: return -1
  if absi(dest.elevation-from.elevation)>1: return -1
- var cost=dest.cost+maxi(0,dest.elevation-from.elevation)*2
+ var terrain_cost=Data.Skills.wilderness_cost(u.person,dest,dest.cost,t.get("layout","")) if u.role!="cart" else dest.cost
+ var cost=terrain_cost+maxi(0,dest.elevation-from.elevation)*2
  if dx!=0 and dy!=0: cost=int(ceil(cost*1.4))
  if u.role=="cart": cost+=1
  if u.stance=="crouch": cost+=1
@@ -292,6 +293,8 @@ func visible(a: Dictionary,b: Dictionary) -> bool:
  if rear(b,a): radius=maxi(2,int(radius*0.65))
  if b.get("stance","stand")=="prone": radius-=2
  radius-=int(tile(b.x,b.y).conceal/10)
+ var stealth=Data.Skills.stealth_reduction(b,tile(b.x,b.y))
+ if stealth>0: radius=maxi(2,radius-stealth)
  return d<=radius and los(a,b)
 
 func los(a: Dictionary,b: Dictionary) -> bool:
@@ -362,7 +365,7 @@ func move(u: Dictionary,x: int,y: int) -> bool:
   u.facing=heading(dest.x-u.x,dest.y-u.y)
   u.x=dest.x
   u.y=dest.y
-  u.person.fatigue=mini(100,u.person.fatigue+(maxi(1,5-int(u.person.endurance/20)) if u.mode=="run" else 1))
+  u.person.fatigue=mini(100,u.person.fatigue+(Data.Skills.running_fatigue(u.person) if u.mode=="run" else 1))
   refresh_knowledge()
   for enemy in t.units:
    if enemy.team==u.team or enemy.person.hp<=10 or not enemy.guard: continue

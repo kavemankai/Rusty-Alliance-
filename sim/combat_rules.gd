@@ -14,23 +14,27 @@ static func accuracy(a: Dictionary) -> int:
 static func defence_bonus(b: Dictionary,kind: String) -> int:
  return 15 if b.get("defence_mode","balanced")==kind else 0
 
-static func risk(b,u: Dictionary,x: int,y: int) -> Dictionary:
+static func risk(b,u: Dictionary,x: int,y: int,preview: bool=true) -> Dictionary:
  var threats=[]
  for other in b.t.units:
   if other.team==u.team or other.person.hp<=10 or not other.guard or not b.known(u.team,other.id): continue
   var weapon=Data.WEAPONS[Data.weapon(other.person)]
   if weapon.reach>0 and other.ap>=weapon.ap and b.distance(u,other)<=weapon.reach and maxi(absi(other.x-x),absi(other.y-y))>weapon.reach: threats.append(other.id)
- var step=b.step_cost(u,b.tile(u.x,u.y),b.tile(x,y))
- return {"threats":threats,"move_ap":step,"disengage_ap":step+4 if step>0 else -1}
+ var charted=preview and u.team=="company"
+ var source=b.Visibility.cell(b,u.x,u.y,u.team) if charted else b.tile(u.x,u.y)
+ var dest=b.Visibility.cell(b,x,y,u.team) if charted else b.tile(x,y)
+ var step=b.step_cost(u,source,dest,charted)
+ return {"threats":threats,"move_ap":step,"disengage_ap":step+Data.Skills.withdrawal_ap(u.person) if step>0 else -1}
 
 static func disengage(b,u: Dictionary,p: Dictionary) -> bool:
  if b.t.phase!="combat": return b.fail("Disengage during combat")
  var dest=b.tile(p.get("x",-1),p.get("y",-1))
- var price=risk(b,u,p.get("x",-1),p.get("y",-1)).disengage_ap
- if dest.is_empty() or price<0 or b.distance(u,dest)!=1 or u.ap<price: return b.fail("Choose an adjacent free tile and reserve step cost plus 4 AP")
+ var price=risk(b,u,p.get("x",-1),p.get("y",-1),false).disengage_ap
+ if dest.is_empty() or price<0 or b.distance(u,dest)!=1 or u.ap<price: return b.fail("Choose an adjacent free tile and reserve the previewed withdrawal AP")
+ if b.path(u,dest.x,dest.y,u.team=="company").cost<=0: return b.fail("Withdrawal destination is not reachable through current knowledge")
  # Deliberate withdrawal suppresses melee opportunities for this single step.
  # Ranged guard reactions still apply through the normal move executor.
- u.ap-=4
+ u.ap-=Data.Skills.withdrawal_ap(u.person)
  u.disengaging=true
  var result=b.move(u,dest.x,dest.y)
  u.disengaging=false

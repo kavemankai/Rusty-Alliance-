@@ -389,6 +389,8 @@ func run() -> void:
  preload("res://tests/production_cases.gd").run(self)
  preload("res://tests/hardening_cases.gd").run(self)
  preload("res://tests/touch_cases.gd").run(self)
+ await process_frame
+ await process_frame
  var results={"checks":checks,"passed":checks.size()-failed,"failed":failed,"contract_rounds":rounds,"engine":Engine.get_version_info().string}
  var f=FileAccess.open("res://test-results.json",FileAccess.WRITE)
  f.store_string(JSON.stringify(results,"  "))

@@ -20,6 +20,9 @@ func run() -> void:
   if child.has_meta("actor_id"): actors+=1
  check(actors>=2,"Packaged actor meshes and materials")
  check(load("res://ui/asset_icons.gd").TEXTURES.size()==63,"Packaged thumbnail dependencies")
+ check(app.game.s.mercs.mara.has_all(app.Data.Skills.ALL),"Packaged character has all seven skills")
+ var roster=JSON.parse_string(FileAccess.get_file_as_string("res://data/greywake_roster.json"))
+ check(roster is Dictionary and roster.get("templates") is Array,"Packaged Greywake roster status/data file exists")
  check(not ResourceLoader.exists("res://assets/quaternius/characters/glTF/Wizard.gltf"),"Unused library models stay out of player builds")
  check("Quaternius art assets" in FileAccess.get_file_as_string("res://THIRD_PARTY_NOTICES.txt"),"Packaged art credit and CC0 notice")
  print("PACK_SMOKE: "+JSON.stringify({"failed":failures.size(),"failures":failures,"actors":actors}))

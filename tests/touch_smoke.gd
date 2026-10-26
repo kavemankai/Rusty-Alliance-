@@ -7,4 +7,6 @@ func check(ok: bool,label: String) -> void:
  else: failed+=1;print("FAIL: "+label)
 func run() -> void:
  preload("res://tests/touch_cases.gd").run(self)
+ await process_frame
+ await process_frame
  print("TOUCH: %d passed, %d failed" % [passed,failed]);quit(1 if failed else 0)

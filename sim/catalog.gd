@@ -1,4 +1,5 @@
 extends RefCounted
+const Skills=preload("res://sim/skills.gd")
 
 # Original values: no JA2 source tables or content are included.
 const WEAPONS = {
@@ -36,6 +37,7 @@ static func person(id: String, title: String, background: String, weapon: String
  "fee":100,"wage":20,"expires":0,"training":0,"kills":0}
  p.inventory[2].ammo_type=ammo_kind_for(weapon)
  p.merge(BACKGROUNDS.get(background, {}), true)
+ Skills.normalize(p)
  return p
 
 static func weight(p: Dictionary) -> int:
@@ -121,6 +123,7 @@ static func injury(p: Dictionary,location: String) -> int:
 
 static func normalize_person(p: Dictionary) -> void:
  if not p.get("inventory") is Array or not p.get("equipment") is Dictionary: return
+ Skills.normalize(p)
  if not p.has("injuries"): p.injuries=[]
  for entry in p.get("inventory",[]):
   if not entry is Dictionary: return
