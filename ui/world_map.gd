@@ -1,9 +1,11 @@
 extends Control
+const Desktop=preload("res://ui/desktop.gd")
 const Icons=preload("res://ui/asset_icons.gd")
 signal sector_selected(index: int)
 var campaign
 var selected=17
 var squad="first"
+var middle=false
 var zoom=0.9
 var offset=Vector2(25,15)
 var pressed=false
@@ -55,6 +57,9 @@ func _draw() -> void:
 
 func input_event(event: InputEvent) -> void:
  if (event is InputEventMouseButton or event is InputEventMouseMotion) and event.device==InputEvent.DEVICE_ID_EMULATION: return
+ if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_MIDDLE:
+  middle=event.pressed;accept_event();return
+ if event is InputEventMouseMotion and middle: offset+=event.relative;queue_redraw();accept_event();return
  if event is InputEventMouseButton:
   if event.button_index==MOUSE_BUTTON_WHEEL_UP: zoom=clampf(zoom*1.1,0.65,2.8)
   elif event.button_index==MOUSE_BUTTON_WHEEL_DOWN: zoom=clampf(zoom/1.1,0.65,2.8)
@@ -67,7 +72,7 @@ func input_event(event: InputEvent) -> void:
     select_point(event.position)
  elif event is InputEventMouseMotion and pressed:
   if event.position.distance_to(down)>12: dragged=true
-  if dragged: offset+=event.relative
+  if dragged and not Desktop.enabled(): offset+=event.relative
  elif event is InputEventPanGesture:
   offset-=event.delta*5.0;dragged=true
  elif event is InputEventMagnifyGesture: zoom=clampf(zoom*event.factor,0.65,2.8)
@@ -101,5 +106,13 @@ func select_point(position: Vector2) -> void:
   selected=y*16+x;sector_selected.emit(selected)
 
 func _notification(what: int) -> void:
- if what==NOTIFICATION_APPLICATION_PAUSED:
+ if what in [NOTIFICATION_APPLICATION_PAUSED,NOTIFICATION_APPLICATION_FOCUS_OUT]:
+  middle=false
   fingers.clear();pressed=false;dragged=true
+
+func reset_camera() -> void:
+ zoom=.9;offset=Vector2(24,24);queue_redraw()
+
+func center_on(index: int) -> void:
+ var point=offset+Vector2(index%16+.5,int(index/16)+.5)*32*zoom
+ offset+=size*.5-point;queue_redraw()

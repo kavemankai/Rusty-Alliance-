@@ -1,0 +1,18 @@
+{
+  "baseline_commit": "90b0ce7",
+  "before": {
+    "median_ms": 6.142,
+    "p95_ms": 6.857
+  },
+  "cpu": "13th Gen Intel(R) Core(TM) i5-13420H",
+  "current": {
+    "median_ms": 0.203,
+    "p95_ms": 0.232
+  },
+  "failed": 0,
+  "failures": [],
+  "limits": "CPU redraw comparison on the same six-person campaign and geometry; GPU targets disabled. This is not a universal FPS or hardware guarantee; deferred node teardown is excluded.",
+  "median_ratio": 30.256157635468,
+  "passed": 11,
+  "samples": 30
+}

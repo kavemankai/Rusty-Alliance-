@@ -1,3 +1,9 @@
+# Current PC slice — 0.16.0
+
+The existing vertical slice now has native desktop sizing, configurable keyboard controls, a persistent tactical crew/action bar, a resizable inspector, focus-safe pause behavior and cached actor rendering. See [PC validation, controls, reproduction and limits](PC_VALIDATION.md) and [the complete acceptance scope](PC_VERTICAL_SLICE.md). The full Greywake campaign, final assets/audio and new Android acceptance remain outstanding.
+
+The earlier version sections below are historical evidence for their own builds.
+
 # Current scene-art preview — 0.15.2
 
 The remaining pack parts are received. Seven supplied scene PNGs and eight UI images are integrated; baked-label maps, combat reference and unmapped portraits remain references. See GREYWAKE_SCENE_ART_STATUS.md for current evidence, provisional quality and remaining work. Earlier build sections below are historical.

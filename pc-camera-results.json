@@ -1,0 +1,6 @@
+{
+  "failed": 0,
+  "failures": [],
+  "passed": 14,
+  "scope": "Headless native Control GUI mouse events and focus-clock behaviour; display/fullscreen/performance use the separate graphical runs."
+}

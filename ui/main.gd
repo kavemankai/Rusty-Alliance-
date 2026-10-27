@@ -5,12 +5,14 @@ const GreywakeMap=preload("res://ui/greywake_map.gd")
 const MapView=preload("res://ui/world_map.gd")
 const BattleView=preload("res://ui/battle_view.gd")
 const OpeningView=preload("res://ui/greywake_opening_view.gd")
+const Desktop=preload("res://ui/desktop.gd")
+const PC=preload("res://ui/pc_controls.gd")
 const Icons=preload("res://ui/asset_icons.gd")
 var game
 var ui: Control
 var header: Label
 var message: Label
-var content: HBoxContainer
+var content: Container
 var map_view
 var battle_view
 var side: VBoxContainer
@@ -38,8 +40,23 @@ var title_visible=false
 var shipping_alert=""
 var port_status: Label
 var confirm: ConfirmationDialog
+var desktop=Desktop.new()
+var desktop_feedback: Label
+var binding_action=""
+var pan_keys={}
+var view_memory={}
+var crew: HBoxContainer
+var action_dock: HBoxContainer
+var preview_caption: Label
+var primary_button: Button
+var background_paused=false
+var sidebar_offset=-60
+var nav_buttons={}
+var reload_button: Button
+var guard_button: Button
 
 func _ready() -> void:
+ if Desktop.enabled(): desktop.load_settings();desktop.apply_window(get_window(),true)
  ui=Control.new()
  ui.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
  add_child(ui)
@@ -51,6 +68,7 @@ func _ready() -> void:
  island_theme=theme.duplicate();island_theme.default_font_size=16
  island_theme.set_color("font_color","Label",Color("e2d4b2"))
  island_theme.set_color("font_color","Button",Color("e2d4b2"))
+ apply_desktop_theme()
  confirm=ConfirmationDialog.new()
  ui.add_child(confirm)
  menu()
@@ -82,12 +100,14 @@ func button(parent: Node,title: String,callback: Callable) -> Button:
  b.size_flags_horizontal=Control.SIZE_EXPAND_FILL
  parent.add_child(b)
  if game!=null and Campaign.World.applies(game.s): preload("res://ui/greywake_art.gd").apply_button(b)
+ if Desktop.enabled(): desktop.style_button(b)
  b.pressed.connect(callback,CONNECT_DEFERRED)
  return b
 
 func label(parent: Node,text: String) -> Label:
  var l=Label.new()
  l.text=text
+ if Desktop.enabled(): l.add_theme_font_size_override("font_size",round(16*desktop.ui_scale))
  l.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
  parent.add_child(l)
  return l
@@ -118,11 +138,19 @@ func continue_greywake() -> void:
    game=candidate;save_slot="user://greywake.json";selected="";squad="first";tab="sector";title_visible=false;rebuild();return
 
 func title_settings() -> void:
- clear();var box=VBoxContainer.new();box.set_anchors_and_offsets_preset(Control.PRESET_CENTER);box.position=Vector2(-250,-120);box.size=Vector2(500,240);ui.add_child(box)
- label(box,"SETTINGS · Desktop and touch")
- label(box,"Left click: select · Middle drag: pan · Wheel: zoom\nEnter: dialogue · Esc: cancel/skip · Space: end turn")
- button(box,"Toggle fullscreen",func():DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED if DisplayServer.window_get_mode()==DisplayServer.WINDOW_MODE_FULLSCREEN else DisplayServer.WINDOW_MODE_FULLSCREEN))
- button(box,"Back",menu)
+ if not Desktop.enabled():
+  clear();var box=VBoxContainer.new();box.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);ui.add_child(box)
+  label(box,"Touch: select · drag: pan · pinch: zoom");button(box,"Back",menu);return
+ pause_desktop();clear()
+ var margin=MarginContainer.new();margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+ for key in ["left","right","top","bottom"]: margin.add_theme_constant_override("margin_"+key,40)
+ ui.add_child(margin)
+ var columns=HBoxContainer.new();margin.add_child(columns);columns.add_spacer(false)
+ var card=VBoxContainer.new();card.custom_minimum_size.x=680;columns.add_child(card);columns.add_spacer(false)
+ button(card,"Back",menu)
+ var scroll=ScrollContainer.new();scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL;card.add_child(scroll)
+ var box=VBoxContainer.new();box.size_flags_horizontal=Control.SIZE_EXPAND_FILL;scroll.add_child(box)
+ PC.settings(self,box)
 
 func opening_execute(kind: String,p: Dictionary={}) -> void:
  if opening_transition: return
@@ -150,6 +178,8 @@ func open_greywake(path: String) -> void:
  selected="";squad="first";tab="company";rebuild()
 
 func rebuild() -> void:
+ cache_views()
+ crew=null;action_dock=null;primary_button=null;preview_caption=null;nav_buttons.clear()
  if opening_tween!=null and opening_tween.is_valid(): opening_tween.kill()
  opening_transition=false
  title_visible=false
@@ -175,11 +205,20 @@ func rebuild() -> void:
  if Campaign.World.applies(game.s): navigation=[["Map","sector"],["Harbour","harbour"],["Company","company"],["Contracts","contracts"],["Inventory","inventory"],["Supplies","supplies"],["Settings","settings"]]
  elif Campaign.Shipping.applies(game.s): navigation=[["Dock Town","harbour"],["Company","company"],["Inventory","inventory"],["Supplies","supplies"],["Ledger","ledger"],["Settings","settings"]]
  if Campaign.Shipping.applies(game.s) and game.battle!=null:
+  if Desktop.enabled(): navigation=navigation.filter(func(item):return item[1]!="sector")
   navigation.push_front(["Battle","sector"])
   if tab=="harbour": tab="sector"
  for item in navigation:
-  button(nav,item[0],change_tab.bind(item[1]))
- content=HBoxContainer.new()
+  if Desktop.enabled() and item[1]=="debug": continue
+  var entry=button(nav,item[0],change_tab.bind(item[1]))
+  if Desktop.enabled(): entry.toggle_mode=true;nav_buttons[item[1]]=entry
+ if Desktop.enabled() and game.battle!=null:
+  var roster_scroll=ScrollContainer.new();roster_scroll.custom_minimum_size.y=64;roster_scroll.vertical_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED;root.add_child(roster_scroll)
+  crew=HBoxContainer.new();crew.size_flags_horizontal=Control.SIZE_EXPAND_FILL;roster_scroll.add_child(crew)
+ content=HSplitContainer.new() if Desktop.enabled() else HBoxContainer.new()
+ if Desktop.enabled():
+  content.split_offset=sidebar_offset
+  content.dragged.connect(func(value):sidebar_offset=value)
  content.size_flags_vertical=Control.SIZE_EXPAND_FILL
  root.add_child(content)
  map_view=null
@@ -203,6 +242,7 @@ func rebuild() -> void:
   map_view.size_flags_horizontal=Control.SIZE_EXPAND_FILL
   map_view.custom_minimum_size.x=400
   content.add_child(map_view)
+  restore_view(map_view,"map")
   map_view.sector_selected.connect(func(index): sector=index; tab="sector"; show_panel())
  else:
   battle_view=BattleView.new()
@@ -210,16 +250,24 @@ func rebuild() -> void:
   battle_view.selected=selected
   battle_view.size_flags_horizontal=Control.SIZE_EXPAND_FILL
   battle_view.custom_minimum_size.x=400
+  battle_view.render_scale=desktop.render_scale if Desktop.enabled() else 1.0
   content.add_child(battle_view)
+  restore_view(battle_view,"battle")
   battle_view.cell_selected.connect(tactical_cell)
  var scroll=ScrollContainer.new()
- scroll.custom_minimum_size.x=380
+ scroll.custom_minimum_size.x=360 if Desktop.enabled() else 380
  scroll.size_flags_horizontal=Control.SIZE_FILL
  content.add_child(scroll)
  side=VBoxContainer.new()
- side.custom_minimum_size.x=360
+ side.custom_minimum_size.x=340 if Desktop.enabled() else 360
  side.size_flags_horizontal=Control.SIZE_EXPAND_FILL
  scroll.add_child(side)
+ if Desktop.enabled() and game.battle!=null:
+  action_dock=HBoxContainer.new();root.add_child(action_dock)
+  preview_caption=label(action_dock,"");preview_caption.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+  primary_button=button(action_dock,"Confirm preview",confirm_preview);primary_button.custom_minimum_size.x=180
+  reload_button=button(action_dock,"Reload",func():battle_action("reload"))
+  guard_button=button(action_dock,"Guard",func():battle_action("guard"))
  var bar=HBoxContainer.new()
  root.add_child(bar)
  button(bar,"Save",func():run_command("save"))
@@ -258,16 +306,20 @@ func rebuild() -> void:
   button(bar,"−",func():battle_view.camera.size=clampf(battle_view.camera.size+2,8,32))
   button(bar,"+",func():battle_view.camera.size=clampf(battle_view.camera.size-2,8,32))
  message=label(root,last_message)
- message.custom_minimum_size.y=46
+ message.custom_minimum_size.y=26 if Desktop.enabled() else 46
+ if Desktop.enabled(): message.max_lines_visible=2
  refresh()
+ if Desktop.enabled(): restore_sidebar_after_layout(content)
 
 func change_tab(value: String) -> void:
+ pan_keys.clear()
+ if Desktop.enabled() and value=="settings": pause_desktop()
  tab=value
  show_panel()
 
 func status(text: String) -> void:
  last_message=text
- if is_instance_valid(message): message.text=text
+ if is_instance_valid(message): message.text=text;message.tooltip_text=text
 
 func refresh() -> void:
  var s=game.s
@@ -285,9 +337,9 @@ func refresh() -> void:
  var pack=game.s.squads[squad].supplies
  var caption=game.s.squads[squad].name
  if game.battle!=null:
-  if game.battle.unit(selected)==null:
+  if game.battle.unit(selected)==null or (Desktop.enabled() and game.battle.unit(selected).person.hp<=0):
    for u in game.battle.t.units:
-    if u.team=="company": selected=u.id;break
+    if u.team=="company" and (not Desktop.enabled() or u.person.hp>0): selected=u.id;break
   if game.battle.unit(selected)!=null:
    pack=game.Supplies.for_person(s,selected)
    caption=game.battle.unit(selected).person.name
@@ -299,10 +351,13 @@ func refresh() -> void:
   map_view.queue_redraw()
  if battle_view!=null:
   battle_view.selected=selected
+  battle_view.highlight_target=target
   battle_view.redraw()
+ refresh_crew()
  show_panel()
 
 func run_command(kind: String,p: Dictionary={}) -> void:
+ cache_views()
  if kind=="save" and not p.has("path"): p={"path":save_slot}
  var had_battle=game.battle!=null
  var previous_phase="" if not had_battle else game.battle.t.phase
@@ -318,6 +373,9 @@ func run_command(kind: String,p: Dictionary={}) -> void:
  else: status(game.error)
 
 func show_panel() -> void:
+ for key in nav_buttons:
+  if is_instance_valid(nav_buttons[key]): nav_buttons[key].set_pressed_no_signal(key==tab)
+ update_context_dock()
  if not is_instance_valid(side): return
  for child in side.get_children():
   side.remove_child(child)
@@ -352,7 +410,8 @@ func show_panel() -> void:
    button(side,"Return to map / battle",func():change_tab("sector"))
    button(side,"Save campaign",run_command.bind("save",{}))
    button(side,"Main menu",func():ask("Save and return to menu?",func():game.command("save",{"path":save_slot});menu()))
-   label(side,"Compatibility renderer · landscape\nPrimitive geometry · touch input\nManual save and boundary autosaves\nPinch or +/− zoom; drag to pan.")
+   if Desktop.enabled(): PC.settings(self,side)
+   else: label(side,"Drag to pan · Pinch or +/− to zoom. Manual save and boundary autosaves.")
   _: sector_panel()
 
 func sector_panel() -> void:
@@ -499,6 +558,7 @@ func tactical_cell(x: int,y: int) -> void:
    var route=b.path(actor,x,y,true)
    battle_view.preview=route.path
  battle_view.selected=selected
+ battle_view.highlight_target=target
  battle_view.redraw()
  show_panel()
 
@@ -510,6 +570,7 @@ func battle_action(kind: String,p: Dictionary={}) -> void:
   if kind in ["guard","defence_mode"]: game.Opening.mark(game.s,"defence")
  else: status(game.battle.error)
  destination={}
+ if target!="" and (game.battle.unit(target)==null or game.battle.unit(target).person.hp<=0 or not game.battle.known("company",target)): target=""
  if battle_view!=null: battle_view.preview=[]
  if previous_phase!=game.battle.t.phase:
   if not game.battle.t.log.is_empty(): status(game.battle.t.log.back())
@@ -533,7 +594,7 @@ func tactical_panel() -> void:
   label(side,"BATTLE · round %d · %s\n%s" % [b.t.round,b.t.turn,b.outcome()])
   label(side,"Quiet rounds: %d/3 before exploration may resume" % b.t.quiet_rounds)
   if b.t.quiet_rounds>=3: button(side,"Resume exploration",run_command.bind("explore",{}))
- for u in b.t.units:
+ for u in ([] if Desktop.enabled() else b.t.units):
   if u.team=="company" and u.person.hp>0: button(side,("● " if selected==u.id else "")+u.person.name+" · %d AP / %d HP" % [u.ap,u.person.hp],func():selected=u.id;target="";destination={};battle_view.selected=selected;game.Opening.mark(game.s,"select");refresh())
  var u=b.unit(selected)
  if u==null: return
@@ -611,6 +672,11 @@ func ask(text: String,callback: Callable) -> void:
  confirm.popup_centered(Vector2i(500,200))
 
 func _process(delta: float) -> void:
+ if Desktop.enabled():
+  PC.pan(self,delta)
+  var paused=background_paused or PC.modal(self) or tab=="settings"
+  if is_instance_valid(battle_view): battle_view.viewport.render_target_update_mode=SubViewport.UPDATE_DISABLED if paused else SubViewport.UPDATE_WHEN_VISIBLE
+  if paused: return
  if title_visible: return
  if game!=null and game.battle!=null and game.battle.t.phase=="exploration" and game.battle.t.exploration.get("running",false):
   timer+=delta
@@ -632,6 +698,13 @@ func _process(delta: float) -> void:
   refresh()
 
 func _notification(what: int) -> void:
+ if Desktop.enabled() and is_instance_valid(ui):
+  if what==NOTIFICATION_APPLICATION_FOCUS_OUT:
+   background_paused=true;pause_desktop();Engine.max_fps=15
+   if is_instance_valid(battle_view): battle_view.viewport.render_target_update_mode=SubViewport.UPDATE_DISABLED
+  elif what==NOTIFICATION_APPLICATION_FOCUS_IN:
+   background_paused=false;Engine.max_fps=desktop.frame_limit
+   if is_instance_valid(battle_view): battle_view.viewport.render_target_update_mode=SubViewport.UPDATE_WHEN_VISIBLE
  if what==NOTIFICATION_APPLICATION_PAUSED and game!=null:
   auto_minutes=0
   if game.battle!=null and game.battle.t.has("exploration"): game.battle.t.exploration.running=false
@@ -759,6 +832,8 @@ func harbour_panel() -> void:
 
 func _unhandled_key_input(event: InputEvent) -> void:
  if not event is InputEventKey or not event.pressed or event.echo: return
+ if Desktop.enabled() and PC.typing(self): return
+ if Desktop.enabled() and event.keycode in [KEY_ENTER,KEY_SPACE] and get_viewport().gui_get_focus_owner() is Button: return
  if title_visible:
   if event.keycode==KEY_ESCAPE: menu();get_viewport().set_input_as_handled()
   return
@@ -769,8 +844,11 @@ func _unhandled_key_input(event: InputEvent) -> void:
   elif event.keycode in [KEY_ESCAPE,KEY_SPACE] and stage in ["BOAT_CROSSING","EMPLOYER_BRIEFING"]: opening_execute("opening_skip",{})
   elif event.keycode==KEY_ESCAPE and stage=="TAVERN_RECRUITMENT": tavern_selected="";rebuild()
   elif event.keycode==KEY_ESCAPE and stage=="COMPANY_CONFIRMATION": opening_execute("opening_back",{})
+  elif Desktop.enabled() and event.keycode==KEY_ENTER and stage=="COMPANY_CONFIRMATION": opening_execute("opening_depart",{})
+  elif Desktop.enabled() and event.keycode==KEY_ENTER and stage in ["GREYWAKE_ARRIVAL","DOCKSIDE_CONTRACT"]: opening_execute("opening_next",{})
   else: return
   get_viewport().set_input_as_handled();return
+ if Desktop.enabled(): return
  if event.keycode==KEY_ESCAPE:
   target="";destination={};get_viewport().gui_release_focus()
   if battle_view!=null: battle_view.preview=[]
@@ -821,16 +899,119 @@ func tutorial_panel() -> void:
 func _input(event: InputEvent) -> void:
  if opening_transition:
   get_viewport().set_input_as_handled();return
+ if Desktop.enabled() and event is InputEventKey and PC.key_input(self,event):
+  get_viewport().set_input_as_handled();return
+ if Desktop.enabled() and event is InputEventKey and PC.typing(self): return
  if title_visible or game==null or confirm.visible: return
  var stage=Campaign.Opening.stage(game.s)
  if event is InputEventKey and event.pressed and not event.echo:
-  if (stage=="EMPLOYER_BRIEFING" and event.keycode in [KEY_ENTER,KEY_SPACE,KEY_ESCAPE]) or (stage=="BOAT_CROSSING" and event.keycode in [KEY_SPACE,KEY_ESCAPE]) or (stage in ["TAVERN_RECRUITMENT","COMPANY_CONFIRMATION"] and event.keycode==KEY_ESCAPE):
-   _unhandled_key_input(event)
+  if (stage=="EMPLOYER_BRIEFING" and event.keycode in [KEY_ENTER,KEY_SPACE,KEY_ESCAPE]) or (stage=="BOAT_CROSSING" and event.keycode in [KEY_SPACE,KEY_ESCAPE]) or (stage in ["TAVERN_RECRUITMENT","COMPANY_CONFIRMATION"] and event.keycode==KEY_ESCAPE) or (Desktop.enabled() and stage in ["COMPANY_CONFIRMATION","GREYWAKE_ARRIVAL","DOCKSIDE_CONTRACT"] and event.keycode==KEY_ENTER):
+   if not (Desktop.enabled() and event.keycode==KEY_ENTER and get_viewport().gui_get_focus_owner() is Button): _unhandled_key_input(event)
  if event is InputEventMouseButton and event.pressed and event.button_index==MOUSE_BUTTON_RIGHT:
   if stage=="TAVERN_RECRUITMENT": tavern_selected="";rebuild()
   elif stage=="COMPANY_CONFIRMATION": opening_execute("opening_back",{})
   elif not Campaign.Opening.locked(game.s):
-   target="";destination={}
-   if battle_view!=null: battle_view.preview=[]
-   refresh()
+   cancel_preview()
   get_viewport().set_input_as_handled()
+
+func apply_desktop_theme() -> void:
+ if not Desktop.enabled(): return
+ if base_theme!=null: base_theme.default_font_size=round(17*desktop.ui_scale)
+ if island_theme!=null: island_theme.default_font_size=round(17*desktop.ui_scale)
+
+func pause_desktop() -> void:
+ auto_minutes=0;timer=0;pan_keys.clear()
+ if game!=null and game.battle!=null and game.battle.t.phase=="exploration": game.battle.t.exploration.running=false
+
+func cache_views() -> void:
+ if not Desktop.enabled() or game==null: return
+ if is_instance_valid(map_view) and map_view.is_inside_tree() and map_view.campaign==game: view_memory[str(game.get_instance_id())+"/map"]={"zoom":map_view.zoom,"offset":map_view.offset}
+ if is_instance_valid(battle_view) and battle_view.is_inside_tree() and battle_view.battle==game.battle: view_memory[str(game.get_instance_id())+"/battle"]={"position":battle_view.camera.position,"zoom":battle_view.camera.size,"roofs":battle_view.show_roofs}
+
+func restore_view(view,kind: String) -> void:
+ if not Desktop.enabled(): return
+ var key=str(game.get_instance_id())+"/"+kind
+ if not view_memory.has(key): return
+ var state=view_memory[key]
+ if kind=="map": view.zoom=state.zoom;view.offset=state.offset
+ else: view.camera.position=state.position;view.camera.size=state.zoom;view.show_roofs=state.roofs
+
+func fighters() -> Array:
+ if game==null or game.battle==null: return []
+ return game.battle.t.units.filter(func(unit):return unit.team=="company" and unit.person.hp>0)
+
+func select_fighter(index: int) -> void:
+ var available=fighters()
+ if index<0 or index>=available.size(): return
+ selected=available[index].id;cancel_pending_only();tab="sector"
+ get_viewport().gui_release_focus();game.Opening.mark(game.s,"select");refresh()
+
+func cycle_fighter(step: int) -> void:
+ var available=fighters()
+ if available.is_empty(): return
+ var index=0
+ for i in range(available.size()):
+  if available[i].id==selected: index=i;break
+ select_fighter(posmod(index+step,available.size()))
+
+func refresh_crew() -> void:
+ if not is_instance_valid(crew): return
+ for child in crew.get_children(): crew.remove_child(child);child.queue_free()
+ var available=fighters()
+ for i in range(available.size()):
+  var unit=available[i];var name=unit.person.name.get_slice(" · ",0)
+  if unit.id.begins_with("greywake-recruit-"): name="#"+unit.id.trim_prefix("greywake-recruit-")
+  var choice=button(crew,"%d · %s\n%d/%d HP · %d AP" % [i+1,name,unit.person.hp,unit.person.max_hp,unit.ap],select_fighter.bind(i))
+  choice.custom_minimum_size=Vector2(165,58);choice.tooltip_text=unit.person.name+" · "+Data.weapon(unit.person)
+  choice.toggle_mode=true;choice.button_pressed=unit.id==selected
+
+func cancel_preview() -> void:
+ target="";destination={};get_viewport().gui_release_focus()
+ if is_instance_valid(battle_view): battle_view.preview=[]
+ refresh()
+
+func end_player_turn() -> void:
+ if game==null or game.battle==null or game.battle.t.phase!="combat": return
+ cancel_pending_only()
+ if game.battle.end_turn(): game.Opening.mark(game.s,"turn");status("Enemy turn resolved")
+ else: status(game.battle.error)
+ refresh()
+
+func cancel_pending_only() -> void:
+ target="";destination={}
+ if is_instance_valid(battle_view): battle_view.preview=[]
+
+func confirm_preview() -> void:
+ if game==null or game.battle==null: return
+ if game.battle.t.phase=="deployment":
+  if not destination.is_empty(): run_command("deploy",{"id":selected,"x":destination.x,"y":destination.y})
+  else: run_command("confirm_deployment")
+ elif game.battle.outcome()!="ongoing": run_command("resolve")
+ elif target!="": battle_action("attack",{"target":target,"aim":aim})
+ elif not destination.is_empty(): battle_action("move",destination.duplicate())
+
+func update_context_dock() -> void:
+ if not is_instance_valid(action_dock) or game==null or game.battle==null: return
+ action_dock.visible=tab=="sector"
+ var battle=game.battle;var actor=battle.unit(selected)
+ var active=actor!=null and battle.t.phase=="combat" and battle.outcome()=="ongoing"
+ reload_button.disabled=not active or Data.WEAPONS[Data.weapon(actor.person)].reach!=0 or actor.person.get("loaded",false) or Data.ammo(actor.person)<=0 if actor!=null else true
+ guard_button.disabled=not active or actor.get("guard",false) if actor!=null else true
+ primary_button.disabled=false
+ primary_button.text="Confirm ["+desktop.key_name("confirm")+"]"
+ if battle.outcome()!="ongoing": preview_caption.text=battle.outcome().capitalize()+" · Resolve to keep the result";return
+ if actor==null: primary_button.disabled=true;preview_caption.text="Select a fighter";return
+ if battle.t.phase=="deployment": preview_caption.text="Review positions · Enter confirms placement or begins combat";return
+ if target!="":
+  var enemy=battle.unit(target)
+  if enemy==null or not battle.known("company",target): primary_button.disabled=true;preview_caption.text="Select a visible target";return
+  preview_caption.text="ATTACK · %d%% hit · %d AP · %d AP available" % [battle.hit_chance(actor,enemy,aim),battle.Combat.cost(actor,aim),actor.ap]
+ elif not destination.is_empty():
+  var route=battle.path(actor,destination.x,destination.y,true)
+  if route.path.is_empty() or route.cost<0: primary_button.disabled=true;preview_caption.text="No legal previewed route to this destination"
+  else: preview_caption.text="MOVE · %d AP estimated · %d AP available · stops on contact" % [route.cost,actor.ap]
+ else: primary_button.disabled=true;preview_caption.text="Select a destination or opponent · "+desktop.key_name("next_unit")+" cycles fighters"
+
+func restore_sidebar_after_layout(split: Container) -> void:
+ await get_tree().process_frame
+ if is_instance_valid(split) and split.is_inside_tree() and split is HSplitContainer: split.split_offset=sidebar_offset

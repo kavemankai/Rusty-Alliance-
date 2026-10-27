@@ -1,0 +1,62 @@
+{
+  "args": [
+    "--script",
+    "tests/pc_frame_probe.gd"
+  ],
+  "configurations": [
+    {
+      "actual_process_fps": 30.0007200172804,
+      "cap": 60,
+      "engine_fps": 30.0,
+      "focused": true,
+      "median_ms": 33.3333333333333,
+      "p95_ms": 33.3333333333333,
+      "samples": 60,
+      "vsync": true,
+      "vsync_actual": 1
+    },
+    {
+      "actual_process_fps": 30.0001650009075,
+      "cap": 0,
+      "engine_fps": 30.0,
+      "focused": true,
+      "median_ms": 33.3333333333333,
+      "p95_ms": 33.3333333333333,
+      "samples": 60,
+      "vsync": true,
+      "vsync_actual": 1
+    },
+    {
+      "actual_process_fps": 29.9998950003675,
+      "cap": 60,
+      "engine_fps": 30.0,
+      "focused": true,
+      "median_ms": 33.3333333333333,
+      "p95_ms": 33.3333333333333,
+      "samples": 60,
+      "vsync": false,
+      "vsync_actual": 0
+    },
+    {
+      "actual_process_fps": 30.0003150033075,
+      "cap": 120,
+      "engine_fps": 30.0,
+      "focused": true,
+      "median_ms": 33.3333333333333,
+      "p95_ms": 33.3333333333333,
+      "samples": 60,
+      "vsync": false,
+      "vsync_actual": 0
+    }
+  ],
+  "engine_cap": 120,
+  "limits": "One shared Windows/NVIDIA host, six-person dockside battle, native 1920x1080 window. No simulation timing changes.",
+  "low_processor_sleep_usec": 6900,
+  "os_low_processor": false,
+  "render_pixels": [
+    1548,
+    817
+  ],
+  "screen_hz": 60.0189514160156,
+  "time_scale": 1.0
+}

@@ -25,10 +25,12 @@ func frame(parent: Node,decorated: bool=false) -> VBoxContainer:
  shell.size_flags_horizontal=SIZE_EXPAND_FILL
  var box=VBoxContainer.new();box.add_theme_constant_override("separation",7);shell.add_child(box);return box
 func text(parent: Node,value: String,font_size: int=18) -> Label:
- var l=app.label(parent,value);l.add_theme_font_size_override("font_size",font_size);l.add_theme_color_override("font_color",Color("e2d4b2"));return l
+ var l=app.label(parent,value);l.add_theme_font_size_override("font_size",round(font_size*app.desktop.ui_scale) if app.Desktop.enabled() else font_size);l.add_theme_color_override("font_color",Color("e2d4b2"));return l
 func action(parent: Node,value: String,callback: Callable) -> Button:
  var b=app.button(parent,value,callback);Art.apply_button(b);b.custom_minimum_size.y=44 if OS.has_feature("android") else 36
- b.add_theme_color_override("font_hover_color",Color("ffe9ad"));return b
+ b.add_theme_color_override("font_hover_color",Color("ffe9ad"))
+ if app.Desktop.enabled(): app.desktop.style_button(b)
+ return b
 func plate(texture: Texture2D) -> void:
  var bg=TextureRect.new();bg.texture=texture;bg.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;bg.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_COVERED
  bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);bg.mouse_filter=MOUSE_FILTER_IGNORE;add_child(bg)
@@ -124,10 +126,10 @@ func tavern() -> void:
   var hover=normal.duplicate();hover.bg_color=Color(.45,.34,.14,.6);hover.border_color=Color("e1c581");hover.set_border_width_all(2)
   hotspot.clip_text=true
   hotspot.add_theme_stylebox_override("normal",normal);hotspot.add_theme_stylebox_override("hover",hover);hotspot.add_theme_stylebox_override("focus",hover)
-  hotspot.add_theme_font_size_override("font_size",14);hotspot.alignment=HORIZONTAL_ALIGNMENT_CENTER
+  hotspot.add_theme_font_size_override("font_size",round(14*app.desktop.ui_scale) if app.Desktop.enabled() else 14);hotspot.alignment=HORIZONTAL_ALIGNMENT_CENTER
   choices.add_child(hotspot);hotspot.size_flags_horizontal=SIZE_EXPAND_FILL;hotspot.custom_minimum_size.y=44 if OS.has_feature("android") else 36
   hotspot.pressed.connect(func():app.tavern_selected=row.id;app.rebuild(),CONNECT_DEFERRED)
- var profile_scroll=ScrollContainer.new();profile_scroll.custom_minimum_size.x=370;body.add_child(profile_scroll)
+ var profile_scroll=ScrollContainer.new();profile_scroll.custom_minimum_size.x=370*(app.desktop.ui_scale if app.Desktop.enabled() else 1.0);body.add_child(profile_scroll)
  var profile=frame(profile_scroll,true);profile.custom_minimum_size.x=280
  populate_profile(profile,rows)
  var manifest_box=frame(root);manifest(manifest_box)
@@ -151,7 +153,7 @@ func populate_profile(profile: VBoxContainer,rows: Array) -> void:
  var stats=GridContainer.new();stats.columns=2;profile.add_child(stats)
  for key in app.Data.Skills.ATTRIBUTES+app.Data.Skills.ALL:
   var stat=text(stats,key.capitalize()+"  "+str(row.attributes.get(key,row.skills.get(key,0))),16)
-  stat.autowrap_mode=TextServer.AUTOWRAP_OFF;stat.custom_minimum_size.x=135
+  stat.autowrap_mode=TextServer.AUTOWRAP_OFF;stat.custom_minimum_size.x=135*(app.desktop.ui_scale if app.Desktop.enabled() else 1.0)
  var kit=[row.weapon,row.armour]
  if row.get("shield",false): kit.append("shield")
  kit.append_array(row.get("secondary_weapons",[]))

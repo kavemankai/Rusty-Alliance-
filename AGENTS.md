@@ -1,6 +1,6 @@
 # The Broken Marches engineering rules
 
-Godot 4.6.2 standard, GDScript, Compatibility renderer, Android landscape. Read BUILD_STATUS.md before continuing. User's production contract is preserved in PRODUCTION_CONTRACT.md.
+Godot 4.6.2 standard, GDScript, Compatibility renderer. Current target: PC vertical slice (0.16.0); Android landscape remains a compatibility path. Read BUILD_STATUS.md before continuing. User's production contract is preserved in PRODUCTION_CONTRACT.md.
 
 - Implement original rules and content. JA2 is research only; never copy source or tables. See LEGAL_PROVENANCE.md.
 - Campaign.s is authoritative. Tactical company units reference the same mercenary dictionaries. Rebind after loading JSON.
@@ -25,4 +25,6 @@ No parallel agents are required for this repository.
 
 Production-pass invariants: ammo_type must match the weapon; throws move actual item IDs; injuries belong to canonical people. Convoy actors belong to jobs, are included in ownership validation and rebind by contract after load. Peaceful visits cannot award victories. Transport assets conserve through split/merge; recruitment and construction spend actual local resources. Mode changes never grant AP; turn carryover is capped at four and requires prior activation.
 
-Greywake art: all seven v0.2 parts are now received. Seven scene PNGs and eight UI textures are active; full-colour baked-label maps, combat reference and mismatched provisional portraits remain outside runtime. Keep canonical roster/geography authoritative and disclose upscaled concept-crop quality. Tavern selection uses native roster buttons beneath atmosphere art until approved individual layers exist. Run tests/scene_art_ui.gd for six-person layout and scene captures. Current art is desktop-verified; do not reuse earlier APK evidence for new scene textures. See GREYWAKE_SCENE_ART_STATUS.md.
+Greywake art: all seven v0.2 parts are received. Seven scene PNGs are active. Desktop uses flat focus-visible buttons plus the supplied profile panel and three icons; touch retains the eight-texture path; full-colour baked-label maps, combat reference and mismatched provisional portraits remain outside runtime. Keep canonical roster/geography authoritative and disclose upscaled concept-crop quality. Tavern selection uses native roster buttons beneath atmosphere art until approved individual layers exist. Run tests/scene_art_ui.gd for six-person layout and scene captures. Current art is desktop-verified; do not reuse earlier APK evidence for new scene textures. See GREYWAKE_SCENE_ART_STATUS.md.
+
+PC: read PC_VALIDATION.md and PC_VERTICAL_SLICE.md. Keep native window sizing, persistent crew/action docks, remappable keys, typing/modal/focus protection, independent preferences and camera continuity. Gameplay commands and saves remain authoritative. Use scripts/check_pc.ps1 for all 18 checks; run the isolated PCK smoke and timed native release launch after export. Never report movie-capture timing as gameplay performance. Tests/benchmark fixtures stay excluded from exports.

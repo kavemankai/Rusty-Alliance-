@@ -1,3 +1,9 @@
+# Current PC slice — 0.16.0
+
+The existing vertical slice now has native desktop sizing, configurable keyboard controls, a persistent tactical crew/action bar, a resizable inspector, focus-safe pause behavior and cached actor rendering. See [PC validation, controls, reproduction and limits](PC_VALIDATION.md) and [the complete acceptance scope](PC_VERTICAL_SLICE.md). The full Greywake campaign, final assets/audio and new Android acceptance remain outstanding.
+
+The earlier version sections below are historical evidence for their own builds.
+
 # Requested production pass — 2026-10-26
 
 The user requested completion of items 1-6, extra attention to item 1, then an offensive/defensive combat feature pass. Implemented scope:

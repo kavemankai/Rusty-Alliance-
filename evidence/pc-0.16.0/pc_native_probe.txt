@@ -1,0 +1,4 @@
+Godot Engine v4.6.2.stable.official.71f334935 - https://godotengine.org
+OpenGL API 3.3.0 NVIDIA 610.78 - Compatibility - Using Device: NVIDIA - NVIDIA GeForce RTX 3050 Laptop GPU
+
+PC_NATIVE_PROBE: {"cap":60,"engine_fps":60.0,"focused":true,"frames":120,"median_ms":16.6663333333333,"normal_scene_mainloop":true,"p95_ms":16.6666666666667,"render_pixels":[1548,817]}

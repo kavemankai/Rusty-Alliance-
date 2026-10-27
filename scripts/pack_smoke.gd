@@ -8,6 +8,7 @@ func run() -> void:
  check(scene!=null,"Packaged main scene")
  var app=scene.instantiate();root.add_child(app)
  await process_frame;await process_frame
+ check(app.Desktop.enabled() and root.content_scale_mode==Window.CONTENT_SCALE_MODE_DISABLED,"Packaged desktop-native window and preferences")
  app.game=app.Campaign.new();app.game.autosave_path="user://asset-pack-smoke-autosave.json"
  app.rebuild();app.change_tab("company");app.change_tab("inventory")
  app.game.s.squads.first.sector=34
@@ -18,6 +19,8 @@ func run() -> void:
  var actors=0
  for child in app.battle_view.geometry.get_children():
   if child.has_meta("actor_id"): actors+=1
+ check(app.battle_view is TextureRect and app.battle_view.viewport.size.x>=int(app.battle_view.size.x*.98),"Packaged native battle render target")
+ check(is_instance_valid(app.action_dock) and is_instance_valid(app.crew),"Packaged persistent PC controls")
  check(actors>=2,"Packaged actor meshes and materials")
  check(load("res://ui/asset_icons.gd").TEXTURES.size()==63,"Packaged thumbnail dependencies")
  check(app.game.s.mercs.mara.has_all(app.Data.Skills.ALL),"Packaged character has all seven skills")

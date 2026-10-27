@@ -1,5 +1,6 @@
 extends RefCounted
 # User-supplied UI art only. Concept boards and unmapped faces never enter runtime.
+const Desktop=preload("res://ui/desktop.gd")
 const ROOT="res://assets/greywake/production_ui/"
 static func skin(file: String,margin: float=12.0) -> StyleBoxTexture:
  var style=StyleBoxTexture.new();style.texture=load(ROOT+file)
@@ -11,7 +12,7 @@ static func panel() -> StyleBoxTexture:
  for side in [SIDE_LEFT,SIDE_TOP,SIDE_RIGHT,SIDE_BOTTOM]: style.set_texture_margin(side,64.0)
  return style
 static func apply_button(button: Button) -> void:
- for state in ["normal","hover","pressed","disabled"]:
+ for state in ([] if Desktop.enabled() else ["normal","hover","pressed","disabled"]):
   var file={"normal":"normal","hover":"hover","pressed":"selected","disabled":"disabled"}[state]
   var style=skin("button_"+file+".png",6.0)
   style.set_content_margin(SIDE_TOP,4.0);style.set_content_margin(SIDE_BOTTOM,4.0)

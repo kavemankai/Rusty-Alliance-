@@ -2,7 +2,6 @@ extends "res://ui/world_map.gd"
 const World=preload("res://sim/greywake_world.gd")
 const Shipping=preload("res://sim/greywake_shipping.gd")
 const BASE=preload("res://assets/greywake/island.svg")
-var middle=false
 func _init() -> void: zoom=1.0;offset=Vector2.ZERO
 func cell_size() -> float: return minf(size.x,size.y)*.09*zoom
 func origin() -> Vector2: return (size-Vector2.ONE*cell_size()*10)/2+offset
@@ -67,4 +66,10 @@ func input_event(event: InputEvent) -> void:
  super.input_event(event)
 func _notification(what: int) -> void:
  super._notification(what)
- if what==NOTIFICATION_APPLICATION_PAUSED: middle=false
+ if what in [NOTIFICATION_APPLICATION_PAUSED,NOTIFICATION_APPLICATION_FOCUS_OUT]: middle=false
+
+func reset_camera() -> void:
+ zoom=1.0;offset=Vector2.ZERO;queue_redraw()
+
+func center_on(index: int) -> void:
+ offset+=size*.5-point(index);queue_redraw()

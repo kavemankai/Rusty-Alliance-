@@ -1,0 +1,2392 @@
+{
+  "checks": [
+    {
+      "name": "Strategic grid contains 256 original sectors",
+      "passed": true
+    },
+    {
+      "name": "Hiring charges fee and adds persistent member",
+      "passed": true
+    },
+    {
+      "name": "Duplicate hiring rejected without charge",
+      "passed": true
+    },
+    {
+      "name": "Unaffordable purchases rejected",
+      "passed": true
+    },
+    {
+      "name": "Market purchases charge original prices",
+      "passed": true
+    },
+    {
+      "name": "Equipping transfers stash ownership",
+      "passed": true
+    },
+    {
+      "name": "Squad split preserves identity",
+      "passed": true
+    },
+    {
+      "name": "Co located squad merge",
+      "passed": true
+    },
+    {
+      "name": "Weighted strategic route reaches adjacent diagonal sector in two legs",
+      "passed": true
+    },
+    {
+      "name": "Travel schedules actual future arrival",
+      "passed": true
+    },
+    {
+      "name": "Hostile arrival interrupts large time advance",
+      "passed": true
+    },
+    {
+      "name": "Travel consumes food through clock",
+      "passed": true
+    },
+    {
+      "name": "Tactical deployment uses campaign equipment",
+      "passed": true
+    },
+    {
+      "name": "Fatigue reduces AP generation",
+      "passed": true
+    },
+    {
+      "name": "Wounds reduce AP generation",
+      "passed": true
+    },
+    {
+      "name": "Movement preview uses exact orthogonal terrain AP",
+      "passed": true
+    },
+    {
+      "name": "Movement execution spends preview AP",
+      "passed": true
+    },
+    {
+      "name": "Wall destination rejected",
+      "passed": true
+    },
+    {
+      "name": "Movement beyond AP budget rejected",
+      "passed": true
+    },
+    {
+      "name": "Stance action costs AP",
+      "passed": true
+    },
+    {
+      "name": "Crouched movement cost affects preview",
+      "passed": true
+    },
+    {
+      "name": "Closed door blocks movement",
+      "passed": true
+    },
+    {
+      "name": "Door interaction changes logical obstacle",
+      "passed": true
+    },
+    {
+      "name": "Opened door supports pathfinding",
+      "passed": true
+    },
+    {
+      "name": "Door cannot close on occupied tile",
+      "passed": true
+    },
+    {
+      "name": "Wall blocks line of sight",
+      "passed": true
+    },
+    {
+      "name": "Window transmits visibility",
+      "passed": true
+    },
+    {
+      "name": "Spear reach and knowledge fixture valid",
+      "passed": true
+    },
+    {
+      "name": "Spear attacks at two tile reach",
+      "passed": true
+    },
+    {
+      "name": "Sword cannot attack at spear reach",
+      "passed": true
+    },
+    {
+      "name": "Rear attack increases chance",
+      "passed": true
+    },
+    {
+      "name": "Aim changes displayed resolution probability",
+      "passed": true
+    },
+    {
+      "name": "Ranged attack consumes ammunition and loaded state",
+      "passed": true
+    },
+    {
+      "name": "Unloaded ranged shot rejected",
+      "passed": true
+    },
+    {
+      "name": "Bow reload consumes AP",
+      "passed": true
+    },
+    {
+      "name": "Crossbow reload requires seven AP",
+      "passed": true
+    },
+    {
+      "name": "Crossbow reload differs from bow",
+      "passed": true
+    },
+    {
+      "name": "First aid consumes real medical stock and stops bleeding",
+      "passed": true
+    },
+    {
+      "name": "Shield/parry/dodge responses consume defender AP across deterministic seeds",
+      "passed": true
+    },
+    {
+      "name": "Plate mitigates total cutting damage over identical seeds",
+      "passed": true
+    },
+    {
+      "name": "AI turns progress with legal AP and occupancy",
+      "passed": true
+    },
+    {
+      "name": "AI exposes decision reasons",
+      "passed": true
+    },
+    {
+      "name": "Atomic tactical save succeeds",
+      "passed": true
+    },
+    {
+      "name": "Load tactical campaign succeeds",
+      "passed": true
+    },
+    {
+      "name": "Save preserves RNG clock and wounds",
+      "passed": true
+    },
+    {
+      "name": "Loaded tactical units rebind to authoritative mercenary state",
+      "passed": true
+    },
+    {
+      "name": "Save resumes deterministic random stream",
+      "passed": true
+    },
+    {
+      "name": "Batched world time equals hourly steps",
+      "passed": true
+    },
+    {
+      "name": "Midnight wages charged exactly once",
+      "passed": true
+    },
+    {
+      "name": "Strategic treatment heals persistent wounds",
+      "passed": true
+    },
+    {
+      "name": "Time based training increases skill",
+      "passed": true
+    },
+    {
+      "name": "Repair consumes tools and restores condition",
+      "passed": true
+    },
+    {
+      "name": "Faction movement uses existing persistent groups",
+      "passed": true
+    },
+    {
+      "name": "Owned farms and mines produce meaningful local resources",
+      "passed": true
+    },
+    {
+      "name": "Employment expiration removes squad member",
+      "passed": true
+    },
+    {
+      "name": "Contract deadline can fail through world time",
+      "passed": true
+    },
+    {
+      "name": "Contract scenario wins through legal movement and attack commands",
+      "passed": true
+    },
+    {
+      "name": "Real victory pays accepted contract exactly once",
+      "passed": true
+    },
+    {
+      "name": "Battle result captures persistent strategic sector",
+      "passed": true
+    },
+    {
+      "name": "Reward cannot be duplicated",
+      "passed": true
+    },
+    {
+      "name": "Completed contract and territory survive reload",
+      "passed": true
+    },
+    {
+      "name": "Persistent campaign completes second distinct contract battle",
+      "passed": true
+    },
+    {
+      "name": "Extended simulation advances thirty full days",
+      "passed": true
+    },
+    {
+      "name": "Extended simulation processes every midnight exactly once",
+      "passed": true
+    },
+    {
+      "name": "Expired events drain without duplicate recurring events",
+      "passed": true
+    },
+    {
+      "name": "Supply shortage penalizes morale and fatigue",
+      "passed": true
+    },
+    {
+      "name": "Levy recruitment charges funds and persists in sector",
+      "passed": true
+    },
+    {
+      "name": "Leadership advances local levy training",
+      "passed": true
+    },
+    {
+      "name": "Scouting reveals sectors through assignment time",
+      "passed": true
+    },
+    {
+      "name": "Renewal extends actual employment contract",
+      "passed": true
+    },
+    {
+      "name": "Removing shield keeps item in backpack",
+      "passed": true
+    },
+    {
+      "name": "Guard assignment increases owned settlement order",
+      "passed": true
+    },
+    {
+      "name": "Corrupt current save recovers valid backup",
+      "passed": true
+    },
+    {
+      "name": "Missing save rejected without replacing active campaign",
+      "passed": true
+    },
+    {
+      "name": "Full strategic save roundtrip preserves exact canonical state",
+      "passed": true
+    },
+    {
+      "name": "Structurally incomplete character save rejected",
+      "passed": true
+    },
+    {
+      "name": "Unsupported save schema rejected",
+      "passed": true
+    },
+    {
+      "name": "Diagonal path cannot cut through a wall corner",
+      "passed": true
+    },
+    {
+      "name": "Climbing onto hill pays terrain plus elevation cost",
+      "passed": true
+    },
+    {
+      "name": "Logical barricade cover modifies ranged accuracy",
+      "passed": true
+    },
+    {
+      "name": "Broken morale reduces tactical AP",
+      "passed": true
+    },
+    {
+      "name": "Bleeding ticks at own team turn boundary",
+      "passed": true
+    },
+    {
+      "name": "Displayed hit percentage matches first RNG contact roll over twenty seeds",
+      "passed": true
+    },
+    {
+      "name": "Persistent levies defeat a weaker force through tactical combat",
+      "passed": true
+    },
+    {
+      "name": "Wage arrears remain accounted and penalize morale",
+      "passed": true
+    },
+    {
+      "name": "Tactical death persists and removes squad membership on resolution",
+      "passed": true
+    },
+    {
+      "name": "160 by 160 tactical grid supported as lightweight data",
+      "passed": true
+    },
+    {
+      "name": "Every starting item has one valid owner and a unique ID",
+      "passed": true
+    },
+    {
+      "name": "Two swords are distinct persistent items",
+      "passed": true
+    },
+    {
+      "name": "Taking a stockpile item moves its actual identity",
+      "passed": true
+    },
+    {
+      "name": "Switching swords retains each item's own condition and displaced weapon",
+      "passed": true
+    },
+    {
+      "name": "Equipped-item transfer is rejected atomically",
+      "passed": true
+    },
+    {
+      "name": "Unequipping changes combat loadout without deleting the item",
+      "passed": true
+    },
+    {
+      "name": "Character transfer preserves item ID and condition",
+      "passed": true
+    },
+    {
+      "name": "Recipient equips transferred gear and keeps previous weapon",
+      "passed": true
+    },
+    {
+      "name": "Backpack weapons contribute to encumbrance",
+      "passed": true
+    },
+    {
+      "name": "Remote squad transfers cannot teleport equipment",
+      "passed": true
+    },
+    {
+      "name": "Base stockpile cannot be equipped remotely",
+      "passed": true
+    },
+    {
+      "name": "Save validation rejects duplicate ownership across containers",
+      "passed": true
+    },
+    {
+      "name": "Save validation rejects equipment not owned by its wearer",
+      "passed": true
+    },
+    {
+      "name": "Save validation prevents the item allocator from reusing existing IDs",
+      "passed": true
+    },
+    {
+      "name": "Combat transfer requires adjacency and rejected transfer spends no AP",
+      "passed": true
+    },
+    {
+      "name": "Adjacent combat handover consumes exactly three AP",
+      "passed": true
+    },
+    {
+      "name": "Combat equip uses the transferred item and charges AP",
+      "passed": true
+    },
+    {
+      "name": "Combat transfer and equipment change preserve unique ownership",
+      "passed": true
+    },
+    {
+      "name": "Continuity fixture kills an enemy through a legal attack",
+      "passed": true
+    },
+    {
+      "name": "Death transfers all actual equipment and ammunition to ground once",
+      "passed": true
+    },
+    {
+      "name": "Looting transfers an existing ground item into the looter backpack",
+      "passed": true
+    },
+    {
+      "name": "Withdrawal prefers the actual adjacent arrival sector",
+      "passed": true
+    },
+    {
+      "name": "Retreat withdraws to an adjacent safe sector rather than Ashford",
+      "passed": true
+    },
+    {
+      "name": "Strategic force strength reflects casualties after retreat",
+      "passed": true
+    },
+    {
+      "name": "Tactical casualty updates faction loss accounting on retreat",
+      "passed": true
+    },
+    {
+      "name": "Retreat and looting retain exactly one owner for every item",
+      "passed": true
+    },
+    {
+      "name": "Retreat campaign saves persistent battlefield and hostile roster",
+      "passed": true
+    },
+    {
+      "name": "Retreat campaign reloads",
+      "passed": true
+    },
+    {
+      "name": "Dead enemies do not respawn when the sector is re-entered",
+      "passed": true
+    },
+    {
+      "name": "Enemy wounds ammo reload state and item condition survive retreat save and re-entry",
+      "passed": true
+    },
+    {
+      "name": "Surviving enemies retain their local battlefield position",
+      "passed": true
+    },
+    {
+      "name": "Door state persists across retreat and re-entry",
+      "passed": true
+    },
+    {
+      "name": "Uncollected loot remains on the same battlefield",
+      "passed": true
+    },
+    {
+      "name": "Re-entered enemies reference the authoritative strategic roster",
+      "passed": true
+    },
+    {
+      "name": "Active persistent battle reloads",
+      "passed": true
+    },
+    {
+      "name": "Loaded enemies rebind to the authoritative strategic roster",
+      "passed": true
+    },
+    {
+      "name": "Save validation rejects tactical profiles that disagree with their authoritative owner",
+      "passed": true
+    },
+    {
+      "name": "Save validation rejects malformed tactical terrain before it reaches pathfinding",
+      "passed": true
+    },
+    {
+      "name": "Surrounded company cannot teleport out through an invalid retreat",
+      "passed": true
+    },
+    {
+      "name": "Simultaneous contacts queue once instead of overwriting or duplicating",
+      "passed": true
+    },
+    {
+      "name": "Pending valid contact becomes the next active encounter",
+      "passed": true
+    },
+    {
+      "name": "One faction tick processes all armies and preserves simultaneous contacts",
+      "passed": true
+    },
+    {
+      "name": "Pending encounter is discarded when its enemy force no longer exists",
+      "passed": true
+    },
+    {
+      "name": "Stale travel callback cannot advance a different route",
+      "passed": true
+    },
+    {
+      "name": "Previous-release strategic save migrates to item instances and local supplies",
+      "passed": true
+    },
+    {
+      "name": "Loading a legacy save leaves the original file unchanged",
+      "passed": true
+    },
+    {
+      "name": "Migrated strategic save has valid unique item ownership",
+      "passed": true
+    },
+    {
+      "name": "Previous-release active battle migrates and resumes",
+      "passed": true
+    },
+    {
+      "name": "Migration preserves legacy position and weapon condition",
+      "passed": true
+    },
+    {
+      "name": "Migrated hostile profile is shared with its strategic group",
+      "passed": true
+    },
+    {
+      "name": "Migrated legacy battle can be saved in schema 2",
+      "passed": true
+    },
+    {
+      "name": "Migrated state roundtrips without creating new item identities",
+      "passed": true
+    },
+    {
+      "name": "Legacy corpse inventory and old ground loot migrate without duplicate ownership",
+      "passed": true
+    },
+    {
+      "name": "Legacy corpse weapon becomes the same unique ground item with no ghost equipment",
+      "passed": true
+    },
+    {
+      "name": "Repeated force resolution counts each casualty once",
+      "passed": true
+    },
+    {
+      "name": "Supplies have explicit squad and depot owners without a global duplicate",
+      "passed": true
+    },
+    {
+      "name": "Squad split divides carried provisions proportionally",
+      "passed": true
+    },
+    {
+      "name": "Squad split conserves every supply type exactly",
+      "passed": true
+    },
+    {
+      "name": "Merge reunites all provisions without duplication",
+      "passed": true
+    },
+    {
+      "name": "A starving squad cannot consume a distant squad's food",
+      "passed": true
+    },
+    {
+      "name": "Fed detached squad pays only its own hourly ration",
+      "passed": true
+    },
+    {
+      "name": "Remote supply transfer rejects atomically",
+      "passed": true
+    },
+    {
+      "name": "Co-located squads exchange exact ration quantities",
+      "passed": true
+    },
+    {
+      "name": "Insufficient supply transfer spends nothing",
+      "passed": true
+    },
+    {
+      "name": "Zero and fractional transfers are rejected",
+      "passed": true
+    },
+    {
+      "name": "A travelling squad cannot hand off supplies",
+      "passed": true
+    },
+    {
+      "name": "Stationary squad deposits real food into its local depot",
+      "passed": true
+    },
+    {
+      "name": "Loading a depot consumes its actual stock",
+      "passed": true
+    },
+    {
+      "name": "Hostile depots are inaccessible until control is recovered",
+      "passed": true
+    },
+    {
+      "name": "Market purchases fill the selected squad, not a remote company pool",
+      "passed": true
+    },
+    {
+      "name": "Farm output remains in its producing sector",
+      "passed": true
+    },
+    {
+      "name": "Carried provisions and tools add real strategic travel burden",
+      "passed": true
+    },
+    {
+      "name": "Remote physician contributes no skill and local treatment consumes one local medicine",
+      "passed": true
+    },
+    {
+      "name": "Co-located physician improves actual healing",
+      "passed": true
+    },
+    {
+      "name": "A patient's squad cannot spend another squad's medical stock automatically",
+      "passed": true
+    },
+    {
+      "name": "Repairs cannot consume a neighbouring squad's tools",
+      "passed": true
+    },
+    {
+      "name": "Co-located squads deploy together instead of receiving separate duplicate battles",
+      "passed": true
+    },
+    {
+      "name": "Recruited levy is a controllable tactical defender",
+      "passed": true
+    },
+    {
+      "name": "Combined mercenaries levies and enemies deploy without occupied or blocked cells",
+      "passed": true
+    },
+    {
+      "name": "Tactical levy health updates its canonical strategic profile",
+      "passed": true
+    },
+    {
+      "name": "Tactical first aid consumes the acting mercenary's own pack",
+      "passed": true
+    },
+    {
+      "name": "Levy first aid consumes the home depot's medicine",
+      "passed": true
+    },
+    {
+      "name": "Paused combat cannot be used to teleport provisions between stores",
+      "passed": true
+    },
+    {
+      "name": "Combined defence with squad supplies saves",
+      "passed": true
+    },
+    {
+      "name": "Combined defence resumes with both squad memberships",
+      "passed": true
+    },
+    {
+      "name": "Loaded levy references rebind to the strategic garrison",
+      "passed": true
+    },
+    {
+      "name": "Loaded levy gear has unique inventory ownership",
+      "passed": true
+    },
+    {
+      "name": "Enemy strategic movement creates a garrison-only tactical engagement",
+      "passed": true
+    },
+    {
+      "name": "Garrison-only battle contains actual levies and no remote mercenaries",
+      "passed": true
+    },
+    {
+      "name": "Home-bound levies cannot retreat by teleporting as a company squad",
+      "passed": true
+    },
+    {
+      "name": "Persistent levies can win and retain ownership through legal tactical actions",
+      "passed": true
+    },
+    {
+      "name": "Remote company location is unchanged by garrison combat",
+      "passed": true
+    },
+    {
+      "name": "Garrison-only victory leaves loot on site for later company recovery",
+      "passed": true
+    },
+    {
+      "name": "Legal enemy attack creates a persistent levy casualty",
+      "passed": true
+    },
+    {
+      "name": "Fallen levy equipment becomes real ground loot once",
+      "passed": true
+    },
+    {
+      "name": "Withdrawing mercenaries leave surviving levies to continue the defence",
+      "passed": true
+    },
+    {
+      "name": "Follow-on garrison defence preserves its casualty without redeploying withdrawn squads",
+      "passed": true
+    },
+    {
+      "name": "Incapacitated garrison defeat transfers sector control to the actual attacking faction",
+      "passed": true
+    },
+    {
+      "name": "Defeated surviving levies are captured and stop defending",
+      "passed": true
+    },
+    {
+      "name": "Garrison training improves the existing defender's combat skills",
+      "passed": true
+    },
+    {
+      "name": "Wounded levy recovery uses local medical skill and spends a local medical supply",
+      "passed": true
+    },
+    {
+      "name": "Living local levies incur upkeep alongside mercenary wages",
+      "passed": true
+    },
+    {
+      "name": "Garrison recruitment cap rejects before charging funds",
+      "passed": true
+    },
+    {
+      "name": "Save validation rejects reused levy IDs",
+      "passed": true
+    },
+    {
+      "name": "Save validation rejects negative provisions",
+      "passed": true
+    },
+    {
+      "name": "Save validation rejects fractional medical supplies",
+      "passed": true
+    },
+    {
+      "name": "Actual schema-2 split-company save migrates to schema 3",
+      "passed": true
+    },
+    {
+      "name": "Migration conserves the full previous global supply pool",
+      "passed": true
+    },
+    {
+      "name": "Migration allocates provisions proportionally to existing squads",
+      "passed": true
+    },
+    {
+      "name": "Migration creates one persistent trained levy for each old garrison member",
+      "passed": true
+    },
+    {
+      "name": "Migrated provisions and levy identities roundtrip without duplication",
+      "passed": true
+    },
+    {
+      "name": "Actual schema-2 active battle resumes without redeploying or resetting positions",
+      "passed": true
+    },
+    {
+      "name": "Migrated active units receive the correct squad supply context",
+      "passed": true
+    },
+    {
+      "name": "An isolated unconscious levy cannot treat itself using a remote doctor",
+      "passed": true
+    },
+    {
+      "name": "Odd split remainders stay with the source squad without loss",
+      "passed": true
+    },
+    {
+      "name": "Defeated company survivors are captured instead of escaping without a capable escort",
+      "passed": true
+    },
+    {
+      "name": "Defeated squad packs remain at the lost sector rather than teleporting to safety",
+      "passed": true
+    },
+    {
+      "name": "Unstocked levies suffer shortage without consuming a co-located squad's pack",
+      "passed": true
+    },
+    {
+      "name": "Migration with no staffed squads puts the whole legacy pool in the base depot",
+      "passed": true
+    },
+    {
+      "name": "An undeployed legacy reserve preserves the defence when the primary squad falls",
+      "passed": true
+    },
+    {
+      "name": "Surviving reserve deploys in the follow-on engagement without resurrecting captured troops",
+      "passed": true
+    },
+    {
+      "name": "Board contains six validated objective types without changing capture IDs",
+      "passed": true
+    },
+    {
+      "name": "Accepted caravan owns actual freight and adds travel burden",
+      "passed": true
+    },
+    {
+      "name": "Active posting cannot be accepted twice",
+      "passed": true
+    },
+    {
+      "name": "Escort neither pays nor teleports freight at an intermediate stop",
+      "passed": true
+    },
+    {
+      "name": "Active escorted freight saves",
+      "passed": true
+    },
+    {
+      "name": "Escort owner, position and freight survive load",
+      "passed": true
+    },
+    {
+      "name": "Real escorted arrival pays once and delivers exact freight to local depot",
+      "passed": true
+    },
+    {
+      "name": "Repeated arrival callback cannot duplicate payment or cargo",
+      "passed": true
+    },
+    {
+      "name": "Repeat posting respects one day cooldown",
+      "passed": true
+    },
+    {
+      "name": "Repeat work gets a distinct posting and fresh deadline",
+      "passed": true
+    },
+    {
+      "name": "Duplicate repost and remote caravan pickup are rejected",
+      "passed": true
+    },
+    {
+      "name": "Payment and repeat posting persist together",
+      "passed": true
+    },
+    {
+      "name": "Road objectives require pickup at origin",
+      "passed": true
+    },
+    {
+      "name": "Patrol counts actual ordered intermediate arrivals",
+      "passed": true
+    },
+    {
+      "name": "Returning before remaining checkpoints cannot finish patrol",
+      "passed": true
+    },
+    {
+      "name": "Patrol checkpoint counter survives save/load",
+      "passed": true
+    },
+    {
+      "name": "Patrol requires the final return leg",
+      "passed": true
+    },
+    {
+      "name": "Patrol pays only after ordered route and return",
+      "passed": true
+    },
+    {
+      "name": "Disbanding assigned escort loses freight and fails immediately",
+      "passed": true
+    },
+    {
+      "name": "Merging away assigned squad cannot transfer a patrol obligation silently",
+      "passed": true
+    },
+    {
+      "name": "Deadline is exclusive and records exact failure time",
+      "passed": true
+    },
+    {
+      "name": "Elimination follows a persistent target away from its posted sector",
+      "passed": true
+    },
+    {
+      "name": "Neutralized target remains pending until current battle resolves",
+      "passed": true
+    },
+    {
+      "name": "Legal battle away from origin pays elimination",
+      "passed": true
+    },
+    {
+      "name": "An off-site elimination cannot claim settlement defence",
+      "passed": true
+    },
+    {
+      "name": "Resolved battle and closed target cannot pay again",
+      "passed": true
+    },
+    {
+      "name": "Board cannot be accepted retrospectively during combat",
+      "passed": true
+    },
+    {
+      "name": "Persistent home levies can fulfil actual settlement defence without remote mercenaries",
+      "passed": true
+    },
+    {
+      "name": "Undefended settlement loss fails defence through faction simulation",
+      "passed": true
+    },
+    {
+      "name": "Occupied original camp accepts assault contract",
+      "passed": true
+    },
+    {
+      "name": "Persistent camp garrison stays at its camp during faction movement",
+      "passed": true
+    },
+    {
+      "name": "Legal camp assault neutralizes its actual roster, captures sector and pays",
+      "passed": true
+    },
+    {
+      "name": "Hostile arrival cannot deliver escort before battle",
+      "passed": true
+    },
+    {
+      "name": "Active caravan contact survives tactical save/load",
+      "passed": true
+    },
+    {
+      "name": "Real withdrawal abandons caravan with no payout or delivered goods",
+      "passed": true
+    },
+    {
+      "name": "Winning the arrival ambush delivers surviving caravan through battle hook",
+      "passed": true
+    },
+    {
+      "name": "Defeat seizes caravan, leaves only actual company pack and pays no reward",
+      "passed": true
+    },
+    {
+      "name": "Missed patrol deadline fails without fake progress",
+      "passed": true
+    },
+    {
+      "name": "Lost settlement cannot sell a defence contract",
+      "passed": true
+    },
+    {
+      "name": "Already neutralized force cannot sell elimination work",
+      "passed": true
+    },
+    {
+      "name": "Malformed freight ownership is rejected before save",
+      "passed": true
+    },
+    {
+      "name": "Out-of-map contract checkpoint is rejected",
+      "passed": true
+    },
+    {
+      "name": "Duplicate posting identifiers are rejected",
+      "passed": true
+    },
+    {
+      "name": "Previous schema-3 capture boards load without inventing new jobs or armies",
+      "passed": true
+    },
+    {
+      "name": "Contact enters a separate deployment phase before combat",
+      "passed": true
+    },
+    {
+      "name": "Default formation is legal and ready for review",
+      "passed": true
+    },
+    {
+      "name": "Deployment rejects movement, enemy turn, world time and resolution atomically",
+      "passed": true
+    },
+    {
+      "name": "Reaction attacks and equipment AP changes cannot bypass deployment freeze",
+      "passed": true
+    },
+    {
+      "name": "Repositioning and pre-start AI calls reveal no opponents or advance simulation",
+      "passed": true
+    },
+    {
+      "name": "Out-of-grid, outside-zone and fractional placement reject without mutation",
+      "passed": true
+    },
+    {
+      "name": "Occupied friendly tiles reject without overlap or AP cost",
+      "passed": true
+    },
+    {
+      "name": "Enemy and unknown identities cannot be placed",
+      "passed": true
+    },
+    {
+      "name": "Invalid facing rejects placement atomically",
+      "passed": true
+    },
+    {
+      "name": "Placement command sets chosen tile and facing",
+      "passed": true
+    },
+    {
+      "name": "Deployment consumes no AP, resources, health, fatigue, RNG or world time",
+      "passed": true
+    },
+    {
+      "name": "Unconfirmed formation can be saved",
+      "passed": true
+    },
+    {
+      "name": "Repeated deployment save retains a valid previous-generation backup",
+      "passed": true
+    },
+    {
+      "name": "Deployment phase, tile and facing survive save/load",
+      "passed": true
+    },
+    {
+      "name": "Loaded deployment rebinds the canonical mercenary profile",
+      "passed": true
+    },
+    {
+      "name": "Confirmation starts first company turn without AP refill or bleeding tick",
+      "passed": true
+    },
+    {
+      "name": "Combat becomes actionable only after confirmation with clock and RNG preserved",
+      "passed": true
+    },
+    {
+      "name": "Confirmed deployment cannot reopen, relocate or refill AP",
+      "passed": true
+    },
+    {
+      "name": "Normal combat movement charges AP after confirmation",
+      "passed": true
+    },
+    {
+      "name": "Confirmed combat position and spent AP survive reload",
+      "passed": true
+    },
+    {
+      "name": "Previous schema-3 active battles resume in place without a fresh placement phase",
+      "passed": true
+    },
+    {
+      "name": "Older tactical fixture resumes directly in combat: legacy-tactical.json",
+      "passed": true
+    },
+    {
+      "name": "Older tactical fixture resumes directly in combat: schema2-tactical.json",
+      "passed": true
+    },
+    {
+      "name": "Blocked terrain cannot be used for deployment",
+      "passed": true
+    },
+    {
+      "name": "Re-entry preserves near-edge enemy position and excludes close deployment tiles without revealing the unit",
+      "passed": true
+    },
+    {
+      "name": "Safe defaults adapt to hostile survivors without relocating them",
+      "passed": true
+    },
+    {
+      "name": "Combined squads and twelve local levies receive non-overlapping legal placements",
+      "passed": true
+    },
+    {
+      "name": "Local levy placement and facing use the same authoritative command",
+      "passed": true
+    },
+    {
+      "name": "Combined squad and garrison formation survives unconfirmed save/load",
+      "passed": true
+    },
+    {
+      "name": "Loaded levy profiles rebind and entire formation confirms together",
+      "passed": true
+    },
+    {
+      "name": "Garrison-only contact has its own reviewable deployment without remote mercenaries",
+      "passed": true
+    },
+    {
+      "name": "Unknown battle phase is rejected",
+      "passed": true
+    },
+    {
+      "name": "Pre-combat save cannot contain revealed enemy knowledge",
+      "passed": true
+    },
+    {
+      "name": "Placed units outside the zone cannot be loaded",
+      "passed": true
+    },
+    {
+      "name": "Incomplete formation cannot confirm or consume a turn",
+      "passed": true
+    },
+    {
+      "name": "Blocked entry zone leaves units unplaced and cannot silently start combat",
+      "passed": true
+    },
+    {
+      "name": "Unplaced formation remains recoverable through save/load",
+      "passed": true
+    },
+    {
+      "name": "No-space formation can withdraw through the existing safe-exit rules",
+      "passed": true
+    },
+    {
+      "name": "Pre-combat withdrawal uses actual safe-exit resolution without a capture reward",
+      "passed": true
+    },
+    {
+      "name": "Sector chooses authored settlement layout and metadata",
+      "passed": true
+    },
+    {
+      "name": "Layout generation is deterministic for settlement",
+      "passed": true
+    },
+    {
+      "name": "Every authored spawn is reachable from entry with openable doors: settlement",
+      "passed": true
+    },
+    {
+      "name": "Friendly formation and hostile spawn cells are legal on settlement",
+      "passed": true
+    },
+    {
+      "name": "Unconfirmed authored formation saves: settlement",
+      "passed": true
+    },
+    {
+      "name": "Authored geometry/zones/spawns survive deployment reload: settlement",
+      "passed": true
+    },
+    {
+      "name": "Company formation confirms on settlement",
+      "passed": true
+    },
+    {
+      "name": "Legal-action company battle captures settlement",
+      "passed": true
+    },
+    {
+      "name": "Home-only garrison deployment confirms on settlement",
+      "passed": true
+    },
+    {
+      "name": "Legal-action garrison defence wins on settlement",
+      "passed": true
+    },
+    {
+      "name": "Actual door command opens authored geometry: settlement",
+      "passed": true
+    },
+    {
+      "name": "Retreat and campaign reload preserve authored field: settlement",
+      "passed": true
+    },
+    {
+      "name": "Re-entry retains doors and authored metadata despite changed facility: settlement",
+      "passed": true
+    },
+    {
+      "name": "Uncollected unique ground item survives retreat/save/re-entry: settlement",
+      "passed": true
+    },
+    {
+      "name": "Reinforcements use free authored spawns without moving veterans or falling into entry zone: settlement",
+      "passed": true
+    },
+    {
+      "name": "Sector chooses authored farm layout and metadata",
+      "passed": true
+    },
+    {
+      "name": "Layout generation is deterministic for farm",
+      "passed": true
+    },
+    {
+      "name": "Every authored spawn is reachable from entry with openable doors: farm",
+      "passed": true
+    },
+    {
+      "name": "Friendly formation and hostile spawn cells are legal on farm",
+      "passed": true
+    },
+    {
+      "name": "Unconfirmed authored formation saves: farm",
+      "passed": true
+    },
+    {
+      "name": "Authored geometry/zones/spawns survive deployment reload: farm",
+      "passed": true
+    },
+    {
+      "name": "Company formation confirms on farm",
+      "passed": true
+    },
+    {
+      "name": "Legal-action company battle captures farm",
+      "passed": true
+    },
+    {
+      "name": "Home-only garrison deployment confirms on farm",
+      "passed": true
+    },
+    {
+      "name": "Legal-action garrison defence wins on farm",
+      "passed": true
+    },
+    {
+      "name": "Actual door command opens authored geometry: farm",
+      "passed": true
+    },
+    {
+      "name": "Retreat and campaign reload preserve authored field: farm",
+      "passed": true
+    },
+    {
+      "name": "Re-entry retains doors and authored metadata despite changed facility: farm",
+      "passed": true
+    },
+    {
+      "name": "Uncollected unique ground item survives retreat/save/re-entry: farm",
+      "passed": true
+    },
+    {
+      "name": "Reinforcements use free authored spawns without moving veterans or falling into entry zone: farm",
+      "passed": true
+    },
+    {
+      "name": "Sector chooses authored mine layout and metadata",
+      "passed": true
+    },
+    {
+      "name": "Layout generation is deterministic for mine",
+      "passed": true
+    },
+    {
+      "name": "Every authored spawn is reachable from entry with openable doors: mine",
+      "passed": true
+    },
+    {
+      "name": "Friendly formation and hostile spawn cells are legal on mine",
+      "passed": true
+    },
+    {
+      "name": "Unconfirmed authored formation saves: mine",
+      "passed": true
+    },
+    {
+      "name": "Authored geometry/zones/spawns survive deployment reload: mine",
+      "passed": true
+    },
+    {
+      "name": "Company formation confirms on mine",
+      "passed": true
+    },
+    {
+      "name": "Legal-action company battle captures mine",
+      "passed": true
+    },
+    {
+      "name": "Home-only garrison deployment confirms on mine",
+      "passed": true
+    },
+    {
+      "name": "Legal-action garrison defence wins on mine",
+      "passed": true
+    },
+    {
+      "name": "Actual door command opens authored geometry: mine",
+      "passed": true
+    },
+    {
+      "name": "Retreat and campaign reload preserve authored field: mine",
+      "passed": true
+    },
+    {
+      "name": "Re-entry retains doors and authored metadata despite changed facility: mine",
+      "passed": true
+    },
+    {
+      "name": "Uncollected unique ground item survives retreat/save/re-entry: mine",
+      "passed": true
+    },
+    {
+      "name": "Reinforcements use free authored spawns without moving veterans or falling into entry zone: mine",
+      "passed": true
+    },
+    {
+      "name": "Sector chooses authored camp layout and metadata",
+      "passed": true
+    },
+    {
+      "name": "Layout generation is deterministic for camp",
+      "passed": true
+    },
+    {
+      "name": "Every authored spawn is reachable from entry with openable doors: camp",
+      "passed": true
+    },
+    {
+      "name": "Friendly formation and hostile spawn cells are legal on camp",
+      "passed": true
+    },
+    {
+      "name": "Unconfirmed authored formation saves: camp",
+      "passed": true
+    },
+    {
+      "name": "Authored geometry/zones/spawns survive deployment reload: camp",
+      "passed": true
+    },
+    {
+      "name": "Company formation confirms on camp",
+      "passed": true
+    },
+    {
+      "name": "Legal-action company battle captures camp",
+      "passed": true
+    },
+    {
+      "name": "Home-only garrison deployment confirms on camp",
+      "passed": true
+    },
+    {
+      "name": "Legal-action garrison defence wins on camp",
+      "passed": true
+    },
+    {
+      "name": "Actual door command opens authored geometry: camp",
+      "passed": true
+    },
+    {
+      "name": "Retreat and campaign reload preserve authored field: camp",
+      "passed": true
+    },
+    {
+      "name": "Re-entry retains doors and authored metadata despite changed facility: camp",
+      "passed": true
+    },
+    {
+      "name": "Uncollected unique ground item survives retreat/save/re-entry: camp",
+      "passed": true
+    },
+    {
+      "name": "Reinforcements use free authored spawns without moving veterans or falling into entry zone: camp",
+      "passed": true
+    },
+    {
+      "name": "Settlement, farm, mine and camp have distinct tactical geometry",
+      "passed": true
+    },
+    {
+      "name": "Mine uses its authored five-column entry instead of legacy strip",
+      "passed": true
+    },
+    {
+      "name": "Camp uses two separated authored approach zones",
+      "passed": true
+    },
+    {
+      "name": "Out-of-bounds authored deployment zone is rejected",
+      "passed": true
+    },
+    {
+      "name": "Fractional authored spawn coordinate is rejected",
+      "passed": true
+    },
+    {
+      "name": "Active battlefield metadata must match its owning sector",
+      "passed": true
+    },
+    {
+      "name": "Partial map metadata cannot masquerade as a legacy field",
+      "passed": true
+    },
+    {
+      "name": "Actual older save retains its original unlabelled battlefield",
+      "passed": true
+    },
+    {
+      "name": "Legacy geometry roundtrips without regeneration or invented authored zones",
+      "passed": true
+    },
+    {
+      "name": "Wilderness fallback has usable spawn/entry connectivity for road",
+      "passed": true
+    },
+    {
+      "name": "Wilderness fallback has usable spawn/entry connectivity for forest",
+      "passed": true
+    },
+    {
+      "name": "Wilderness fallback has usable spawn/entry connectivity for hills",
+      "passed": true
+    },
+    {
+      "name": "Wilderness fallback has usable spawn/entry connectivity for marsh",
+      "passed": true
+    },
+    {
+      "name": "Wilderness fallback has usable spawn/entry connectivity for grass",
+      "passed": true
+    },
+    {
+      "name": "Scout confirmation starts exploration when neither side detects opponents",
+      "passed": true
+    },
+    {
+      "name": "Exploration entry preserves AP, PRNG, world time and positions",
+      "passed": true
+    },
+    {
+      "name": "Exploration cannot advance combat rounds, resolve an ongoing battle or advance strategic time",
+      "passed": true
+    },
+    {
+      "name": "Exploration cannot attack or reserve combat reactions",
+      "passed": true
+    },
+    {
+      "name": "Invalid exploration route spends no local time or AP",
+      "passed": true
+    },
+    {
+      "name": "Wait advances one local pulse and a real enemy patrol step",
+      "passed": true
+    },
+    {
+      "name": "Exploration movement advances one simultaneous local pulse per tile",
+      "passed": true
+    },
+    {
+      "name": "Local movement/patrol time does not advance strategic events, combat rounds or PRNG",
+      "passed": true
+    },
+    {
+      "name": "Exploration state saves",
+      "passed": true
+    },
+    {
+      "name": "Mode, elapsed pulses, patrol state and character positions survive reload",
+      "passed": true
+    },
+    {
+      "name": "Exploration reload binds authoritative company profiles",
+      "passed": true
+    },
+    {
+      "name": "Detection stops a long exploration route at first contact and cancels pending orders",
+      "passed": true
+    },
+    {
+      "name": "Contact establishes a valid company turn with remaining AP and actual perceived opponent",
+      "passed": true
+    },
+    {
+      "name": "Transitioned combat saves without an AP refill or reopened exploration",
+      "passed": true
+    },
+    {
+      "name": "Enemy-only detection also triggers combat without exposing hidden enemy coordinates",
+      "passed": true
+    },
+    {
+      "name": "Immediate post-deployment contact bypasses exploration without an extra time pulse",
+      "passed": true
+    },
+    {
+      "name": "Manual combat entry preserves remaining AP",
+      "passed": true
+    },
+    {
+      "name": "Combat cannot return to exploration before three quiet rounds",
+      "passed": true
+    },
+    {
+      "name": "Three full rounds without either side seeing opponents establish quiet state",
+      "passed": true
+    },
+    {
+      "name": "Quiet combat resumes exploration without resetting turn number or AP",
+      "passed": true
+    },
+    {
+      "name": "Leaving combat preserves all positions and injuries",
+      "passed": true
+    },
+    {
+      "name": "Untreated bleeding progresses during local exploration time",
+      "passed": true
+    },
+    {
+      "name": "Oversized exploration time request rejects atomically",
+      "passed": true
+    },
+    {
+      "name": "Pending adjacent movement route survives save/load",
+      "passed": true
+    },
+    {
+      "name": "A newly blocked route stops without teleporting or charging movement AP",
+      "passed": true
+    },
+    {
+      "name": "Exploration bleeding death creates actual ground inventory without duplication",
+      "passed": true
+    },
+    {
+      "name": "Exploration withdrawal uses real safe-sector retreat and preserves hostile control",
+      "passed": true
+    },
+    {
+      "name": "Saved exploration route cannot jump across the map",
+      "passed": true
+    },
+    {
+      "name": "Negative exploration time is rejected",
+      "passed": true
+    },
+    {
+      "name": "Company identities cannot own hostile patrol records",
+      "passed": true
+    },
+    {
+      "name": "Exploration cannot load with an enemy team turn",
+      "passed": true
+    },
+    {
+      "name": "Older active saves retain combat and initialize quiet-round tracking safely",
+      "passed": true
+    },
+    {
+      "name": "A home-only garrison can scout without remote company units",
+      "passed": true
+    },
+    {
+      "name": "Levy exploration movement and mode survive save/load",
+      "passed": true
+    },
+    {
+      "name": "Loaded exploring levies bind the authoritative home roster",
+      "passed": true
+    },
+    {
+      "name": "One local pulse advances pending orders from combined squads together",
+      "passed": true
+    },
+    {
+      "name": "Current LOS rejects exploration atomically even if saved quiet counter/knowledge are stale",
+      "passed": true
+    },
+    {
+      "name": "Malformed boolean patrol direction cannot enter movement arithmetic",
+      "passed": true
+    },
+    {
+      "name": "Unexplored hostile-side terrain has no exposed live terrain properties",
+      "passed": true
+    },
+    {
+      "name": "Each team sees its own local terrain independently",
+      "passed": true
+    },
+    {
+      "name": "Visible door state enters persistent terrain memory",
+      "passed": true
+    },
+    {
+      "name": "An unseen door change does not overwrite remembered terrain",
+      "passed": true
+    },
+    {
+      "name": "Remembered terrain distinct from current world saves",
+      "passed": true
+    },
+    {
+      "name": "Hidden current state and remembered snapshot remain distinct after reload",
+      "passed": true
+    },
+    {
+      "name": "Seeing the door again updates its actual current state",
+      "passed": true
+    },
+    {
+      "name": "Provisional route assumes unknown ground without routing around a hidden obstacle",
+      "passed": true
+    },
+    {
+      "name": "Actual execution stops before newly encountered terrain and only charges executed steps",
+      "passed": true
+    },
+    {
+      "name": "Approach reveals the obstacle rather than silently bypassing it",
+      "passed": true
+    },
+    {
+      "name": "Previously observed ground remains remembered after leaving sight",
+      "passed": true
+    },
+    {
+      "name": "Sector terrain memory persists across retreat and campaign save",
+      "passed": true
+    },
+    {
+      "name": "Re-entry preserves explored terrain outside the deployment briefing zone",
+      "passed": true
+    },
+    {
+      "name": "Low cover protects from its incoming side and can be flanked",
+      "passed": true
+    },
+    {
+      "name": "Elevated attacker reduces the directional protection of low cover",
+      "passed": true
+    },
+    {
+      "name": "An adjacent window can pass sight while supplying directional protection",
+      "passed": true
+    },
+    {
+      "name": "Ranged AI takes a legal protected firing step before attacking",
+      "passed": true
+    },
+    {
+      "name": "Cover-seeking AI obeys actual occupancy, terrain and AP",
+      "passed": true
+    },
+    {
+      "name": "AI investigates stored coordinates without attacking or rolling against an unseen foe",
+      "passed": true
+    },
+    {
+      "name": "Moving a still-hidden player does not change pursuit decisions based on the same memory",
+      "passed": true
+    },
+    {
+      "name": "AI search goal and decision trace persist through tactical save/load",
+      "passed": true
+    },
+    {
+      "name": "Expired opponent memory stops directing pursuit",
+      "passed": true
+    },
+    {
+      "name": "Reaching an empty last-seen location marks it searched rather than tracking hidden movement",
+      "passed": true
+    },
+    {
+      "name": "An unengaged fighter moves to support a nearby wounded ally",
+      "passed": true
+    },
+    {
+      "name": "Out-of-map fog cache record is rejected",
+      "passed": true
+    },
+    {
+      "name": "AI state cannot bind to an unknown tactical identity",
+      "passed": true
+    },
+    {
+      "name": "Malformed remembered tile costs are rejected",
+      "passed": true
+    },
+    {
+      "name": "Legacy active combat safely initializes fog and AI search state",
+      "passed": true
+    },
+    {
+      "name": "Power strike has a real two-AP surcharge",
+      "passed": true
+    },
+    {
+      "name": "Selecting a body target adds AP and an accuracy tradeoff",
+      "passed": true
+    },
+    {
+      "name": "Actual aimed power hit records the selected body injury and spends preview AP",
+      "passed": true
+    },
+    {
+      "name": "Leg injury severity continues reducing AP even after HP is restored",
+      "passed": true
+    },
+    {
+      "name": "Skilled treatment reduces persistent localized injury severity",
+      "passed": true
+    },
+    {
+      "name": "Invalid attack/target choices reject without spending resources",
+      "passed": true
+    },
+    {
+      "name": "Withdrawal preview names perceived armed reaction threats and exact deliberate cost",
+      "passed": true
+    },
+    {
+      "name": "Deliberate one-step disengagement avoids melee opportunities while paying extra AP",
+      "passed": true
+    },
+    {
+      "name": "Insufficient-AP disengagement rejects atomically",
+      "passed": true
+    },
+    {
+      "name": "Shield-focused defence is an actual paid combat choice",
+      "passed": true
+    },
+    {
+      "name": "Defensive specialization boosts its selected response only",
+      "passed": true
+    },
+    {
+      "name": "Broken shields no longer function or permit shield-focused defence",
+      "passed": true
+    },
+    {
+      "name": "Next activated turn carries at most four actual unused AP",
+      "passed": true
+    },
+    {
+      "name": "A unit's first activation receives no unearned carryover",
+      "passed": true
+    },
+    {
+      "name": "Crossbows cannot reload with arrows or spend AP on incompatible ammunition",
+      "passed": true
+    },
+    {
+      "name": "Matching bolts reload with the crossbow's actual seven-AP cost",
+      "passed": true
+    },
+    {
+      "name": "Market purchases create explicitly typed projectile stacks",
+      "passed": true
+    },
+    {
+      "name": "A thrown dagger leaves its actual inventory owner and becomes recoverable ground equipment",
+      "passed": true
+    },
+    {
+      "name": "Throwing preserves unique item ownership",
+      "passed": true
+    },
+    {
+      "name": "Injuries, combat choices, ammunition types and thrown equipment save",
+      "passed": true
+    },
+    {
+      "name": "Thrown equipment survives active-combat reload",
+      "passed": true
+    },
+    {
+      "name": "Invalid localized injury severity is rejected before loading",
+      "passed": true
+    },
+    {
+      "name": "Carryover is capped at four AP rather than accumulating a full unused turn",
+      "passed": true
+    },
+    {
+      "name": "Charge pays the real approach steps and a seven-AP power strike",
+      "passed": true
+    },
+    {
+      "name": "Shield bash spends AP/condition, deals a real hit and displaces a surviving opponent into a free cell",
+      "passed": true
+    },
+    {
+      "name": "A blunt shield bash does not create cutting bleed",
+      "passed": true
+    },
+    {
+      "name": "Shield protection reserves an adjacent ally with a real initial AP cost",
+      "passed": true
+    },
+    {
+      "name": "A guardian spends additional AP and shield durability when intercepting an actual incoming hit",
+      "passed": true
+    },
+    {
+      "name": "Interception is explicitly reported in combat feedback",
+      "passed": true
+    },
+    {
+      "name": "Protection expires on the guardian's next activation",
+      "passed": true
+    },
+    {
+      "name": "Feints trade damage/AP for a reduced opposing parry chance",
+      "passed": true
+    },
+    {
+      "name": "Arm injury severity reduces actual hit probability",
+      "passed": true
+    },
+    {
+      "name": "Head injury severity reduces available action points",
+      "passed": true
+    },
+    {
+      "name": "A peaceful company can enter its sector tactically without an enemy force",
+      "passed": true
+    },
+    {
+      "name": "Peaceful exploration cannot fabricate a capture victory",
+      "passed": true
+    },
+    {
+      "name": "Building creates a real fortification and consumes local tools, funds and AP",
+      "passed": true
+    },
+    {
+      "name": "Remote construction rejects before spending resources",
+      "passed": true
+    },
+    {
+      "name": "Peaceful visits and built terrain save",
+      "passed": true
+    },
+    {
+      "name": "Built fortifications and peaceful mode survive load",
+      "passed": true
+    },
+    {
+      "name": "Leaving a peaceful visit preserves territory and strategic location",
+      "passed": true
+    },
+    {
+      "name": "Constructed terrain persists on a later visit",
+      "passed": true
+    },
+    {
+      "name": "Night reduces actual perception range",
+      "passed": true
+    },
+    {
+      "name": "A constructed torch changes the actual night visibility calculation",
+      "passed": true
+    },
+    {
+      "name": "Exploration can run on timed UI pulses",
+      "passed": true
+    },
+    {
+      "name": "Running exploration queues rather than instantly executing movement",
+      "passed": true
+    },
+    {
+      "name": "Running exploration advances its queued movement through actual local pulses",
+      "passed": true
+    },
+    {
+      "name": "Loading a running visit pauses safely without undoing progress",
+      "passed": true
+    },
+    {
+      "name": "Authored directional approaches are selectable before combat",
+      "passed": true
+    },
+    {
+      "name": "The whole formation relocates into a legal selected edge without moving enemies",
+      "passed": true
+    },
+    {
+      "name": "Approach changes are locked after combat starts",
+      "passed": true
+    },
+    {
+      "name": "Settlement buildings contain actual room and roof data with walkable interiors",
+      "passed": true
+    },
+    {
+      "name": "Training grounds have a distinct facility variant",
+      "passed": true
+    },
+    {
+      "name": "A local levy can receive and equip the actual stockpile armour instance",
+      "passed": true
+    },
+    {
+      "name": "Levy loadout management retains unique gear ownership",
+      "passed": true
+    },
+    {
+      "name": "Remote company-to-levy handovers are rejected atomically",
+      "passed": true
+    },
+    {
+      "name": "Ransoming a local prisoner pays once and does not reactivate the enemy army",
+      "passed": true
+    },
+    {
+      "name": "Released or ransomed prisoners cannot pay twice",
+      "passed": true
+    },
+    {
+      "name": "Prisoner enlistment transfers the original profile into paid company employment",
+      "passed": true
+    },
+    {
+      "name": "Enlisted prisoner ownership and employment survive save/load",
+      "passed": true
+    },
+    {
+      "name": "Merciful release has a persistent non-combat state",
+      "passed": true
+    },
+    {
+      "name": "Owned horses enable faster mounted travel when every member has a mount",
+      "passed": true
+    },
+    {
+      "name": "Splitting a company conserves whole horses and carts",
+      "passed": true
+    },
+    {
+      "name": "Merging combines actual owned transport assets without duplication",
+      "passed": true
+    },
+    {
+      "name": "Transport purchases require a physical market visit",
+      "passed": true
+    },
+    {
+      "name": "A real board request creates route-priced delivery and patrol postings",
+      "passed": true
+    },
+    {
+      "name": "Procedural postings are limited to one request per day",
+      "passed": true
+    },
+    {
+      "name": "A threatened escort deploys an independently targetable cart and driver",
+      "passed": true
+    },
+    {
+      "name": "Convoy actors bind to authoritative contract profiles after reload",
+      "passed": true
+    },
+    {
+      "name": "A cart cannot move without its capable driver nearby",
+      "passed": true
+    },
+    {
+      "name": "A nearby living driver enables paid cart movement",
+      "passed": true
+    },
+    {
+      "name": "An actual enemy hit can destroy the protected cart and fail the delivery before payment",
+      "passed": true
+    },
+    {
+      "name": "Faction income/upkeep funds an actual sixty-resource recruit at a staffed owned base",
+      "passed": true
+    },
+    {
+      "name": "Budgeted reinforcements and their persistent equipment survive saves",
+      "passed": true
+    },
+    {
+      "name": "A faction with insufficient resources cannot create a reinforcement",
+      "passed": true
+    },
+    {
+      "name": "A nearby army observes company presence and changes its raid objective",
+      "passed": true
+    },
+    {
+      "name": "Strategic contact intelligence expires instead of tracking remote squads forever",
+      "passed": true
+    },
+    {
+      "name": "Opposing mobile armies resolve actual persistent casualties and sector control",
+      "passed": true
+    },
+    {
+      "name": "Army-clash equipment becomes unique recoverable ground items",
+      "passed": true
+    },
+    {
+      "name": "A distant observer does not grant instant personal target knowledge to an isolated ally",
+      "passed": true
+    },
+    {
+      "name": "A nearby observer can relay a currently perceived contact within communication range",
+      "passed": true
+    },
+    {
+      "name": "Line formation issues real movement orders for distinct squad destinations",
+      "passed": true
+    },
+    {
+      "name": "A leader can spend real AP to rally nearby allies",
+      "passed": true
+    },
+    {
+      "name": "Rally cannot be spammed again in the same combat round",
+      "passed": true
+    },
+    {
+      "name": "A captured company member cannot join the rescue battle remotely",
+      "passed": true
+    },
+    {
+      "name": "An actual local victory rescues the captive profile and reunites it with the surviving company",
+      "passed": true
+    },
+    {
+      "name": "Owned horses consume their company's actual forage each day",
+      "passed": true
+    },
+    {
+      "name": "A known hostile on the proposed route increases procedural escort pay",
+      "passed": true
+    },
+    {
+      "name": "A smith can repair an adjacent surviving cart using real AP and local tools",
+      "passed": true
+    },
+    {
+      "name": "Medicine cannot be used as a substitute for cart repair tools",
+      "passed": true
+    },
+    {
+      "name": "A patrol that finishes its objective returns toward its original base",
+      "passed": true
+    },
+    {
+      "name": "A completed return leg begins another actual patrol objective",
+      "passed": true
+    },
+    {
+      "name": "Assignment command stores a typed actor/task/location/time record",
+      "passed": true
+    },
+    {
+      "name": "Typed records reject missing event payload and fractional transactions",
+      "passed": true
+    },
+    {
+      "name": "Malformed save is rejected without changing live campaign: [\"mercs\", \"mara\", \"inventory\"]",
+      "passed": true
+    },
+    {
+      "name": "Malformed save is rejected without changing live campaign: [\"mercs\", \"mara\", \"injuries\"]",
+      "passed": true
+    },
+    {
+      "name": "Malformed save is rejected without changing live campaign: [\"mercs\", \"mara\", \"equipment\"]",
+      "passed": true
+    },
+    {
+      "name": "Malformed save is rejected without changing live campaign: [\"mercs\", \"mara\", \"hp\"]",
+      "passed": true
+    },
+    {
+      "name": "Malformed save is rejected without changing live campaign: [\"mercs\", \"mara\", \"max_hp\"]",
+      "passed": true
+    },
+    {
+      "name": "Malformed save is rejected without changing live campaign: [\"mercs\", \"mara\", \"assignment_record\", \"actor\"]",
+      "passed": true
+    },
+    {
+      "name": "Malformed save is rejected without changing live campaign: [\"mercs\", \"mara\", \"inventory\", 0, \"quantity\"]",
+      "passed": true
+    },
+    {
+      "name": "Malformed save is rejected without changing live campaign: [\"mercs\", \"mara\", \"inventory\", 0, \"condition\"]",
+      "passed": true
+    },
+    {
+      "name": "Malformed save is rejected without changing live campaign: [\"events\", 0, \"payload\"]",
+      "passed": true
+    },
+    {
+      "name": "Malformed save is rejected without changing live campaign: [\"events\", 0, \"kind\"]",
+      "passed": true
+    },
+    {
+      "name": "Malformed save is rejected without changing live campaign: [\"events\", 0, \"id\"]",
+      "passed": true
+    },
+    {
+      "name": "Malformed save is rejected without changing live campaign: [\"events\", 0, \"at\"]",
+      "passed": true
+    },
+    {
+      "name": "Malformed save is rejected without changing live campaign: [\"ledger\", 0, \"balance\"]",
+      "passed": true
+    },
+    {
+      "name": "Malformed save is rejected without changing live campaign: [\"ledger\", 0, \"reason\"]",
+      "passed": true
+    },
+    {
+      "name": "Malformed save is rejected without changing live campaign: [\"pending_encounters\"]",
+      "passed": true
+    },
+    {
+      "name": "Malformed save is rejected without changing live campaign: [\"squads\", \"first\", \"members\"]",
+      "passed": true
+    },
+    {
+      "name": "Malformed save is rejected without changing live campaign: [\"squads\", \"first\", \"sector\"]",
+      "passed": true
+    },
+    {
+      "name": "Malformed save is rejected without changing live campaign: [\"squads\", \"first\", \"route\"]",
+      "passed": true
+    },
+    {
+      "name": "Malformed save is rejected without changing live campaign: [\"groups\", 0, \"positions\"]",
+      "passed": true
+    },
+    {
+      "name": "Malformed save is rejected without changing live campaign: [\"groups\", 0, \"fighters\"]",
+      "passed": true
+    },
+    {
+      "name": "Malformed save is rejected without changing live campaign: [\"sectors\", 0, \"id\"]",
+      "passed": true
+    },
+    {
+      "name": "Malformed save is rejected without changing live campaign: [\"sectors\", 0, \"levies\"]",
+      "passed": true
+    },
+    {
+      "name": "Malformed save is rejected without changing live campaign: [\"sectors\", 0, \"supplies\"]",
+      "passed": true
+    },
+    {
+      "name": "Malformed save is rejected without changing live campaign: [\"factions\", \"bandits\", \"resources\"]",
+      "passed": true
+    },
+    {
+      "name": "Malformed save is rejected without changing live campaign: [\"funds\"]",
+      "passed": true
+    },
+    {
+      "name": "Malformed save is rejected without changing live campaign: [\"version\"]",
+      "passed": true
+    },
+    {
+      "name": "Active battle with typed records saves before corruption probes",
+      "passed": true
+    },
+    {
+      "name": "Malformed tactical save is rejected: [\"battle\", \"units\", 0, \"person\"]",
+      "passed": true
+    },
+    {
+      "name": "Malformed tactical save is rejected: [\"battle\", \"tiles\", 0, \"cost\"]",
+      "passed": true
+    },
+    {
+      "name": "Malformed tactical save is rejected: [\"battle\", \"knowledge\", \"company\"]",
+      "passed": true
+    },
+    {
+      "name": "Malformed tactical save is rejected: [\"battle\", \"noise\"]",
+      "passed": true
+    },
+    {
+      "name": "Malformed tactical save is rejected: [\"battle\", \"units\", 0, \"x\"]",
+      "passed": true
+    },
+    {
+      "name": "Malformed tactical save is rejected: [\"battle\", \"ground\"]",
+      "passed": true
+    },
+    {
+      "name": "Malformed tactical save is rejected: [\"battle\", \"fog\", \"company\"]",
+      "passed": true
+    },
+    {
+      "name": "Malformed tactical save is rejected: [\"battle\", \"exploration\"]",
+      "passed": true
+    },
+    {
+      "name": "Recovery fixture commits: partial_write",
+      "passed": true
+    },
+    {
+      "name": "Injected interruption reports failure: partial_write",
+      "passed": true
+    },
+    {
+      "name": "Interrupted write keeps previous committed campaign: partial_write",
+      "passed": true
+    },
+    {
+      "name": "Process termination recovers committed campaign: partial_write",
+      "passed": true
+    },
+    {
+      "name": "Recovery fixture commits: after_temp",
+      "passed": true
+    },
+    {
+      "name": "Injected interruption reports failure: after_temp",
+      "passed": true
+    },
+    {
+      "name": "Interrupted write keeps previous committed campaign: after_temp",
+      "passed": true
+    },
+    {
+      "name": "Process termination recovers committed campaign: after_temp",
+      "passed": true
+    },
+    {
+      "name": "Recovery fixture commits: backup_write",
+      "passed": true
+    },
+    {
+      "name": "Injected interruption reports failure: backup_write",
+      "passed": true
+    },
+    {
+      "name": "Interrupted write keeps previous committed campaign: backup_write",
+      "passed": true
+    },
+    {
+      "name": "Process termination recovers committed campaign: backup_write",
+      "passed": true
+    },
+    {
+      "name": "Recovery fixture commits: after_backup",
+      "passed": true
+    },
+    {
+      "name": "Injected interruption reports failure: after_backup",
+      "passed": true
+    },
+    {
+      "name": "Interrupted write keeps previous committed campaign: after_backup",
+      "passed": true
+    },
+    {
+      "name": "Process termination recovers committed campaign: after_backup",
+      "passed": true
+    },
+    {
+      "name": "Truncated current file restores verified prior backup",
+      "passed": true
+    },
+    {
+      "name": "First-save interruption can recover a fully validated temporary file",
+      "passed": true
+    },
+    {
+      "name": "Cutout and navigation insets convert from physical pixels into logical UI space",
+      "passed": true
+    },
+    {
+      "name": "Unavailable safe-area data preserves a usable full-window layout",
+      "passed": true
+    },
+    {
+      "name": "Native strategic touch selects exactly once without mouse emulation",
+      "passed": true
+    },
+    {
+      "name": "Strategic single-finger pan does not select on release",
+      "passed": true
+    },
+    {
+      "name": "Strategic pinch pans/zooms and neither finger release selects",
+      "passed": true
+    },
+    {
+      "name": "Touch-generated mouse twin cannot duplicate strategic selection",
+      "passed": true
+    },
+    {
+      "name": "Fresh touch selects after a completed pinch",
+      "passed": true
+    },
+    {
+      "name": "Cancelled strategic touch never selects",
+      "passed": true
+    },
+    {
+      "name": "Pause clears strategic gesture state without a late selection",
+      "passed": true
+    },
+    {
+      "name": "Strategic map handles Android native magnify gestures",
+      "passed": true
+    },
+    {
+      "name": "Strategic map handles Android native pan gestures",
+      "passed": true
+    },
+    {
+      "name": "Native tactical touch ray-picks the intended cell exactly once",
+      "passed": true
+    },
+    {
+      "name": "Tactical single-finger pan suppresses cell selection",
+      "passed": true
+    },
+    {
+      "name": "Tactical pinch pans/zooms with opposite release order and no accidental pick",
+      "passed": true
+    },
+    {
+      "name": "Touch-generated mouse twin cannot duplicate tactical picking",
+      "passed": true
+    },
+    {
+      "name": "Cancelled tactical touch never picks",
+      "passed": true
+    },
+    {
+      "name": "Pause clears tactical gesture state without a late pick",
+      "passed": true
+    },
+    {
+      "name": "Tactical camera handles Android native magnify gestures",
+      "passed": true
+    },
+    {
+      "name": "Tactical camera handles Android native pan gestures",
+      "passed": true
+    }
+  ],
+  "contract_rounds": 3,
+  "engine": "4.6.2-stable (official)",
+  "failed": 0,
+  "passed": 596
+}

@@ -1,4 +1,5 @@
-extends SubViewportContainer
+extends TextureRect
+const Desktop=preload("res://ui/desktop.gd")
 const Art=preload("res://ui/asset_visuals.gd")
 signal cell_selected(x: int,y: int)
 var battle
@@ -7,6 +8,7 @@ var world: Node3D
 var geometry: Node3D
 var camera: Camera3D
 var selected="mara"
+var highlight_target=""
 var preview=[]
 var show_roofs=true
 var middle=false
@@ -17,14 +19,22 @@ var fingers={}
 var terrain_stamp=0
 var floor_multi: MultiMesh
 var marked_cells=[]
+var render_scale=1.0
+var dynamic_stamp=0
+var actor_rebuilds=0
+var terrain_rebuilds=0
 
 func _ready() -> void:
- stretch=true
+ expand_mode=TextureRect.EXPAND_IGNORE_SIZE
+ stretch_mode=TextureRect.STRETCH_SCALE
  viewport=SubViewport.new()
  viewport.size=Vector2i(850,580)
- viewport.render_target_update_mode=SubViewport.UPDATE_ALWAYS
+ viewport.render_target_update_mode=SubViewport.UPDATE_WHEN_VISIBLE
  viewport.handle_input_locally=false
  add_child(viewport)
+ texture=viewport.get_texture()
+ resized.connect(update_render_size)
+ call_deferred("update_render_size")
  world=Node3D.new()
  viewport.add_child(world)
  var light=DirectionalLight3D.new()
@@ -44,6 +54,7 @@ func _ready() -> void:
  camera.position=Vector3(24,25,28)
  world.add_child(camera)
  camera.look_at(Vector3(8.5,0,6.5))
+ reset_camera()
  gui_input.connect(input_event)
  redraw()
 
@@ -75,7 +86,10 @@ func redraw() -> void:
  var multi: MultiMesh
  var instance: MultiMeshInstance3D
  var rebuild=geometry==null or stamp!=terrain_stamp
+ var actors_stamp=[battle.t.units.hash(),battle.t.ground.hash(),stamp].hash()
+ var update_actors=rebuild or actors_stamp!=dynamic_stamp
  if rebuild:
+  terrain_rebuilds+=1
   if geometry!=null:
    world.remove_child(geometry)
    geometry.queue_free()
@@ -127,17 +141,22 @@ func redraw() -> void:
    if c.kind=="floor" and level>0: Art.place(geometry,"floor",base,Vector3(0.94,0.04,0.94),false,level==1)
   instance.multimesh=multi
   geometry.add_child(instance)
- else:
+ elif update_actors:
   for child in geometry.get_children():
    if child.has_meta("dynamic"):
     geometry.remove_child(child);child.queue_free()
  # Only changed selection/route colours need uploading when terrain/fog is unchanged.
  var dirty=marked_cells.duplicate()
  marked_cells=preview.duplicate()
+ if highlight_target!="" and battle.known("company",highlight_target):
+  var target=battle.unit(highlight_target)
+  if target!=null: marked_cells.append(int(target.y)*int(battle.t.width)+int(target.x))
  if chosen!=null: marked_cells.append(int(chosen.y)*int(battle.t.width)+int(chosen.x))
  dirty.append_array(marked_cells)
  for i in dirty:
   if i>=0 and i<battle.t.tiles.size(): floor_multi.set_instance_color(i,tile_color(i,chosen))
+ if not update_actors: return
+ dynamic_stamp=actors_stamp;actor_rebuilds+=1
  var static_count=geometry.get_child_count()
  var piles={}
  for placement in battle.t.ground:
@@ -162,9 +181,13 @@ func redraw() -> void:
   marker.position=Vector3(u.x,elevation+0.075,u.y)
   geometry.add_child(marker)
   var label=Label3D.new()
-  label.text="%s\n%d HP · %d AP" % [u.person.name,u.person.hp,u.ap]
+  var title=u.person.name
+  if Desktop.enabled() and u.id.begins_with("greywake-recruit-"):
+   var friends=battle.t.units.filter(func(unit):return unit.team=="company" and unit.person.hp>0)
+   title="#"+str(friends.find(u)+1)
+  label.text=title.trim_prefix("Dockside ") if Desktop.enabled() else "%s\n%d HP · %d AP" % [title,u.person.hp,u.ap]
   label.font_size=32
-  label.pixel_size=0.008
+  label.pixel_size=0.010 if Desktop.enabled() else 0.008
   label.position=Vector3(u.x,elevation+1.8,u.y)
   label.billboard=BaseMaterial3D.BILLBOARD_ENABLED
   geometry.add_child(label)
@@ -191,6 +214,9 @@ func paint_cell(c: Dictionary,level: int,i: int,chosen) -> Color:
  elif level==1: color=color.darkened(0.65)
  if i in preview and level>0: color=Color("a69745")
  if chosen!=null and c.x==chosen.x and c.y==chosen.y: color=Color("2898b4")
+ if level==2 and highlight_target!="" and battle.known("company",highlight_target):
+  var target=battle.unit(highlight_target)
+  if target!=null and target.x==c.x and target.y==c.y: color=Color("ad5d43")
  return color
 
 func pick(point: Vector2) -> void:
@@ -215,7 +241,7 @@ func input_event(event: InputEvent) -> void:
  if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_MIDDLE:
   middle=event.pressed;accept_event();return
  if event is InputEventMouseMotion and middle:
-  camera.position+=Vector3(-event.relative.x-event.relative.y,0,event.relative.x-event.relative.y)*camera.size/900;return
+  pan_screen(event.relative);accept_event();return
  if event is InputEventMouseButton:
   if event.button_index==MOUSE_BUTTON_WHEEL_UP: camera.size=clampf(camera.size-1,8,32)
   elif event.button_index==MOUSE_BUTTON_WHEEL_DOWN: camera.size=clampf(camera.size+1,8,32)
@@ -227,7 +253,7 @@ func input_event(event: InputEvent) -> void:
    elif not dragged: pick(event.position)
  elif event is InputEventMouseMotion and pressed:
   if event.position.distance_to(down)>12: dragged=true
-  if dragged: camera.position+=Vector3(-event.relative.x-event.relative.y,0,event.relative.x-event.relative.y)*camera.size/900
+  if dragged and not Desktop.enabled(): pan_screen(event.relative)
  elif event is InputEventPanGesture:
   var relative=-event.delta*5.0
   camera.position+=Vector3(-relative.x-relative.y,0,relative.x-relative.y)*camera.size/900
@@ -256,5 +282,30 @@ func input_event(event: InputEvent) -> void:
   fingers[event.index]=event.position
 
 func _notification(what: int) -> void:
- if what==NOTIFICATION_APPLICATION_PAUSED:
+ if what in [NOTIFICATION_APPLICATION_PAUSED,NOTIFICATION_APPLICATION_FOCUS_OUT]:
   fingers.clear();pressed=false;middle=false;dragged=true
+
+func update_render_size() -> void:
+ if viewport==null or size.x<1 or size.y<1: return
+ var pixels=size
+ if Desktop.enabled():
+  var scale=get_screen_transform().get_scale().abs()
+  pixels*=scale*render_scale
+  pixels*=minf(1.0,minf(2560.0/maxf(1,pixels.x),1440.0/maxf(1,pixels.y)))
+ viewport.size=Vector2i(maxi(1,roundi(pixels.x)),maxi(1,roundi(pixels.y)))
+
+func pan_screen(relative: Vector2) -> void:
+ camera.position+=Vector3(-relative.x-relative.y,0,relative.x-relative.y)*camera.size/900
+
+func reset_camera() -> void:
+ if camera==null or battle==null: return
+ var center=Vector3((battle.t.width-1)*.5,0,(battle.t.height-1)*.5)
+ camera.size=clampf(maxf(battle.t.width*1.2,battle.t.height*1.6),8,32)
+ camera.position=center+Vector3(15.5,25,21.5);camera.look_at(center)
+
+func center_on(id: String) -> void:
+ var unit=battle.unit(id)
+ if unit==null: return
+ var middle=Vector2(viewport.size)*.5
+ var point=Plane(Vector3.UP,0.06).intersects_ray(camera.project_ray_origin(middle),camera.project_ray_normal(middle))
+ if point!=null: camera.position+=Vector3(unit.x,point.y,unit.y)-point
