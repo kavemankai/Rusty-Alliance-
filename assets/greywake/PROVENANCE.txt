@@ -1,3 +1,7 @@
+# Updated receipt — 0.15.2
+
+All seven distinct v0.2 parts are now received (66 PNGs). Seven scene plates and eight UI textures are used. The supplied metadata discloses upscaled concept crops; these remain provisional, without a claim of native full-resolution painting. Maps/combat reference and mismatched portrait identities remain reference-only. See GREYWAKE_SCENE_ART_STATUS.md and the import audit for exact classification and hashes. Earlier partial-receipt notes below are historical.
+
 # Greywake art provenance and current limitations
 
 The four SVG scene/map plates are original temporary vector illustrations from the opening milestone. The user supplied five partial v0.2 ZIP attachments on 2026-10-27. Parts 3 and 4 are byte-identical and are imported once.

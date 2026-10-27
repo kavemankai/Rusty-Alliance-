@@ -2,15 +2,15 @@ extends Control
 const Art=preload("res://ui/greywake_art.gd")
 const ArrivalMap=preload("res://ui/greywake_map.gd")
 const ICONS=preload("res://ui/asset_icons.gd")
-const TAVERN=preload("res://assets/greywake/tavern.svg")
-const EMPLOYER=preload("res://assets/greywake/employer.svg")
-const VOYAGE=preload("res://assets/greywake/voyage.svg")
-const POSITIONS={"militia_spearman":Vector2(.15,.56),"militia_crossbowman":Vector2(.27,.60),"mara":Vector2(.42,.53),"oswin":Vector2(.52,.50),"ada":Vector2(.10,.30),"bram":Vector2(.66,.72),"elin":Vector2(.65,.30),"nessa":Vector2(.36,.29),"garran":Vector2(.86,.50),"sabine":Vector2(.87,.65),"roderic":Vector2(.79,.35),"ysra":Vector2(.48,.25)}
+const TAVERN=preload("res://assets/greywake/scenes/03_tavern_recruitment_1920x1080.png")
+const EMPLOYER=preload("res://assets/greywake/scenes/02_hooded_employer_1920x1080.png")
+const VOYAGE=preload("res://assets/greywake/scenes/04_boat_crossing_1920x1080.png")
+const TITLE=preload("res://assets/greywake/scenes/01_title_atmosphere_1920x1080.png")
+const DOCK=preload("res://assets/greywake/scenes/06_dock_town_1920x1080.png")
 var app
 var mode="opening"
 var elapsed=0.0
 var canvas: Control
-var hot=[]
 func _ready() -> void:
  set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
  if mode=="title": title()
@@ -32,12 +32,14 @@ func action(parent: Node,value: String,callback: Callable) -> Button:
 func plate(texture: Texture2D) -> void:
  var bg=TextureRect.new();bg.texture=texture;bg.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;bg.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_COVERED
  bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);bg.mouse_filter=MOUSE_FILTER_IGNORE;add_child(bg)
+ var shade=ColorRect.new();shade.color=Color(0,0,0,.22);shade.mouse_filter=MOUSE_FILTER_IGNORE
+ shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(shade)
 func root_box() -> VBoxContainer:
  var margin=MarginContainer.new();margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
  for k in ["left","right","top","bottom"]: margin.add_theme_constant_override("margin_"+k,18)
  add_child(margin);var v=VBoxContainer.new();v.add_theme_constant_override("separation",10);margin.add_child(v);return v
 func title() -> void:
- plate(VOYAGE)
+ plate(TITLE)
  var root=root_box();root.add_spacer(false)
  text(root,"THE BROKEN MARCHES",34);text(root,"The Fall of Greywake",25)
  text(root,"A company of your choosing. An island under a baron.",17)
@@ -65,9 +67,9 @@ func toolbar(root: VBoxContainer) -> void:
 func opening() -> void:
  var stage=app.Campaign.Opening.stage(app.game.s)
  if stage=="TAVERN_RECRUITMENT": tavern();return
- if stage in ["GREYWAKE_ARRIVAL","DOCKSIDE_CONTRACT"]:
+ if stage=="DOCKSIDE_CONTRACT":
   var chart=ArrivalMap.new();chart.campaign=app.game;chart.selected=17;chart.squad="first";chart.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(chart)
- else: plate(EMPLOYER if stage=="EMPLOYER_BRIEFING" else VOYAGE)
+ else: plate(EMPLOYER if stage=="EMPLOYER_BRIEFING" else (DOCK if stage=="GREYWAKE_ARRIVAL" else VOYAGE))
  var root=root_box();text(root,"THE FALL OF GREYWAKE",23);root.add_spacer(false)
  var box=frame(root);var data=app.Campaign.Opening.content()
  match stage:
@@ -96,7 +98,11 @@ func manifest(parent: Node) -> void:
  var row=HFlowContainer.new();parent.add_child(row)
  for id in ids:
   var p=s.mercs[id]
-  if app.Campaign.Opening.stage(s)=="TAVERN_RECRUITMENT": action(row,"Remove "+p.name,app.opening_execute.bind("cancel_opening_hire",{"id":id}))
+  if app.Campaign.Opening.stage(s)=="TAVERN_RECRUITMENT":
+   var caption="Remove #"+id.trim_prefix("greywake-recruit-") if id.begins_with("greywake-recruit-") else "Remove "+p.name
+   var remove=action(row,caption,app.opening_execute.bind("cancel_opening_hire",{"id":id}))
+   remove.clip_text=false;remove.size_flags_horizontal=SIZE_SHRINK_BEGIN
+   remove.tooltip_text="Remove "+p.name+" · refund "+str(p.fee)+" crowns"
   else:
    var name_label=text(row,p.name+"  ·  ",16);name_label.autowrap_mode=TextServer.AUTOWRAP_OFF
  if wages>0: text(parent,"Remaining funds cover about %d days of current wages, before provisions and renewal fees." % int(maxi(0,s.funds)/wages),15)
@@ -106,9 +112,10 @@ func tavern() -> void:
  var root=root_box();text(root,"THE MAINLAND TAVERN · Choose your company",25)
  var body=HBoxContainer.new();body.size_flags_vertical=SIZE_EXPAND_FILL;root.add_child(body)
  var left=VBoxContainer.new();left.size_flags_horizontal=SIZE_EXPAND_FILL;body.add_child(left)
- canvas=TextureRect.new();canvas.texture=TAVERN;canvas.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;canvas.stretch_mode=TextureRect.STRETCH_SCALE
- canvas.size_flags_vertical=SIZE_EXPAND_FILL;canvas.custom_minimum_size=Vector2(460,240);left.add_child(canvas)
- canvas.resized.connect(place_hotspots)
+ canvas=TextureRect.new();canvas.texture=TAVERN;canvas.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;canvas.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_COVERED
+ canvas.size_flags_vertical=SIZE_EXPAND_FILL;canvas.custom_minimum_size=Vector2(460,140);left.add_child(canvas)
+ canvas.mouse_filter=MOUSE_FILTER_IGNORE
+ var choices=GridContainer.new();choices.columns=4;left.add_child(choices)
  var rows=app.game.s.recruitment.templates
  for row in rows:
   var hotspot=Button.new();hotspot.text=row.name;hotspot.name="candidate_"+row.id
@@ -118,9 +125,8 @@ func tavern() -> void:
   hotspot.clip_text=true
   hotspot.add_theme_stylebox_override("normal",normal);hotspot.add_theme_stylebox_override("hover",hover);hotspot.add_theme_stylebox_override("focus",hover)
   hotspot.add_theme_font_size_override("font_size",14);hotspot.alignment=HORIZONTAL_ALIGNMENT_CENTER
-  canvas.add_child(hotspot);hotspot.set_meta("point",POSITIONS[row.id]);hot.append(hotspot)
+  choices.add_child(hotspot);hotspot.size_flags_horizontal=SIZE_EXPAND_FILL;hotspot.custom_minimum_size.y=44 if OS.has_feature("android") else 36
   hotspot.pressed.connect(func():app.tavern_selected=row.id;app.rebuild(),CONNECT_DEFERRED)
- call_deferred("place_hotspots")
  var profile_scroll=ScrollContainer.new();profile_scroll.custom_minimum_size.x=370;body.add_child(profile_scroll)
  var profile=frame(profile_scroll,true);profile.custom_minimum_size.x=280
  populate_profile(profile,rows)
@@ -157,12 +163,6 @@ func populate_profile(profile: VBoxContainer,rows: Array) -> void:
  text(profile,"Already selected" if hired else ("Affordable" if available else "Insufficient funds or full transport"),16)
  if hired: action(profile,"Remove "+row.name,app.opening_execute.bind("cancel_opening_hire",{"id":"greywake-named-"+row.id}))
  var recruit=action(profile,"Recruit "+row.name,app.opening_execute.bind("recruit_template" if row.repeatable else "hire",{"template":row.id,"id":"greywake-named-"+row.id,"squad":"first"}));recruit.disabled=not available
-func place_hotspots() -> void:
- if not is_instance_valid(canvas): return
- for hotspot in hot:
-  var point=hotspot.get_meta("point")*canvas.size
-  hotspot.size=Vector2(minf(135,canvas.size.x*.16),46)
-  hotspot.position=point-Vector2(hotspot.size.x/2,5)
 func _process(delta: float) -> void:
  if mode!="opening" or app.game==null: return
  if app.Campaign.Opening.stage(app.game.s)=="BOAT_CROSSING":

@@ -730,6 +730,10 @@ func opening_screen() -> void:
 
 func harbour_panel() -> void:
  var shipping=Campaign.Shipping;var sh=game.s.shipping
+ if Campaign.World.applies(game.s):
+  var illustration=TextureRect.new();illustration.texture=preload("res://ui/greywake_art.gd").harbour_image(game.s)
+  illustration.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;illustration.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_COVERED
+  illustration.custom_minimum_size=Vector2(0,150);illustration.mouse_filter=Control.MOUSE_FILTER_IGNORE;side.add_child(illustration)
  label(side,"DOCK TOWN · MAINLAND RECRUITMENT")
  label(side,"Harbour access: "+("open" if shipping.accessible(game.s) else "blockaded"))
  label(side,"Next scheduled ship: "+shipping.timestamp(sh.next_arrival_at)+"\nHiring requires a stationary squad at Dock Town. Resolve any tactical encounter first.")

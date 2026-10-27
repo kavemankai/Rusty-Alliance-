@@ -24,3 +24,10 @@ static func apply_button(button: Button) -> void:
  if key!="":
   button.icon=load(ROOT+key+"_256.png");button.expand_icon=true
   button.add_theme_constant_override("icon_max_width",22)
+
+static func harbour_image(s: Dictionary) -> Texture2D:
+ var file="06_dock_town_1920x1080.png"
+ for vessel in s.shipping.vessels:
+  if vessel.status=="offshore": file="08_offshore_blockade_1920x1080.png";break
+  if vessel.status=="docked" and s.time<vessel.recruitment_deadline: file="05_recruitment_vessel_1920x1080.png"
+ return load("res://assets/greywake/scenes/"+file)

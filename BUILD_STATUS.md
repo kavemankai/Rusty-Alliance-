@@ -1,3 +1,7 @@
+# Current scene-art preview — 0.15.2
+
+The remaining pack parts are received. Seven supplied scene PNGs and eight UI images are integrated; baked-label maps, combat reference and unmapped portraits remain references. See GREYWAKE_SCENE_ART_STATUS.md for current evidence, provisional quality and remaining work. Earlier build sections below are historical.
+
 # Current art update — 0.15.1-greywake-ui-art
 
 Partial v0.2 archives have now been received. Eight supplied UI textures are integrated; the concept boards and mismatched provisional portraits remain reference-only. Standalone scene plates/map are missing from these attachments. See GREYWAKE_ART_V02_STATUS.md. The 0.15 opening evidence below remains historical for its exact binaries.

@@ -30,6 +30,7 @@ func run() -> void:
  check("Quaternius art assets" in FileAccess.get_file_as_string("res://THIRD_PARTY_NOTICES.txt"),"Packaged art credit and CC0 notice")
  check(ResourceLoader.exists("res://assets/greywake/production_ui/button_normal.png"),"Packaged supplied UI texture")
  check(not ResourceLoader.exists("res://art_reference/greywake_v02/preview/portrait_overview.png"),"Reference boards and unmapped faces excluded from player pack")
+ check(not ResourceLoader.exists("res://art_reference/greywake_v02/assets/maps/greywake_isle_full.png"),"Mismatched baked-label map is reference-only")
  var opening=app.Campaign.new();opening.autosave_path="user://opening-pack-smoke-auto.json"
  check(opening.configure_greywake_opening() and opening.valid_save(opening.s),"Packaged opening/dialogue/island data loads")
  opening.command("opening_skip")
@@ -39,7 +40,7 @@ func run() -> void:
  check(opening.battle.t.tiles.any(func(tile):return tile.kind=="water" and tile.block),"Packaged authored dockside collision")
  app.game=opening;app.tab="sector";app.selected="";app.rebuild()
  await process_frame;await process_frame
- check(ResourceLoader.exists("res://assets/greywake/tavern.svg") and ResourceLoader.exists("res://assets/greywake/island.svg"),"Packaged actual opening illustrations")
+ check(ResourceLoader.exists("res://assets/greywake/scenes/03_tavern_recruitment_1920x1080.png") and ResourceLoader.exists("res://assets/greywake/island.svg"),"Packaged actual opening illustrations")
  check(app.battle_view.geometry.get_children().any(func(node):return node.get_meta("asset_key","")=="barrel"),"Packaged additional CC0 barrel mesh and materials")
  print("PACK_SMOKE: "+JSON.stringify({"failed":failures.size(),"failures":failures,"actors":actors}))
  app.queue_free();await process_frame;await process_frame

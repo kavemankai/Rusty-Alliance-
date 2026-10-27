@@ -32,14 +32,17 @@ func click(text: String) -> void:
 func run() -> void:
  app=load("res://main.tscn").instantiate();root.add_child(app);await settle()
  check(find(app,"New Game")!=null and find(app,"New campaign")!=null,"Title preserves separate original and Greywake access")
+ check(app.opening_view.get_child(0).texture.resource_path.ends_with("01_title_atmosphere_1920x1080.png"),"Supplied title scene is displayed")
  await click("New Game")
+ check(app.opening_view.get_child(0).texture.resource_path.ends_with("02_hooded_employer_1920x1080.png"),"Supplied anonymous employer scene is displayed")
  app.save_slot="user://opening-ui-save.json";app.game.autosave_path="user://opening-ui-auto.json"
  check(app.Campaign.Opening.stage(app.game.s)=="EMPLOYER_BRIEFING","New Game enters employer briefing")
  await click("Continue briefing")
  check(app.game.s.opening_flow.dialogue_index==1,"Briefing advances actual saved dialogue index")
  await click("Enter tavern")
  check(app.Campaign.Opening.stage(app.game.s)=="TAVERN_RECRUITMENT","Skip briefing still enters recruitment")
- for row in app.game.s.recruitment.templates: check(find(app,row.name)!=null,"Actual tavern hotspot "+row.id)
+ check(app.opening_view.canvas.texture.resource_path.ends_with("03_tavern_recruitment_1920x1080.png"),"Supplied tavern atmosphere accompanies the real roster controls")
+ for row in app.game.s.recruitment.templates: check(find(app,row.name)!=null,"Actual tavern choice "+row.id)
  for row in app.game.s.recruitment.templates:
   await click(row.name)
   for key in app.Data.Skills.ATTRIBUTES+app.Data.Skills.ALL:

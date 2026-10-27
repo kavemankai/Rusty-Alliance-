@@ -1,3 +1,7 @@
+# Current scene-art preview — 0.15.2
+
+The remaining pack parts are received. Seven supplied scene PNGs and eight UI images are integrated; baked-label maps, combat reference and unmapped portraits remain references. See GREYWAKE_SCENE_ART_STATUS.md for current evidence, provisional quality and remaining work. Earlier build sections below are historical.
+
 # Current UI art preview — 0.15.1
 
 Supplied v0.2 panel/button/icon art now skins the real Greywake controls. The roster, existing scenes, live battle and layered island are preserved. [Import audit, missing assets and current checks](GREYWAKE_ART_V02_STATUS.md). Portrait identities remain unmapped; standalone scene/map files were not included in the supplied parts.

@@ -1,3 +1,5 @@
+> Historical 0.15.1 partial-receipt report. The missing parts have since arrived; see [0.15.2 scene integration](GREYWAKE_SCENE_ART_STATUS.md). Portrait identity/quality limits remain.
+
 # Greywake partial v0.2 art integration — 0.15.1
 
 ## What is actually supplied

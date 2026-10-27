@@ -60,8 +60,9 @@ def main():
  # Include the small runtime explicitly; imported scene/material dependencies
  # are then followed by the exporter. Library-only models are not selected.
  files=['res://main.tscn','res://icon.svg']
- files+=['res://'+p.relative_to(ROOT).as_posix() for p in sorted((ROOT/'assets/greywake').glob('*.svg'))]
+ files+=['res://'+p.relative_to(ROOT).as_posix() for p in sorted((ROOT/'assets/greywake').glob('island.svg'))]
  files+=['res://assets/greywake/production_ui/'+name+'.png' for name in ['button_normal','button_hover','button_selected','button_disabled','tavern_profile_panel_550x700','anchor_256','ship_256','recruit_256']]
+ files+=['res://'+p.relative_to(ROOT).as_posix() for p in sorted((ROOT/'assets/greywake/scenes').glob('*.png'))]
  files+=['res://'+p.relative_to(ROOT).as_posix() for folder in ['sim','ui'] for p in sorted((ROOT/folder).glob('*.gd'))]
  files+=sorted(set(active.values()))
  files+=['res://assets/ui/icons/'+key+'.png' for key in selected if (ROOT/'assets/ui/icons'/(key+'.png')).exists()]

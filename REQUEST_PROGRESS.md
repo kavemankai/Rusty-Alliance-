@@ -43,3 +43,7 @@ The user-supplied opening specification is preserved in GREYWAKE_OPENING_EXPERIE
 ## 2026-10-27 — partial v0.2 art
 
 Eight supplied UI textures are integrated into real Greywake controls; duplicate ZIP deduplicated. Canonical roster and existing gameplay are preserved. Unmapped provisional portraits/boards are reference-only; the standalone scenes/map are absent. See GREYWAKE_ART_V02_STATUS.md and ui-art-results.json for current evidence and remaining assets.
+
+## 2026-10-27 — remaining scene parts received
+
+The full seven-part v0.2 pack is now received (66 PNGs). Seven scene plates and eight UI textures are active. Baked-label/geographically mismatched maps, combat reference and unmapped portraits remain reference-only. See GREYWAKE_SCENE_ART_STATUS.md and scene-art-results.json for current evidence. Gameplay/canonical data and earlier binaries are preserved.
