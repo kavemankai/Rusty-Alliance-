@@ -1,5 +1,6 @@
 extends Control
 const Art=preload("res://ui/greywake_art.gd")
+const RecruitHighlight=preload("res://ui/recruit_highlight.gd")
 const ArrivalMap=preload("res://ui/greywake_map.gd")
 const ICONS=preload("res://ui/asset_icons.gd")
 const TAVERN=preload("res://assets/greywake/scenes/03_tavern_recruitment_1920x1080.png")
@@ -11,6 +12,26 @@ var app
 var mode="opening"
 var elapsed=0.0
 var canvas: Control
+var candidate_controls={}
+var profile_box: VBoxContainer
+
+func choose_candidate(id: String) -> void:
+ if not candidate_controls.has(id): return
+ app.tavern_selected=id
+ for candidate in candidate_controls:
+  for control in candidate_controls[candidate]: RecruitHighlight.apply(control,candidate==id)
+ if is_instance_valid(profile_box):
+  for child in profile_box.get_children():
+   profile_box.remove_child(child);child.queue_free()
+  populate_profile(profile_box,app.game.s.recruitment.templates)
+  profile_box.get_parent().get_parent().scroll_vertical=0
+
+func bind_candidate(button: Button,id: String) -> void:
+ if not candidate_controls.has(id): candidate_controls[id]=[]
+ candidate_controls[id].append(button)
+ button.set_meta("candidate_id",id)
+ RecruitHighlight.apply(button,app.tavern_selected==id)
+ button.pressed.connect(choose_candidate.bind(id),CONNECT_DEFERRED)
 func _ready() -> void:
  set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
  if mode=="title": title()
@@ -122,15 +143,12 @@ func tavern() -> void:
  for row in rows:
   var hotspot=Button.new();hotspot.text=row.name;hotspot.name="candidate_"+row.id
   hotspot.tooltip_text="%s · %s · fee %d · wage %d/day. Click to inspect." % [row.name,row.tier,row.fee,row.wage]
-  var normal=StyleBoxFlat.new();normal.bg_color=Color(0,0,0,.30);normal.border_color=Color(0.8,.69,.42,.25);normal.set_border_width_all(1)
-  var hover=normal.duplicate();hover.bg_color=Color(.45,.34,.14,.6);hover.border_color=Color("e1c581");hover.set_border_width_all(2)
   hotspot.clip_text=true
-  hotspot.add_theme_stylebox_override("normal",normal);hotspot.add_theme_stylebox_override("hover",hover);hotspot.add_theme_stylebox_override("focus",hover)
   hotspot.add_theme_font_size_override("font_size",round(14*app.desktop.ui_scale) if app.Desktop.enabled() else 14);hotspot.alignment=HORIZONTAL_ALIGNMENT_CENTER
   choices.add_child(hotspot);hotspot.size_flags_horizontal=SIZE_EXPAND_FILL;hotspot.custom_minimum_size.y=44 if OS.has_feature("android") else 36
-  hotspot.pressed.connect(func():app.tavern_selected=row.id;app.rebuild(),CONNECT_DEFERRED)
+  bind_candidate(hotspot,row.id)
  var profile_scroll=ScrollContainer.new();profile_scroll.custom_minimum_size.x=370*(app.desktop.ui_scale if app.Desktop.enabled() else 1.0);body.add_child(profile_scroll)
- var profile=frame(profile_scroll,true);profile.custom_minimum_size.x=280
+ var profile=frame(profile_scroll,true);profile.custom_minimum_size.x=280;profile_box=profile
  populate_profile(profile,rows)
  var manifest_box=frame(root);manifest(manifest_box)
  var bar=HBoxContainer.new();root.add_child(bar)
