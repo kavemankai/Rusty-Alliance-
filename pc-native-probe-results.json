@@ -1,13 +1,13 @@
 {
   "cap": 60,
-  "engine_fps": 60.0,
+  "engine_fps": 30.0,
   "focused": true,
   "frames": 120,
-  "median_ms": 16.6663333333333,
+  "median_ms": 33.3333333333333,
   "normal_scene_mainloop": true,
-  "p95_ms": 16.6666666666667,
+  "p95_ms": 33.3333333333333,
   "render_pixels": [
-    1548,
-    817
+    1920,
+    707
   ]
 }

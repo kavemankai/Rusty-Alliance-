@@ -11,7 +11,7 @@ $suites=@(
  @('skills','skills-test-results.json','Core'),@('greywake','greywake-test-results.json','Core'),
  @('opening_flow','opening-flow-results.json','Core'),@('greywake_island','island-test-results.json','Core'),
  @('greywake_dockside','dockside-test-results.json','Core'),@('assets','asset-test-results.json','Core'),
- @('desktop_settings','desktop-settings-results.json','Core'),@('pc_camera','pc-camera-results.json','Core'),
+ @('battle_ui','battle-ui-results.json','Core'),@('tavern_selection','tavern-selection-results.json','Core'),@('desktop_settings','desktop-settings-results.json','Core'),@('pc_camera','pc-camera-results.json','Core'),
  @('ui_smoke','ui-test-results.json','UI'),@('skills_ui','skills-ui-results.json','UI'),
  @('greywake_ui','greywake-ui-results.json','UI'),@('opening_ui','opening-ui-results.json','UI'),
  @('scene_art_ui','scene-art-ui-results.json','UI'),@('pc_vertical_slice','pc-vertical-slice-results.json','UI'),

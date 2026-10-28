@@ -1,0 +1,4 @@
+Godot Engine v4.6.2.stable.official.71f334935 - https://godotengine.org
+OpenGL API 3.3.0 NVIDIA 610.78 - Compatibility - Using Device: NVIDIA - NVIDIA GeForce RTX 3050 Laptop GPU
+
+PC_VERTICAL_SLICE: {"failed":0,"failures":[],"measurements":{"actor_rebuilds":1,"cached_100_redraw_ms":12.963,"frame_samples":89,"idle_frame_median_ms":33.3333333333333,"idle_frame_p95_ms":33.3333333333333,"idle_process_fps":30.0552917183312,"render_pixels":[1448,707],"screen_refresh_hz":60.0189514160156,"window_focused":true},"passed":112,"scope":"Desktop native UI events, canonical commands, six paid recruits, real tactical turns, persistence and renderer behaviour; no forced victory."}

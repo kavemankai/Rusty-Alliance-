@@ -3,14 +3,14 @@
   "failures": [],
   "measurements": {
     "actor_rebuilds": 1,
-    "cached_100_redraw_ms": 9.121,
+    "cached_100_redraw_ms": 12.963,
     "frame_samples": 89,
-    "idle_frame_median_ms": 16.6666666666667,
-    "idle_frame_p95_ms": 16.6666666666667,
-    "idle_process_fps": 60.0131628870599,
+    "idle_frame_median_ms": 33.3333333333333,
+    "idle_frame_p95_ms": 33.3333333333333,
+    "idle_process_fps": 30.0552917183312,
     "render_pixels": [
       1448,
-      817
+      707
     ],
     "screen_refresh_hz": 60.0189514160156,
     "window_focused": true

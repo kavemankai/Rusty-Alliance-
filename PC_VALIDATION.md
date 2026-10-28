@@ -1,3 +1,5 @@
+Current source has the 0.17 tavern and battle interface update; see DESKTOP_UI_017_STATUS.md. The version-specific evidence below is historical for its original commit/build.
+
 # PC vertical slice validation — 0.16.0
 
 The existing Greywake opening and original campaign now have native desktop sizing, configurable keyboard controls, persistent combat controls, a resizable inspector and presentation caching. Acceptance covers 1280×720 through 1920×1080 on Windows, with a default window up to 1600×900 within the available desktop.

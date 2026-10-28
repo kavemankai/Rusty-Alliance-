@@ -16,6 +16,9 @@ func settle() -> void: await process_frame;await process_frame
 func click(text: String) -> void:
  var b=find(app,text)
  if b==null: check(false,"Missing button "+text);return
+ if is_instance_valid(app.battle_hud) and is_instance_valid(app.side) and app.side.get_parent().is_ancestor_of(b) and not app.side.get_parent().visible:
+  await click("Details")
+  b=find(app,text)
  var parent=b.get_parent()
  while parent!=null:
   if parent is ScrollContainer: parent.ensure_control_visible(b)

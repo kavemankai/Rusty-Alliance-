@@ -1,3 +1,5 @@
+Current source has the 0.17 tavern and battle interface update; see DESKTOP_UI_017_STATUS.md. The version-specific evidence below is historical for its original commit/build.
+
 # Greywake scene art — 0.15.2
 
 ## Complete receipt, provisional artwork

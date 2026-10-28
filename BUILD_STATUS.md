@@ -1,3 +1,7 @@
+# Current desktop interface — 0.17.0
+
+The tavern now supports direct image selection of all twelve recruits, with faint borders, selection glow and synchronized profiles. Battle now uses a full-width field, bottom company/equipment/overview panel, contextual radial choices and clear active-fighter/visible-target highlights. [Current verification, controls, build and limits](DESKTOP_UI_017_STATUS.md). Earlier version sections below are historical.
+
 # Current PC slice — 0.16.0
 
 The existing vertical slice now has native desktop sizing, configurable keyboard controls, a persistent tactical crew/action bar, a resizable inspector, focus-safe pause behavior and cached actor rendering. See [PC validation, controls, reproduction and limits](PC_VALIDATION.md) and [the complete acceptance scope](PC_VERTICAL_SLICE.md). The full Greywake campaign, final assets/audio and new Android acceptance remain outstanding.

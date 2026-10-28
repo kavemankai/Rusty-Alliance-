@@ -1,3 +1,5 @@
+Desktop 0.17: tavern image selection and the battle HUD/radial delegate to existing validated commands. No combat, equipment, progression, save, shipping or economy formulas changed. See DESKTOP_UI_017_STATUS.md for actual evidence.
+
 # PC presentation audit — 0.16.0
 
 The PC pass changes presentation and input only. `sim/` and `data/` are byte-identical in Git to `90b0ce7`. Canonical identities, inventories, skills, deterministic combat, previews, fog/AI restrictions, economic accounting, saves, shipping and original geography retain the tested implementation. Exact roster data was supplied and implemented before this pass; older workshop-missing notes below are historical. No JA2 code, assets or tables were added. Current checks and explicit limits: [PC_VALIDATION.md](PC_VALIDATION.md).

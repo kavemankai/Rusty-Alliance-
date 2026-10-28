@@ -2,6 +2,7 @@ extends RefCounted
 const Desktop=preload("res://ui/desktop.gd")
 const CAMERA_KEYS=[KEY_W,KEY_A,KEY_S,KEY_D,KEY_UP,KEY_LEFT,KEY_DOWN,KEY_RIGHT]
 static func modal(app) -> bool:
+ if is_instance_valid(app.battle_radial) and app.battle_radial.visible: return true
  for child in app.ui.get_children():
   if child is Window and child.visible: return true
  return false

@@ -17,6 +17,9 @@ func find(node: Node,title: String):
 func click(title: String) -> void:
  var button=find(app,title)
  if button==null: check(false,"Missing control "+title);return
+ if is_instance_valid(app.battle_hud) and is_instance_valid(app.side) and app.side.get_parent().is_ancestor_of(button) and not app.side.get_parent().visible:
+  await click("Details")
+  button=find(app,title)
  var parent=button.get_parent()
  while parent!=null:
   if parent is ScrollContainer: parent.ensure_control_visible(button)
@@ -96,6 +99,7 @@ func run() -> void:
  view.pan_screen(Vector2(80,30));var position=view.camera.position
  await key(KEY_ENTER)
  check(app.game.battle.t.phase=="combat" and app.battle_view.camera.position.is_equal_approx(position),"Enter begins real combat and preserves deployment camera")
+ await click("Details")
  var splitter=app.content;var old_width=splitter.get_child(1).size.x;var snapshot=state()
  var handle=Vector2(splitter.get_child(0).get_global_rect().end.x+6,splitter.get_global_rect().get_center().y)
  var down=InputEventMouseButton.new();down.button_index=MOUSE_BUTTON_LEFT;down.pressed=true;down.position=handle;root.push_input(down)

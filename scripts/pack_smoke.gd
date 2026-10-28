@@ -37,14 +37,26 @@ func run() -> void:
  var opening=app.Campaign.new();opening.autosave_path="user://opening-pack-smoke-auto.json"
  check(opening.configure_greywake_opening() and opening.valid_save(opening.s),"Packaged opening/dialogue/island data loads")
  opening.command("opening_skip")
+ app.game=opening;app.tab="sector";app.rebuild()
+ await process_frame;await process_frame
+ check(app.opening_view.canvas.hotspots.size()==12,"Packaged twelve-person scene and region code")
+ app.opening_view.choose_candidate("ysra")
+ check(app.opening_view.profile_box.get_child(0).text=="Ysra" and app.opening_view.canvas.hotspots.ysra.button_pressed,"Packaged image selection opens canonical profile")
  for repeat in range(2): opening.command("recruit_template",{"template":"militia_spearman"})
  opening.command("opening_confirm");opening.command("opening_depart");opening.command("opening_skip");opening.command("opening_next");opening.command("opening_next")
  check(opening.command("dockside_start") and opening.command("confirm_deployment"),"Packaged opening reaches real dockside combat")
  check(opening.battle.t.tiles.any(func(tile):return tile.kind=="water" and tile.block),"Packaged authored dockside collision")
  app.game=opening;app.tab="sector";app.selected="";app.rebuild()
  await process_frame;await process_frame
- check(ResourceLoader.exists("res://assets/greywake/scenes/03_tavern_recruitment_1920x1080.png") and ResourceLoader.exists("res://assets/greywake/island.svg"),"Packaged actual opening illustrations")
+ check(ResourceLoader.exists("res://assets/greywake/scenes/03_tavern_recruitment_interactive_v2.png") and ResourceLoader.exists("res://assets/greywake/island.svg"),"Packaged actual opening illustrations")
  check(app.battle_view.geometry.get_children().any(func(node):return node.get_meta("asset_key","")=="barrel"),"Packaged additional CC0 barrel mesh and materials")
+ check(is_instance_valid(app.battle_hud) and is_instance_valid(app.battle_radial),"Packaged bottom HUD and contextual radial scripts")
+ var actor=opening.battle.unit(app.selected)
+ var ap_before=actor.ap;var rng_before=opening.s.rng
+ app.open_battle_radial(actor.x,actor.y,app.battle_view.size*.5,true)
+ check(app.battle_radial.visible and app.battle_radial.buttons.size()>3 and app.battle_radial.context_valid(),"Packaged radial has live validated context choices")
+ check(actor.ap==ap_before and opening.s.rng==rng_before,"Packaged preview UI spends no AP or RNG")
+ app.close_radial()
  print("PACK_SMOKE: "+JSON.stringify({"failed":failures.size(),"failures":failures,"actors":actors}))
  app.queue_free();await process_frame;await process_frame
  quit(0 if failures.is_empty() else 1)

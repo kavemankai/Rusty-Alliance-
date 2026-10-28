@@ -7,6 +7,8 @@ const BattleView=preload("res://ui/battle_view.gd")
 const OpeningView=preload("res://ui/greywake_opening_view.gd")
 const Desktop=preload("res://ui/desktop.gd")
 const PC=preload("res://ui/pc_controls.gd")
+const BattleHUD=preload("res://ui/battle_hud.gd")
+const TacticalRadial=preload("res://ui/tactical_radial.gd")
 const Icons=preload("res://ui/asset_icons.gd")
 var game
 var ui: Control
@@ -54,6 +56,9 @@ var sidebar_offset=-60
 var nav_buttons={}
 var reload_button: Button
 var guard_button: Button
+var battle_hud
+var battle_radial
+var battle_details=false
 
 func _ready() -> void:
  if Desktop.enabled(): desktop.load_settings();desktop.apply_window(get_window(),true)
@@ -179,7 +184,7 @@ func open_greywake(path: String) -> void:
 
 func rebuild() -> void:
  cache_views()
- crew=null;action_dock=null;primary_button=null;preview_caption=null;nav_buttons.clear()
+ crew=null;action_dock=null;primary_button=null;preview_caption=null;nav_buttons.clear();battle_hud=null;battle_radial=null
  if opening_tween!=null and opening_tween.is_valid(): opening_tween.kill()
  opening_transition=false
  title_visible=false
@@ -212,9 +217,6 @@ func rebuild() -> void:
   if Desktop.enabled() and item[1]=="debug": continue
   var entry=button(nav,item[0],change_tab.bind(item[1]))
   if Desktop.enabled(): entry.toggle_mode=true;nav_buttons[item[1]]=entry
- if Desktop.enabled() and game.battle!=null:
-  var roster_scroll=ScrollContainer.new();roster_scroll.custom_minimum_size.y=64;roster_scroll.vertical_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED;root.add_child(roster_scroll)
-  crew=HBoxContainer.new();crew.size_flags_horizontal=Control.SIZE_EXPAND_FILL;roster_scroll.add_child(crew)
  content=HSplitContainer.new() if Desktop.enabled() else HBoxContainer.new()
  if Desktop.enabled():
   content.split_offset=sidebar_offset
@@ -245,6 +247,9 @@ func rebuild() -> void:
   restore_view(map_view,"map")
   map_view.sector_selected.connect(func(index): sector=index; tab="sector"; show_panel())
  else:
+  if game.battle.unit(selected)==null:
+   for unit in game.battle.t.units:
+    if unit.team=="company" and unit.person.hp>0: selected=unit.id;break
   battle_view=BattleView.new()
   battle_view.battle=game.battle
   battle_view.selected=selected
@@ -254,6 +259,7 @@ func rebuild() -> void:
   content.add_child(battle_view)
   restore_view(battle_view,"battle")
   battle_view.cell_selected.connect(tactical_cell)
+  if Desktop.enabled(): battle_view.context_requested.connect(open_battle_radial)
  var scroll=ScrollContainer.new()
  scroll.custom_minimum_size.x=360 if Desktop.enabled() else 380
  scroll.size_flags_horizontal=Control.SIZE_FILL
@@ -263,6 +269,7 @@ func rebuild() -> void:
  side.size_flags_horizontal=Control.SIZE_EXPAND_FILL
  scroll.add_child(side)
  if Desktop.enabled() and game.battle!=null:
+  battle_hud=BattleHUD.new();battle_hud.app=self;root.add_child(battle_hud)
   action_dock=HBoxContainer.new();root.add_child(action_dock)
   preview_caption=label(action_dock,"");preview_caption.size_flags_horizontal=Control.SIZE_EXPAND_FILL
   primary_button=button(action_dock,"Confirm preview",confirm_preview);primary_button.custom_minimum_size.x=180
@@ -308,10 +315,13 @@ func rebuild() -> void:
  message=label(root,last_message)
  message.custom_minimum_size.y=26 if Desktop.enabled() else 46
  if Desktop.enabled(): message.max_lines_visible=2
+ if Desktop.enabled() and game.battle!=null:
+  battle_radial=TacticalRadial.new();battle_radial.app=self;ui.add_child(battle_radial)
  refresh()
  if Desktop.enabled(): restore_sidebar_after_layout(content)
 
 func change_tab(value: String) -> void:
+ close_radial()
  pan_keys.clear()
  if Desktop.enabled() and value=="settings": pause_desktop()
  tab=value
@@ -354,9 +364,13 @@ func refresh() -> void:
   battle_view.highlight_target=target
   battle_view.redraw()
  refresh_crew()
+ if is_instance_valid(battle_hud):
+  var phase=game.battle.t.phase
+  header.text="  "+("DEPLOYMENT" if phase=="deployment" else ("EXPLORATION" if phase=="exploration" else ("PLAYER'S TURN" if game.battle.t.turn=="company" else "ENEMY TURN")))+"  ·  Round %d  ·  %s  ·  %d crowns"%[game.battle.t.round,game.s.sectors[game.s.encounter.sector].name,game.s.funds]
  show_panel()
 
 func run_command(kind: String,p: Dictionary={}) -> void:
+ close_radial()
  cache_views()
  if kind=="save" and not p.has("path"): p={"path":save_slot}
  var had_battle=game.battle!=null
@@ -373,6 +387,13 @@ func run_command(kind: String,p: Dictionary={}) -> void:
  else: status(game.error)
 
 func show_panel() -> void:
+ if game!=null and game.battle!=null and target!="" and not game.battle.known("company",target):
+  target=""
+  if is_instance_valid(battle_view): battle_view.highlight_target=""
+ if is_instance_valid(battle_hud):
+  battle_hud.visible=tab=="sector"
+  if is_instance_valid(side): side.get_parent().visible=tab!="sector" or battle_details
+  battle_hud.refresh_info()
  for key in nav_buttons:
   if is_instance_valid(nav_buttons[key]): nav_buttons[key].set_pressed_no_signal(key==tab)
  update_context_dock()
@@ -545,6 +566,7 @@ func tactical_cell(x: int,y: int) -> void:
    destination={}
   battle_view.selected=selected
   battle_view.redraw()
+  refresh_crew()
   show_panel()
   return
  if u!=null and u.team=="company":
@@ -560,9 +582,11 @@ func tactical_cell(x: int,y: int) -> void:
  battle_view.selected=selected
  battle_view.highlight_target=target
  battle_view.redraw()
+ refresh_crew()
  show_panel()
 
 func battle_action(kind: String,p: Dictionary={}) -> void:
+ close_radial()
  var previous_phase=game.battle.t.phase
  if game.battle.action(selected,kind,p):
   status("Done: "+kind)
@@ -576,6 +600,20 @@ func battle_action(kind: String,p: Dictionary={}) -> void:
   if not game.battle.t.log.is_empty(): status(game.battle.t.log.back())
   rebuild()
  else: refresh()
+
+func close_radial() -> void:
+ if is_instance_valid(battle_radial) and battle_radial.visible: battle_radial.dismiss()
+
+func open_battle_radial(x: int,y: int,point: Vector2,right_click: bool=false) -> void:
+ if game==null or game.battle==null or tab!="sector" or PC.modal(self): return
+ pause_desktop()
+ var b=game.battle
+ if right_click:
+  var unit=b.at(x,y)
+  if unit!=null and unit.team=="company": target="";destination={};refresh()
+  else: tactical_cell(x,y)
+ var global_point=battle_view.get_global_transform()*point
+ battle_radial.open_at(global_point,Vector2i(x,y))
 
 func tactical_panel() -> void:
  var b=game.battle
@@ -908,6 +946,7 @@ func _input(event: InputEvent) -> void:
   if (stage=="EMPLOYER_BRIEFING" and event.keycode in [KEY_ENTER,KEY_SPACE,KEY_ESCAPE]) or (stage=="BOAT_CROSSING" and event.keycode in [KEY_SPACE,KEY_ESCAPE]) or (stage in ["TAVERN_RECRUITMENT","COMPANY_CONFIRMATION"] and event.keycode==KEY_ESCAPE) or (Desktop.enabled() and stage in ["COMPANY_CONFIRMATION","GREYWAKE_ARRIVAL","DOCKSIDE_CONTRACT"] and event.keycode==KEY_ENTER):
    if not (Desktop.enabled() and event.keycode==KEY_ENTER and get_viewport().gui_get_focus_owner() is Button): _unhandled_key_input(event)
  if event is InputEventMouseButton and event.pressed and event.button_index==MOUSE_BUTTON_RIGHT:
+  if Desktop.enabled() and game.battle!=null and tab=="sector" and is_instance_valid(battle_view) and battle_view.get_global_rect().has_point(event.position): return
   if stage=="TAVERN_RECRUITMENT": tavern_selected="";rebuild()
   elif stage=="COMPANY_CONFIRMATION": opening_execute("opening_back",{})
   elif not Campaign.Opening.locked(game.s):
@@ -920,6 +959,7 @@ func apply_desktop_theme() -> void:
  if island_theme!=null: island_theme.default_font_size=round(17*desktop.ui_scale)
 
 func pause_desktop() -> void:
+ close_radial()
  auto_minutes=0;timer=0;pan_keys.clear()
  if game!=null and game.battle!=null and game.battle.t.phase=="exploration": game.battle.t.exploration.running=false
 
@@ -941,6 +981,7 @@ func fighters() -> Array:
  return game.battle.t.units.filter(func(unit):return unit.team=="company" and unit.person.hp>0)
 
 func select_fighter(index: int) -> void:
+ close_radial()
  var available=fighters()
  if index<0 or index>=available.size(): return
  selected=available[index].id;cancel_pending_only();tab="sector"
@@ -956,6 +997,7 @@ func cycle_fighter(step: int) -> void:
 
 func refresh_crew() -> void:
  if not is_instance_valid(crew): return
+ if is_instance_valid(battle_hud): battle_hud.refresh_roster();return
  for child in crew.get_children(): crew.remove_child(child);child.queue_free()
  var available=fighters()
  for i in range(available.size()):
@@ -966,11 +1008,13 @@ func refresh_crew() -> void:
   choice.toggle_mode=true;choice.button_pressed=unit.id==selected
 
 func cancel_preview() -> void:
+ close_radial()
  target="";destination={};get_viewport().gui_release_focus()
  if is_instance_valid(battle_view): battle_view.preview=[]
  refresh()
 
 func end_player_turn() -> void:
+ close_radial()
  if game==null or game.battle==null or game.battle.t.phase!="combat": return
  cancel_pending_only()
  if game.battle.end_turn(): game.Opening.mark(game.s,"turn");status("Enemy turn resolved")

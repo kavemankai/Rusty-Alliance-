@@ -21,6 +21,9 @@ func click(text: String) -> void:
  if b==null:
   failures.append("Missing button: "+text)
   return
+ if is_instance_valid(app.battle_hud) and is_instance_valid(app.side) and app.side.get_parent().is_ancestor_of(b) and not app.side.get_parent().visible:
+  await click("Details")
+  b=find_button(app,text)
  var ancestor=b.get_parent()
  while ancestor!=null:
   if ancestor is ScrollContainer: ancestor.ensure_control_visible(b)

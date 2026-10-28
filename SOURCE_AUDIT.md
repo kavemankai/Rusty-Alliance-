@@ -1,4 +1,4 @@
-Tavern selection work is in progress; see TAVERN_SELECTION_STATUS.md. Shared UI selection/highlight changes only; portrait placement awaits the layout choice.
+Desktop 0.17 changes presentation only. The user-supplied JA screenshots inform layout; no reference source/assets/tables were copied. The built-in generated tavern edit, normalized selection regions, bottom HUD, radial and visibility-filtered highlights are documented in DESKTOP_UI_017_STATUS.md. Simulation and catalogue data remain unchanged from 482244e.
 
 # PC presentation audit — 0.16.0
 

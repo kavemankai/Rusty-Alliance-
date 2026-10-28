@@ -21,6 +21,9 @@ func settle() -> void: await process_frame;await process_frame;await create_time
 func click(text: String) -> void:
  var b=find(app,text)
  if b==null: check(false,"Missing button "+text);return
+ if is_instance_valid(app.battle_hud) and is_instance_valid(app.side) and app.side.get_parent().is_ancestor_of(b) and not app.side.get_parent().visible:
+  await click("Details")
+  b=find(app,text)
  var parent=b.get_parent()
  while parent!=null:
   if parent is ScrollContainer: parent.ensure_control_visible(b)
@@ -41,7 +44,7 @@ func run() -> void:
  check(app.game.s.opening_flow.dialogue_index==1,"Briefing advances actual saved dialogue index")
  await click("Enter tavern")
  check(app.Campaign.Opening.stage(app.game.s)=="TAVERN_RECRUITMENT","Skip briefing still enters recruitment")
- check(app.opening_view.canvas.texture.resource_path.ends_with("03_tavern_recruitment_1920x1080.png"),"Supplied tavern atmosphere accompanies the real roster controls")
+ check(app.opening_view.canvas.texture.resource_path.ends_with("03_tavern_recruitment_interactive_v2.png"),"Supplied tavern atmosphere accompanies the real roster controls")
  for row in app.game.s.recruitment.templates: check(find(app,row.name)!=null,"Actual tavern choice "+row.id)
  for row in app.game.s.recruitment.templates:
   await click(row.name)
@@ -120,6 +123,11 @@ func run() -> void:
   var tap=InputEventMouseButton.new();tap.button_index=MOUSE_BUTTON_LEFT;tap.pressed=pressed;tap.position=screen_point;root.push_input(tap)
  await settle()
  var round_before=app.game.battle.t.round
+ if app.Desktop.enabled():
+  check(app.battle_radial.visible,"Clicking a fighter opens the contextual radial")
+  key=InputEventKey.new();key.pressed=true;key.keycode=KEY_SPACE;root.push_input(key);await settle()
+  check(app.game.battle.t.round==round_before,"Space cannot end a turn through an open radial")
+  key=InputEventKey.new();key.pressed=true;key.keycode=KEY_ESCAPE;root.push_input(key);await settle()
  key=InputEventKey.new();key.pressed=true;key.keycode=KEY_SPACE;root.push_input(key);await settle()
  check(app.game.battle.t.round==round_before+1 and app.game.s.opening_flow.tutorial_flags.get("turn",false),"Unfocused Space ends a real tactical turn and advances guidance")
  var camera_before=board.camera.position;var state_before=JSON.stringify(app.game.s);centre=board.get_global_rect().get_center()

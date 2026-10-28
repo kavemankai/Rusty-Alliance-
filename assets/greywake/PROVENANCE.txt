@@ -1,3 +1,5 @@
+0.17 update: the supplied original tavern is preserved. The active twelve-person scene is a new built-in imagegen edit, with its exact prompt and appearance mapping recorded in TAVERN_ART_V2.md and TAVERN_IMAGE_PROMPT.txt. No provisional portrait-pack identities were silently reassigned. Prior receipt/import claims below describe those older assets.
+
 # Updated receipt — 0.15.2
 
 All seven distinct v0.2 parts are now received (66 PNGs). Seven scene plates and eight UI textures are used. The supplied metadata discloses upscaled concept crops; these remain provisional, without a claim of native full-resolution painting. Maps/combat reference and mismatched portrait identities remain reference-only. See GREYWAKE_SCENE_ART_STATUS.md and the import audit for exact classification and hashes. Earlier partial-receipt notes below are historical.

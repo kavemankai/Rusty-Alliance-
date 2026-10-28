@@ -1,9 +1,10 @@
 extends Control
 const Art=preload("res://ui/greywake_art.gd")
 const RecruitHighlight=preload("res://ui/recruit_highlight.gd")
+const TavernScene=preload("res://ui/tavern_scene.gd")
 const ArrivalMap=preload("res://ui/greywake_map.gd")
 const ICONS=preload("res://ui/asset_icons.gd")
-const TAVERN=preload("res://assets/greywake/scenes/03_tavern_recruitment_1920x1080.png")
+const TAVERN=preload("res://assets/greywake/scenes/03_tavern_recruitment_interactive_v2.png")
 const EMPLOYER=preload("res://assets/greywake/scenes/02_hooded_employer_1920x1080.png")
 const VOYAGE=preload("res://assets/greywake/scenes/04_boat_crossing_1920x1080.png")
 const TITLE=preload("res://assets/greywake/scenes/01_title_atmosphere_1920x1080.png")
@@ -19,7 +20,7 @@ func choose_candidate(id: String) -> void:
  if not candidate_controls.has(id): return
  app.tavern_selected=id
  for candidate in candidate_controls:
-  for control in candidate_controls[candidate]: RecruitHighlight.apply(control,candidate==id)
+  for control in candidate_controls[candidate]: RecruitHighlight.apply(control,candidate==id,control.get_meta("scene_candidate",false))
  if is_instance_valid(profile_box):
   for child in profile_box.get_children():
    profile_box.remove_child(child);child.queue_free()
@@ -30,7 +31,7 @@ func bind_candidate(button: Button,id: String) -> void:
  if not candidate_controls.has(id): candidate_controls[id]=[]
  candidate_controls[id].append(button)
  button.set_meta("candidate_id",id)
- RecruitHighlight.apply(button,app.tavern_selected==id)
+ RecruitHighlight.apply(button,app.tavern_selected==id,button.get_meta("scene_candidate",false))
  button.pressed.connect(choose_candidate.bind(id),CONNECT_DEFERRED)
 func _ready() -> void:
  set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -135,13 +136,17 @@ func tavern() -> void:
  var root=root_box();text(root,"THE MAINLAND TAVERN · Choose your company",25)
  var body=HBoxContainer.new();body.size_flags_vertical=SIZE_EXPAND_FILL;root.add_child(body)
  var left=VBoxContainer.new();left.size_flags_horizontal=SIZE_EXPAND_FILL;body.add_child(left)
- canvas=TextureRect.new();canvas.texture=TAVERN;canvas.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;canvas.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_COVERED
+ canvas=TavernScene.new();canvas.texture=TAVERN
  canvas.size_flags_vertical=SIZE_EXPAND_FILL;canvas.custom_minimum_size=Vector2(460,140);left.add_child(canvas)
  canvas.mouse_filter=MOUSE_FILTER_IGNORE
  var choices=GridContainer.new();choices.columns=4;left.add_child(choices)
  var rows=app.game.s.recruitment.templates
  for row in rows:
+  var image_button=canvas.add_candidate(row.id)
+  image_button.tooltip_text=row.name+" · click to view profile"
+  bind_candidate(image_button,row.id)
   var hotspot=Button.new();hotspot.text=row.name;hotspot.name="candidate_"+row.id
+  hotspot.mouse_default_cursor_shape=Control.CURSOR_POINTING_HAND
   hotspot.tooltip_text="%s · %s · fee %d · wage %d/day. Click to inspect." % [row.name,row.tier,row.fee,row.wage]
   hotspot.clip_text=true
   hotspot.add_theme_font_size_override("font_size",round(14*app.desktop.ui_scale) if app.Desktop.enabled() else 14);hotspot.alignment=HORIZONTAL_ALIGNMENT_CENTER
@@ -163,10 +168,10 @@ func populate_profile(profile: VBoxContainer,rows: Array) -> void:
  for candidate in rows:
   if candidate.id==app.tavern_selected: row=candidate
  text(profile,row.name,24);text(profile,row.background.capitalize()+" · "+row.tier.capitalize(),18)
- var portrait=TextureRect.new();portrait.texture=ICONS.get_icon(row.background);portrait.custom_minimum_size=Vector2(72,72);portrait.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;portrait.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+ var portrait=TextureRect.new();portrait.texture=TavernScene.portrait(TAVERN,row.id);portrait.custom_minimum_size=Vector2(96,96);portrait.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;portrait.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
  portrait.mouse_filter=MOUSE_FILTER_IGNORE
- portrait.tooltip_text="Temporary role illustration; an identity-matched portrait is not supplied.";profile.add_child(portrait)
- text(profile,"Role portrait",13)
+ portrait.tooltip_text="Tavern illustration. Actual equipment is listed below.";profile.add_child(portrait)
+ text(profile,"Tavern portrait",13)
  if row.has("biography"): text(profile,row.biography,16)
  var stats=GridContainer.new();stats.columns=2;profile.add_child(stats)
  for key in app.Data.Skills.ATTRIBUTES+app.Data.Skills.ALL:

@@ -2,6 +2,7 @@ extends TextureRect
 const Desktop=preload("res://ui/desktop.gd")
 const Art=preload("res://ui/asset_visuals.gd")
 signal cell_selected(x: int,y: int)
+signal context_requested(x: int,y: int,point: Vector2,right_click: bool)
 var battle
 var viewport: SubViewport
 var world: Node3D
@@ -25,6 +26,7 @@ var actor_rebuilds=0
 var terrain_rebuilds=0
 
 func _ready() -> void:
+ clip_contents=true
  expand_mode=TextureRect.EXPAND_IGNORE_SIZE
  stretch_mode=TextureRect.STRETCH_SCALE
  viewport=SubViewport.new()
@@ -219,7 +221,7 @@ func paint_cell(c: Dictionary,level: int,i: int,chosen) -> Color:
   if target!=null and target.x==c.x and target.y==c.y: color=Color("ad5d43")
  return color
 
-func pick(point: Vector2) -> void:
+func pick(point: Vector2,right_click: bool=false) -> void:
  var screen=point*Vector2(viewport.size)/size
  var origin=camera.project_ray_origin(screen)
  var direction=camera.project_ray_normal(screen)
@@ -232,12 +234,15 @@ func pick(point: Vector2) -> void:
    var y=int(round(hit.z))
    var c=battle.Visibility.cell(battle,x,y)
    if not c.is_empty() and c.elevation==level:
-    cell_selected.emit(x,y)
+    if not right_click: cell_selected.emit(x,y)
+    if Desktop.enabled(): context_requested.emit(x,y,point,right_click)
     return
 
 func input_event(event: InputEvent) -> void:
  if (event is InputEventMouseButton or event is InputEventMouseMotion) and event.device==InputEvent.DEVICE_ID_EMULATION: return
  if battle==null: return
+ if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_RIGHT and event.pressed and Desktop.enabled():
+  pick(event.position,true);accept_event();return
  if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_MIDDLE:
   middle=event.pressed;accept_event();return
  if event is InputEventMouseMotion and middle:
@@ -301,11 +306,45 @@ func reset_camera() -> void:
  if camera==null or battle==null: return
  var center=Vector3((battle.t.width-1)*.5,0,(battle.t.height-1)*.5)
  camera.size=clampf(maxf(battle.t.width*1.2,battle.t.height*1.6),8,32)
+ if Desktop.enabled():
+  camera.size=16
+  var actor=battle.unit(selected)
+  if actor!=null and actor.team=="company": center=Vector3(actor.x,0,actor.y)
  camera.position=center+Vector3(15.5,25,21.5);camera.look_at(center)
 
 func center_on(id: String) -> void:
  var unit=battle.unit(id)
  if unit==null: return
+ center_at(Vector2i(unit.x,unit.y))
+
+func center_at(cell: Vector2i) -> void:
  var middle=Vector2(viewport.size)*.5
  var point=Plane(Vector3.UP,0.06).intersects_ray(camera.project_ray_origin(middle),camera.project_ray_normal(middle))
- if point!=null: camera.position+=Vector3(unit.x,point.y,unit.y)-point
+ if point!=null: camera.position+=Vector3(cell.x,point.y,cell.y)-point;queue_redraw()
+
+func _process(_delta: float) -> void:
+ # Cheap screen overlays follow camera motion without rebuilding any actors.
+ queue_redraw()
+
+func highlighted_units() -> Array:
+ var result=[]
+ if battle==null: return result
+ var actor=battle.unit(selected)
+ if actor!=null and actor.team=="company" and actor.person.hp>0: result.append(actor.id)
+ var victim=battle.unit(highlight_target)
+ if victim!=null and victim.team!="company" and victim.person.hp>0 and battle.known("company",victim.id): result.append(victim.id)
+ return result
+
+func _draw() -> void:
+ if not Desktop.enabled() or camera==null or viewport==null or battle==null: return
+ for id in highlighted_units():
+  var unit=battle.unit(id);var height=battle.Visibility.cell(battle,unit.x,unit.y).elevation*.5
+  var feet=camera.unproject_position(Vector3(unit.x,height+.08,unit.y))*size/Vector2(viewport.size)
+  var head=camera.unproject_position(Vector3(unit.x,height+1.45,unit.y))*size/Vector2(viewport.size)
+  var color=Color("f3d778") if id==selected else Color("ff796b")
+  var radius=maxf(12,(feet.y-head.y)*.55)
+  draw_polyline(PackedVector2Array([feet+Vector2(0,8),feet+Vector2(-radius,0),feet+Vector2(0,-8),feet+Vector2(radius,0),feet+Vector2(0,8)]),Color("101713"),5,true)
+  draw_polyline(PackedVector2Array([feet+Vector2(0,8),feet+Vector2(-radius,0),feet+Vector2(0,-8),feet+Vector2(radius,0),feet+Vector2(0,8)]),color,2,true)
+  var rect=Rect2(Vector2(head.x-radius,head.y-5),Vector2(radius*2,maxf(20,feet.y-head.y+10)))
+  draw_rect(rect,Color(color,.58),false,1.5)
+  draw_colored_polygon(PackedVector2Array([head+Vector2(-5,-15),head+Vector2(5,-15),head+Vector2(0,-8)]),color)
